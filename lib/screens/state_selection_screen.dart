@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 import '../helpers/navigation_helper.dart';
@@ -35,19 +36,15 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
     "North Carolina"
   ];
 
-  // Track selected states
   final Set<String> _selectedStates = {};
 
   final RoundedLoadingButtonController _btnController =
-  RoundedLoadingButtonController();
-
-  // Function to check if at least two states are selected
-  bool get _isSelectionValid => _selectedStates.length >= 2;
+      RoundedLoadingButtonController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
         title: Text(
@@ -56,14 +53,17 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0,vertical: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.info_outline,color: Colors.orange,),
+                Icon(
+                  Icons.info_outline,
+                  color: Colors.orange,
+                ),
                 SizedBox(width: 10),
                 Text(
                   "Maximum 5 Favourite States",
@@ -71,7 +71,9 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                 ),
               ],
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Expanded(
               child: ListView.separated(
                 itemCount: states.length,
@@ -83,7 +85,25 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                     onChanged: (bool? isChecked) {
                       setState(() {
                         if (isChecked == true) {
-                          _selectedStates.add(state);
+                          if (_selectedStates.length < 5) {
+                            _selectedStates.add(state);
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Text("Favourite States"),
+                                content: Text(
+                                  'Only 5 selection allowed',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text("OK"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         } else {
                           _selectedStates.remove(state);
                         }
@@ -101,16 +121,32 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                 ),
               ),
             ),
-
             RoundedLoadingButton(
-              width: double.infinity,
+              width: double.maxFinite,
               controller: _btnController,
-              onPressed: () async {
-                NavigationHelper.pushNamed(
+              onPressed: _selectedStates.isNotEmpty
+                  ? () async {
+                      /*NavigationHelper.pushNamed(
                   AppRoutes.stateSelection,
-                );
-                _btnController.reset();
-              },
+                );*/
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text("Selected States"),
+                          content: Text(
+                            _selectedStates.join(", "),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                      _btnController.reset();
+                    }
+                  : null,
               color: Colors.orange.shade400,
               child: Text(
                 AppStrings.finish,

@@ -8,6 +8,9 @@ class AppRoutes {
   static const String registerBasicDetails = 'register_basic_details';
   static const String registerCreatePin = 'register_create_pin';
   static const String stateSelection = 'state_selection';
+  static const String eggPriceScreen = 'egg_price_screen';
+  static const String chickenPriceScreen = 'chicken_price_screen';
+  static const String chickPriceScreen = 'chick_price_screen';
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';
   static const String dashboard = 'dashboard';

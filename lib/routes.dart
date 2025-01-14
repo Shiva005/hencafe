@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/responsive_scaffold.dart';
+import 'package:hencafe/screens/chick_price_screen.dart';
+import 'package:hencafe/screens/chicken_price_screen.dart';
+import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
@@ -74,6 +77,30 @@ class Routes {
             mobile: const StateSelectionPage(),
             tablet: StateSelectionPage(),
             desktop: StateSelectionPage(),
+          ),
+        );
+      case AppRoutes.eggPriceScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const EggPriceScreen(),
+            tablet: EggPriceScreen(),
+            desktop: EggPriceScreen(),
+          ),
+        );
+      case AppRoutes.chickenPriceScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const ChickenPriceScreen(),
+            tablet: ChickenPriceScreen(),
+            desktop: ChickenPriceScreen(),
+          ),
+        );
+      case AppRoutes.chickPriceScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const ChickPriceScreen(),
+            tablet: ChickPriceScreen(),
+            desktop: ChickPriceScreen(),
           ),
         );
       default:
