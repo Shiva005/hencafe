@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   flutter_localization
+  rive_common
   url_launcher_windows
 )
 

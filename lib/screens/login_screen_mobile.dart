@@ -1,11 +1,16 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/services/service_name.dart';
+import 'package:hencafe/utils/my_logger.dart';
+import 'package:hencafe/values/app_constants.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
@@ -22,11 +27,9 @@ class LoginPageMobile extends StatefulWidget {
 class _LoginPageMobileState extends State<LoginPageMobile> {
   final _formKey = GlobalKey<FormState>();
 
-  final ValueNotifier<bool> passwordNotifier = ValueNotifier(true);
   final ValueNotifier<bool> fieldValidNotifier = ValueNotifier(false);
 
   late final TextEditingController mobileController;
-  late final TextEditingController passwordController;
 
   bool _rememberMe = false;
   String _selectedLanguage = 'English';
@@ -37,23 +40,17 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
 
   void initializeControllers() {
     mobileController = TextEditingController()..addListener(controllerListener);
-    passwordController = TextEditingController()
-      ..addListener(controllerListener);
   }
 
   void disposeControllers() {
     mobileController.dispose();
-    passwordController.dispose();
   }
 
   void controllerListener() {
-    final email = mobileController.text;
-    final password = passwordController.text;
+    final phone = mobileController.text;
+    if (phone.isEmpty) return;
 
-    if (email.isEmpty && password.isEmpty) return;
-
-    if (AppRegex.emailRegex.hasMatch(email) &&
-        AppRegex.passwordRegex.hasMatch(password)) {
+    if (AppConstants.phoneRegex.hasMatch(phone)) {
       fieldValidNotifier.value = true;
     } else {
       fieldValidNotifier.value = false;
@@ -71,7 +68,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     final packageInfo = await PackageInfo.fromPlatform();
 
     setState(() {
-      versionName = packageInfo.version; // e.g., "1.0.0"
+      versionName = packageInfo.version;
     });
   }
 
@@ -81,8 +78,9 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     super.dispose();
   }
 
+  final List<String> languages = ['English', 'Spanish', 'French'];
+
   void _showLanguageBottomSheet() {
-    print("Bottom sheet triggered");
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -99,36 +97,18 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              ListTile(
-                leading: Icon(Icons.language),
-                title: Text('English'),
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'English';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.language),
-                title: Text('Spanish'),
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'Spanish';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.language),
-                title: Text('French'),
-                onTap: () {
-                  setState(() {
-                    _selectedLanguage = 'French';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
+              ...languages
+                  .map((lang) => ListTile(
+                        leading: Icon(Icons.language),
+                        title: Text(lang),
+                        onTap: () {
+                          setState(() {
+                            _selectedLanguage = lang;
+                          });
+                          Navigator.pop(context);
+                        },
+                      ))
+                  .toList(),
             ],
           ),
         );
@@ -184,7 +164,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                           controller: mobileController,
                           labelText: AppStrings.mobile,
                           keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.done,
                           maxLength: 10,
                           enabled: true,
                           prefixIcon: Icon(Icons.phone_android),
@@ -218,12 +198,33 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                               controller: _btnController,
                               onPressed: () async {
                                 _btnController.reset();
-                                NavigationHelper.pushNamed(
-                                  AppRoutes.loginPin,
-                                  arguments: {
-                                    'mobileNumber': mobileController.text,
-                                  },
-                                );
+                                var registrationCheckRes = await AuthServices()
+                                    .registrationCheck(context,
+                                        mobileController.text, 'english');
+
+                                if (registrationCheckRes
+                                        .apiResponse![0].registrationStatus ==
+                                    true) {
+                                  NavigationHelper.pushNamed(
+                                    AppRoutes.loginPin,
+                                    arguments: {
+                                      'mobileNumber': mobileController.text
+                                    },
+                                  );
+                                } else {
+                                  AwesomeDialog(
+                                    context: context,
+                                    animType: AnimType.bottomSlide,
+                                    dialogType: DialogType.warning,
+                                    dialogBackgroundColor: Colors.white,
+                                    title: registrationCheckRes.apiResponse![0]
+                                        .responseDetailsLanguage,
+                                    titleTextStyle: AppTheme.appBarText,
+                                    descTextStyle: AppTheme.appBarText,
+                                    btnOkOnPress: () {},
+                                    btnOkColor: Colors.yellow.shade700,
+                                  ).show();
+                                }
                               },
                               color: Colors.orange.shade300,
                               child: Row(

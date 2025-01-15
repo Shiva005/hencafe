@@ -6,6 +6,7 @@ import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../helpers/snackbar_helper.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
@@ -219,8 +220,12 @@ class _LoginPagePinState extends State<LoginPagePin> {
       ),
     );
   }
+  bool validateFields() {
+    if (mobileController.text.isEmpty) {
+      SnackbarHelper.showSnackBar('Please enter mobile number.');
+      return false;
+    }
+    return true;
+  }
 }
 
-bool validateFields() {
-  return true;
-}

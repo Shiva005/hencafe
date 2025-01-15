@@ -35,6 +35,8 @@ dependencies:
   smart_auth: ^3.2.0
   flutter_localization: ^0.3.1
   dob_input_field: ^2.0.0
+  awesome_dialog: ^3.2.1
+  logger: any
 
 dev_dependencies:
   flutter_test:
