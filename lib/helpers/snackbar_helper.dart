@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../values/app_strings.dart';
 
 class SnackbarHelper {
   const SnackbarHelper._();
@@ -29,11 +26,22 @@ class SnackbarHelper {
         );
 
   static void openWhatsApp(String message) async {
-    final String url = 'https://wa.me/919885279787?text=${Uri.encodeFull(message)}';
+    final String url =
+        'https://wa.me/919885279787?text=${Uri.encodeFull(message)}';
     final Uri uri = Uri.parse(url);
 
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication); // Opens in WhatsApp
+      await launchUrl(uri,
+          mode: LaunchMode.externalApplication); // Opens in WhatsApp
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static Future<void> openUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
       throw 'Could not launch $url';
     }

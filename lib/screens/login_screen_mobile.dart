@@ -78,10 +78,11 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     super.dispose();
   }
 
-  final List<String> languages = ['English', 'Spanish', 'French'];
+  final List<String> languages = ['English', 'Telgu', 'Hindi'];
 
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -93,21 +94,33 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Select Language",
+                "Change Language",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               ...languages
-                  .map((lang) => ListTile(
-                        leading: Icon(Icons.language),
-                        title: Text(lang),
-                        onTap: () {
-                          setState(() {
-                            _selectedLanguage = lang;
-                          });
-                          Navigator.pop(context);
-                        },
-                      ))
+                  .map(
+                    (lang) => Column(
+                      children: [
+                        ListTile(
+                          leading: Radio<String>(
+                            value: lang,
+                            groupValue: _selectedLanguage,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedLanguage = value!;
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                          title: Text(lang),
+                        ),
+                        Divider(
+                          color: Colors.grey.shade100,
+                        ),
+                      ],
+                    ),
+                  )
                   .toList(),
             ],
           ),
@@ -121,25 +134,28 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundColor,
-      body: Stack(
+      body: Column(
         children: [
-          Positioned(
-            right: 25.0,
-            top: 50.0,
-            child: GestureDetector(
-              onTap: _showLanguageBottomSheet,
-              // Call the method to show the bottom sheet
-              child: Row(
-                children: [
-                  Icon(Icons.language),
-                  SizedBox(width: 5.0),
-                  Text(_selectedLanguage),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.only(top: 45.0, right: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: _showLanguageBottomSheet,
+                  // Call the method to show the bottom sheet
+                  child: Row(
+                    children: [
+                      Icon(Icons.language),
+                      SizedBox(width: 5.0),
+                      Text(_selectedLanguage),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          Expanded(
             child: ListView(
               children: [
                 Form(
@@ -250,31 +266,26 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               ],
             ),
           ),
-          Positioned(
-            bottom: 30.0,
-            left: 0.0,
-            right: 0.0,
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: () {
-                    SnackbarHelper.openWhatsApp('message');
-                  },
-                  child: Ink(
-                    child: Text('Privacy Policy', style: AppTheme.linkText),
-                  ),
-                ),
-                SizedBox(height: 5.0),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('© 20224 SV Poultry Farms | v',
-                        style: AppTheme.informationString),
-                    Text(versionName, style: AppTheme.informationString),
-                  ],
-                ),
-              ],
-            ),
+          Column(
+            children: [
+              TextButton(
+                child: Text('Privacy Policy', style: AppTheme.linkText),
+                onPressed: () {
+                  SnackbarHelper.openUrl("https://pub.dev/packages/awesome_dialog");
+                },
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('© 20224 SV Poultry Farms | v',
+                      style: AppTheme.informationString),
+                  Text(versionName, style: AppTheme.informationString),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20.0,
           ),
         ],
       ),
