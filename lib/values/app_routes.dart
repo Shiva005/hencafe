@@ -13,5 +13,5 @@ class AppRoutes {
   static const String chickPriceScreen = 'chick_price_screen';
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';
-  static const String dashboard = 'dashboard';
+  static const String dashboardScreen = 'dashboard_screen';
 }

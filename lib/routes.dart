@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/responsive_scaffold.dart';
 import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
+import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
@@ -101,6 +102,14 @@ class Routes {
             mobile: const ChickPriceScreen(),
             tablet: ChickPriceScreen(),
             desktop: ChickPriceScreen(),
+          ),
+        );
+      case AppRoutes.dashboardScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile:  DashboardScreen(),
+            tablet: DashboardScreen(),
+            desktop: DashboardScreen(),
           ),
         );
       default:

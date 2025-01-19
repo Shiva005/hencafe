@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: AppStrings.appName,
         theme: AppTheme.themeData,
-        initialRoute: AppRoutes.registerCreatePin,
+        initialRoute: AppRoutes.dashboardScreen,
         scaffoldMessengerKey: SnackbarHelper.key,
         navigatorKey: NavigationHelper.key,
         onGenerateRoute: Routes.generateRoute,
