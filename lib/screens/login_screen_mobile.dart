@@ -26,7 +26,6 @@ class LoginPageMobile extends StatefulWidget {
 
 class _LoginPageMobileState extends State<LoginPageMobile> {
   final _formKey = GlobalKey<FormState>();
-
   final ValueNotifier<bool> fieldValidNotifier = ValueNotifier(false);
 
   late final TextEditingController mobileController;
@@ -36,7 +35,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
   String versionName = "Unknown";
 
   final RoundedLoadingButtonController _btnController =
-      RoundedLoadingButtonController();
+  RoundedLoadingButtonController();
 
   void initializeControllers() {
     mobileController = TextEditingController()..addListener(controllerListener);
@@ -78,7 +77,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     super.dispose();
   }
 
-  final List<String> languages = ['English', 'Telgu', 'Hindi'];
+  final List<String> languages = ['English', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi'];
 
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
@@ -101,26 +100,26 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               ...languages
                   .map(
                     (lang) => Column(
-                      children: [
-                        ListTile(
-                          leading: Radio<String>(
-                            value: lang,
-                            groupValue: _selectedLanguage,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedLanguage = value!;
-                              });
-                              Navigator.pop(context);
-                            },
-                          ),
-                          title: Text(lang),
-                        ),
-                        Divider(
-                          color: Colors.grey.shade100,
-                        ),
-                      ],
+                  children: [
+                    ListTile(
+                      leading: Radio<String>(
+                        value: lang,
+                        groupValue: _selectedLanguage,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedLanguage = value!;
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                      title: Text(lang),
                     ),
-                  )
+                    Divider(
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
+              )
                   .toList(),
             ],
           ),
@@ -143,7 +142,6 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               children: [
                 GestureDetector(
                   onTap: _showLanguageBottomSheet,
-                  // Call the method to show the bottom sheet
                   child: Row(
                     children: [
                       Icon(Icons.language),
@@ -184,6 +182,15 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                           maxLength: 10,
                           enabled: true,
                           prefixIcon: Icon(Icons.phone_android),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your mobile number';
+                            }
+                            if (!AppConstants.phoneRegex.hasMatch(value)) {
+                              return 'Invalid mobile number';
+                            }
+                            return null;
+                          },
                         ),
                         Row(
                           children: [
@@ -197,6 +204,9 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                     _rememberMe = value;
                                   });
                                 },
+                                activeColor: Colors.orange, // Color when the switch is "on"
+                                inactiveThumbColor: Colors.black, // Thumb color when "off"
+                                inactiveTrackColor: Colors.white, // Track color when "off"
                               ),
                             ),
                             Text(
@@ -213,34 +223,44 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                               width: MediaQuery.of(context).size.width * 0.4,
                               controller: _btnController,
                               onPressed: () async {
-                                _btnController.reset();
-                                var registrationCheckRes = await AuthServices()
-                                    .registrationCheck(context,
-                                        mobileController.text, 'english');
+                                if (_formKey.currentState?.validate() == true) {
+                                  var registrationCheckRes = await AuthServices()
+                                      .registrationCheck(context,
+                                      mobileController.text, 'english');
 
-                                if (registrationCheckRes
-                                        .apiResponse![0].registrationStatus ==
-                                    true) {
-                                  NavigationHelper.pushNamed(
-                                    AppRoutes.loginPin,
-                                    arguments: {
-                                      'mobileNumber': mobileController.text
-                                    },
-                                  );
-                                } else {
-                                  AwesomeDialog(
-                                    context: context,
-                                    animType: AnimType.bottomSlide,
-                                    dialogType: DialogType.warning,
-                                    dialogBackgroundColor: Colors.white,
-                                    title: registrationCheckRes.apiResponse![0]
-                                        .responseDetailsLanguage,
-                                    titleTextStyle: AppTheme.appBarText,
-                                    descTextStyle: AppTheme.appBarText,
-                                    btnOkOnPress: () {},
-                                    btnOkColor: Colors.yellow.shade700,
-                                  ).show();
+                                  if (registrationCheckRes
+                                      .apiResponse![0].registrationStatus ==
+                                      true) {
+                                    NavigationHelper.pushNamed(
+                                      AppRoutes.loginPin,
+                                      arguments: {
+                                        'mobileNumber': mobileController.text
+                                      },
+                                    );
+                                  } else {
+                                    AwesomeDialog(
+                                      context: context,
+                                      animType: AnimType.bottomSlide,
+                                      dialogType: DialogType.warning,
+                                      dialogBackgroundColor: Colors.white,
+                                      title: registrationCheckRes.apiResponse![0]
+                                          .responseDetailsLanguage,
+                                      titleTextStyle: AppTheme.appBarText,
+                                      descTextStyle: AppTheme.appBarText,
+                                      btnOkOnPress: () {
+                                        NavigationHelper.pushNamed(
+                                          AppRoutes.registerBasicDetails,
+                                          arguments: {
+                                            'mobileNumber': mobileController.text
+                                          },
+                                        );
+                                      },
+                                      btnOkText: 'Start Registration',
+                                      btnOkColor: Colors.yellow.shade700,
+                                    ).show();
+                                  }
                                 }
+                                _btnController.reset();
                               },
                               color: Colors.orange.shade300,
                               child: Row(

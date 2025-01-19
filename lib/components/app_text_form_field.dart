@@ -17,6 +17,8 @@ class AppTextFormField extends StatelessWidget {
     this.focusNode,
     this.maxLength,
     this.enabled,
+    this.minLines,
+    this.maxLines,
   });
 
   final void Function(String)? onChanged;
@@ -32,12 +34,14 @@ class AppTextFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final int? maxLength;
   final bool? enabled;
+  final int? minLines;
+  final int? maxLines;
   final void Function()? onEditingComplete;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50.0,
+      height: maxLines != null ? 90 : 70.0,
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
@@ -49,7 +53,9 @@ class AppTextFormField extends StatelessWidget {
         obscureText: obscureText ?? false,
         obscuringCharacter: '*',
         maxLength: maxLength,
-        enabled: enabled,
+        minLines: minLines,
+        maxLines: maxLines ?? 1,
+        enabled: enabled ?? true,
         onEditingComplete: onEditingComplete,
         decoration: InputDecoration(
           counterText: '',
@@ -76,6 +82,10 @@ class AppTextFormField extends StatelessWidget {
           ),
           disabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
             borderRadius: BorderRadius.circular(10),
           ),
         ),

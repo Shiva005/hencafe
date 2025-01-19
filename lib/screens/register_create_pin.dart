@@ -27,7 +27,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
   late final TextEditingController confirmPinController;
 
   final RoundedLoadingButtonController _btnController =
-      RoundedLoadingButtonController();
+  RoundedLoadingButtonController();
 
   void initializeControllers() {
     pinController = TextEditingController()..addListener(controllerListener);
@@ -103,7 +103,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
                             onPressed: () =>
-                                pinNotifier.value = !passwordObscure,
+                            pinNotifier.value = !passwordObscure,
                             style: IconButton.styleFrom(
                               minimumSize: const Size.square(48),
                             ),
@@ -115,10 +115,19 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                               color: Colors.black,
                             ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your pin';
+                            }
+                            if (value.length < 4) {
+                              return 'Pin must be 4 digits';
+                            }
+                            return null;
+                          },
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     ValueListenableBuilder(
                       valueListenable: confirmPinNotifier,
                       builder: (_, passwordObscure, __) {
@@ -133,7 +142,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
                             onPressed: () =>
-                                confirmPinNotifier.value = !passwordObscure,
+                            confirmPinNotifier.value = !passwordObscure,
                             style: IconButton.styleFrom(
                               minimumSize: const Size.square(48),
                             ),
@@ -145,10 +154,19 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                               color: Colors.black,
                             ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your pin';
+                            }
+                            if (value != pinController.text) {
+                              return 'Pins do not match';
+                            }
+                            return null;
+                          },
                         );
                       },
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -156,11 +174,12 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           width: MediaQuery.of(context).size.width * 0.4,
                           controller: _btnController,
                           onPressed: () async {
-                            NavigationHelper.pushNamed(
-                              AppRoutes.stateSelection,
-                            );
+                            if (_formKey.currentState?.validate() ?? false) {
+                              NavigationHelper.pushNamed(
+                                AppRoutes.stateSelection,
+                              );
+                            }
                             _btnController.reset();
-                            if (validateFields()) {}
                           },
                           color: Colors.orange.shade400,
                           child: Text(
