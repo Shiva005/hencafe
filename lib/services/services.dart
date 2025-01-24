@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/error_model.dart';
+import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
 import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
@@ -214,8 +215,43 @@ class AuthServices {
     }
   }
 
-  Future<StateModel> getStates(
-      BuildContext context) async {
+  Future<ForgetPinModel> forgetPin(
+      BuildContext context, String mobileNumber, String otp) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.FORGET_PIN),
+    );
+    request.fields['user_login_uid'] = mobileNumber;
+    request.fields['otp_otp'] = otp;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return ForgetPinModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return ForgetPinModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow; // Re-throwing the exception for the caller to handle
+    }
+  }
+
+  Future<StateModel> getStates(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
 
     var request = http.MultipartRequest(

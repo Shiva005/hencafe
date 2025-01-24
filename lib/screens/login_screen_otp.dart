@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/components/app_text_form_field.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
@@ -11,6 +12,7 @@ import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
+import '../values/app_theme.dart';
 
 class LoginPageOtp extends StatefulWidget {
   const LoginPageOtp({Key? key}) : super(key: key);
@@ -186,11 +188,13 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                   TextButton(
                     onPressed: _isResendEnabled
                         ? () async {
-                      await _resendOTP(mobileNumber);
-                    }
+                            await _resendOTP(mobileNumber);
+                          }
                         : null, // Set to null when button is disabled
                     child: Text(
-                      _isResendEnabled ? "RESEND OTP" : "RESEND OTP in $_start s",
+                      _isResendEnabled
+                          ? "RESEND OTP"
+                          : "RESEND OTP in $_start s",
                       style: TextStyle(
                         fontSize: 14,
                         color: _isResendEnabled ? Colors.orange : Colors.grey,
@@ -206,23 +210,60 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                 controller: _btnVerifyController,
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
-                    var validateOtpRes = await AuthServices()
-                        .otpValidate(context, mobileNumber, otpController.text);
-                    if (validateOtpRes.errorCount == 0) {
-                      NavigationHelper.pushNamed(
-                        AppRoutes.registerCreatePin,
-                        arguments: {
-                          'pageType': AppRoutes.registerBasicDetails,
-                          'firstName': firstName,
-                          'lastName': lastName,
-                          'mobileNumber': mobileNumber,
-                          'email': email,
-                          'dob': dob,
-                          'address': address,
-                          'stateID': stateID,
-                          'referralCode': referralCode,
-                        },
-                      );
+                    if (pageType == AppRoutes.registerBasicDetails) {
+                      var validateOtpRes = await AuthServices().otpValidate(
+                          context, mobileNumber, otpController.text);
+                      if (validateOtpRes.errorCount == 0) {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.registerCreatePin,
+                          arguments: {
+                            'pageType': AppRoutes.registerBasicDetails,
+                            'firstName': firstName,
+                            'lastName': lastName,
+                            'mobileNumber': mobileNumber,
+                            'email': email,
+                            'dob': dob,
+                            'address': address,
+                            'stateID': stateID,
+                            'referralCode': referralCode,
+                          },
+                        );
+                      }
+                    } else if (pageType == AppRoutes.loginPin) {
+                      var validateOtpRes = await AuthServices().otpValidate(
+                          context, mobileNumber, otpController.text);
+                      if (validateOtpRes.errorCount == 0) {
+                        var forgetPinRes = await AuthServices().forgetPin(
+                            context, mobileNumber, otpController.text);
+                        if (forgetPinRes.errorCount == 0) {
+                          AwesomeDialog(
+                            context: context,
+                            animType: AnimType.bottomSlide,
+                            dialogType: DialogType.success,
+                            dialogBackgroundColor: Colors.white,
+                            title: forgetPinRes.apiResponse![0].responseDetails,
+                            titleTextStyle: AppTheme.appBarText,
+                            descTextStyle: AppTheme.appBarText,
+                            btnOkOnPress: () {
+                              NavigationHelper.pushReplacementNamedUntil(
+                                AppRoutes.loginPin,
+                                arguments: {'mobileNumber': mobileNumber},
+                              );
+                            },
+                            btnOkText: 'OK',
+                            btnOkColor: Colors.greenAccent.shade700,
+                          ).show();
+                        }
+                      }
+                    } else if (pageType == 'LoginWithOtp') {
+                      var validateOtpRes = await AuthServices().otpValidate(
+                          context, mobileNumber, otpController.text);
+                      if (validateOtpRes.errorCount == 0) {
+                        NavigationHelper.pushReplacementNamedUntil(
+                          AppRoutes.dashboardScreen,
+                          arguments: {'mobileNumber': mobileNumber},
+                        );
+                      }
                     }
                   }
                   _btnVerifyController.reset();

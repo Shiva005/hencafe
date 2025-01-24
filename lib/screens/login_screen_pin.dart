@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../helpers/snackbar_helper.dart';
 import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
@@ -125,7 +126,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                           labelText: AppStrings.pin,
                           maxLength: 4,
                           textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.visiblePassword,
+                          keyboardType: TextInputType.number,
                           enabled: true,
                           prefixIcon: Icon(Icons.pin),
                           validator: (value) {
@@ -160,10 +161,23 @@ class _LoginPagePinState extends State<LoginPagePin> {
                       children: [
                         Column(
                           children: [
-                            Text(
-                              'Forget Pin?',
-                              style: TextStyle(color: Colors.black),
-                            ),
+                            TextButton(
+                                onPressed: () async {
+                                  var generateOtpRes = await AuthServices()
+                                      .otpGenerate(context, mobileNumber);
+                                  if (generateOtpRes.errorCount == 0) {
+                                    SnackbarHelper.showSnackBar(generateOtpRes
+                                        .apiResponse![0].responseDetails!);
+                                    NavigationHelper.pushNamed(
+                                      AppRoutes.loginOtp,
+                                      arguments: {
+                                        'pageType': AppRoutes.loginPin,
+                                        'mobileNumber': mobileController.text,
+                                      },
+                                    );
+                                  }
+                                },
+                                child: Text('Forget Pin?')),
                             Container(
                               width: 75.0,
                               height: 1,
@@ -221,12 +235,19 @@ class _LoginPagePinState extends State<LoginPagePin> {
                     RoundedLoadingButton(
                       controller: _btnLoginWithOtpController,
                       onPressed: () async {
-                        NavigationHelper.pushNamed(
-                          AppRoutes.registerBasicDetails,
-                          arguments: {
-                            'mobileNumber': mobileController.text,
-                          },
-                        );
+                        var generateOtpRes = await AuthServices()
+                            .otpGenerate(context, mobileNumber);
+                        if (generateOtpRes.errorCount == 0) {
+                          SnackbarHelper.showSnackBar(generateOtpRes
+                              .apiResponse![0].responseDetails!);
+                          NavigationHelper.pushNamed(
+                            AppRoutes.loginOtp,
+                            arguments: {
+                              'pageType': 'LoginWithOtp',
+                              'mobileNumber': mobileController.text,
+                            },
+                          );
+                        }
                         _btnLoginWithOtpController.reset();
                       },
                       color: Colors.red.shade400,
