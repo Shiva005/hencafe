@@ -7,6 +7,7 @@ import 'package:hencafe/values/app_constants.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
@@ -33,9 +34,10 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
   bool _rememberMe = false;
   String _selectedLanguage = 'English';
   String versionName = "Unknown";
+  var prfs;
 
   final RoundedLoadingButtonController _btnController =
-  RoundedLoadingButtonController();
+      RoundedLoadingButtonController();
 
   void initializeControllers() {
     mobileController = TextEditingController()..addListener(controllerListener);
@@ -64,8 +66,20 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
   }
 
   Future<void> fetchAppInfo() async {
-    final packageInfo = await PackageInfo.fromPlatform();
+    prfs = await SharedPreferences.getInstance();
+    if (prfs.containsKey(AppStrings.prefMobileNumber)) {
+      setState(() {
+        _rememberMe = true;
+        mobileController.text = prfs.getString(AppStrings.prefMobileNumber);
+      });
+    } else {
+      setState(() {
+        _rememberMe = false;
+        mobileController.text = '';
+      });
+    }
 
+    final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       versionName = packageInfo.version;
     });
@@ -77,7 +91,19 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     super.dispose();
   }
 
-  final List<String> languages = ['English', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi', 'Telgu', 'Hindi'];
+  final List<String> languages = [
+    'English',
+    'Telgu',
+    'Hindi',
+    'Telgu',
+    'Hindi',
+    'Telgu',
+    'Hindi',
+    'Telgu',
+    'Hindi',
+    'Telgu',
+    'Hindi'
+  ];
 
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
@@ -100,26 +126,26 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               ...languages
                   .map(
                     (lang) => Column(
-                  children: [
-                    ListTile(
-                      leading: Radio<String>(
-                        value: lang,
-                        groupValue: _selectedLanguage,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedLanguage = value!;
-                          });
-                          Navigator.pop(context);
-                        },
-                      ),
-                      title: Text(lang),
+                      children: [
+                        ListTile(
+                          leading: Radio<String>(
+                            value: lang,
+                            groupValue: _selectedLanguage,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedLanguage = value!;
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                          title: Text(lang),
+                        ),
+                        Divider(
+                          color: Colors.grey,
+                        ),
+                      ],
                     ),
-                    Divider(
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-              )
+                  )
                   .toList(),
             ],
           ),
@@ -204,9 +230,12 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                     _rememberMe = value;
                                   });
                                 },
-                                activeColor: Colors.orange, // Color when the switch is "on"
-                                inactiveThumbColor: Colors.black, // Thumb color when "off"
-                                inactiveTrackColor: Colors.white, // Track color when "off"
+                                activeColor: Colors.orange,
+                                // Color when the switch is "on"
+                                inactiveThumbColor: Colors.black,
+                                // Thumb color when "off"
+                                inactiveTrackColor:
+                                    Colors.white, // Track color when "off"
                               ),
                             ),
                             Text(
@@ -224,12 +253,26 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                               controller: _btnController,
                               onPressed: () async {
                                 if (_formKey.currentState?.validate() == true) {
-                                  var registrationCheckRes = await AuthServices()
-                                      .registrationCheck(context,
-                                      mobileController.text, 'english');
+                                  if (_rememberMe) {
+                                    setState(() {
+                                      prfs.setString(
+                                          AppStrings.prefMobileNumber,
+                                          mobileController.text);
+                                      prfs.setString(
+                                          AppStrings.prefLanguage, 'english');
+                                      prfs.setString(
+                                          AppStrings.prefCountryCode, '101');
+                                    });
+                                  } else {
+                                    prfs.remove(AppStrings.prefMobileNumber);
+                                  }
+
+                                  var registrationCheckRes =
+                                      await AuthServices().registrationCheck(
+                                          context, mobileController.text);
 
                                   if (registrationCheckRes
-                                      .apiResponse![0].registrationStatus ==
+                                          .apiResponse![0].registrationStatus ==
                                       true) {
                                     NavigationHelper.pushNamed(
                                       AppRoutes.loginPin,
@@ -243,7 +286,8 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                       animType: AnimType.bottomSlide,
                                       dialogType: DialogType.warning,
                                       dialogBackgroundColor: Colors.white,
-                                      title: registrationCheckRes.apiResponse![0]
+                                      title: registrationCheckRes
+                                          .apiResponse![0]
                                           .responseDetailsLanguage,
                                       titleTextStyle: AppTheme.appBarText,
                                       descTextStyle: AppTheme.appBarText,
@@ -251,7 +295,8 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                         NavigationHelper.pushNamed(
                                           AppRoutes.registerBasicDetails,
                                           arguments: {
-                                            'mobileNumber': mobileController.text
+                                            'mobileNumber':
+                                                mobileController.text
                                           },
                                         );
                                       },
@@ -291,7 +336,8 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               TextButton(
                 child: Text('Privacy Policy', style: AppTheme.linkText),
                 onPressed: () {
-                  SnackbarHelper.openUrl("https://pub.dev/packages/awesome_dialog");
+                  SnackbarHelper.openUrl(
+                      "https://pub.dev/packages/awesome_dialog");
                 },
               ),
               Row(

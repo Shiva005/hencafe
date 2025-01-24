@@ -4,7 +4,12 @@ class ServiceNames {
   static const bool HTTPS = true;
   static String BASE_URL = 'https://api.svpfarms.in/';
 
-  static String REGISTRATION_CHECK = BASE_URL + 'registration/v1.0/registration_check.php';
-  static String LOGIN = BASE_URL + 'auth/login';
+  static String REGISTRATION_CHECK = '${BASE_URL}registration/v1.0/registration_check.php';
+  static String REGISTRATION_CREATE = '${BASE_URL}registration/v1.0/registration_create.php';
+  static String LOGIN_PIN_CHECK = '${BASE_URL}login/v1.0/login_check_password.php';
+  static String OTP_GENERATE = '${BASE_URL}otp/v1.0/otp_generate.php';
+  static String OTP_VALIDATE = '${BASE_URL}otp/v1.0/otp_validate.php';
+  static String FORGET_PIN = '${BASE_URL}forget_pin/v1.0/forget_pin.php';
+  static String STATE_LIST = '${BASE_URL}country_state_city/v1.0/state_list.php';
 
 }

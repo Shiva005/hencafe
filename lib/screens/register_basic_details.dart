@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/values/app_regex.dart';
 import 'package:intl/intl.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
@@ -34,6 +36,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
+  var stateRes;
+  List<ApiResponse> _states = [];
+  String? _selectedStateID;
 
   void initializeControllers() {
     firstNameController = TextEditingController()
@@ -69,6 +74,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
   @override
   void initState() {
     initializeControllers();
+    _fetchStates();
     super.initState();
   }
 
@@ -78,30 +84,25 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     super.dispose();
   }
 
-  String _selectedState = 'Select State';
-  final List<String> states = [
-    'Delhi',
-    'Hydrabad',
-    'Telangana',
-    'Hydrabad',
-    'Telangana',
-    'Hydrabad',
-    'Telangana',
-    'Hydrabad',
-    'Telangana',
-    'Hydrabad',
-    'Telangana',
-    'Hydrabad',
-    'Telangana'
-  ];
+  Future<StateModel> _fetchStates() async {
+    final stateRes = await AuthServices().getStates(context);
+    if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
+      setState(() {
+        _states = stateRes.apiResponse!;
+      });
+    }
+    return stateRes;
+  }
 
   // Function to show a bottom sheet
-  void _showLanguageBottomSheet() {
+  void _showLanguageBottomSheet() async {
+    // Fetch states before showing the bottom sheet
+    await _fetchStates();
+
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
       isScrollControlled: true,
-      // Allows the height to expand dynamically
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
@@ -110,7 +111,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
           builder: (context, constraints) {
             return ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8, // 90% of screen height
+                maxHeight: constraints.maxHeight * 0.8,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -118,42 +119,48 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      const Text(
                         "Select State",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
-                      // Add dynamic content here
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: states.length, // Example content
-                        itemBuilder: (context, index) => Column(
-                          children: [
-                            ListTile(
-                              trailing: Radio<String>(
-                                value: states[index],
-                                groupValue: _selectedState,
-                                onChanged: (value) {
-                                  setState(() {
-                                    stateController.text = value!;
-                                    _selectedState = value;
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              title: Text(states[index]),
+                      _states.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _states.length,
+                              itemBuilder: (context, index) {
+                                final state = _states[index];
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      trailing: Radio<String>(
+                                        value: state.stateNameLanguage ?? '',
+                                        groupValue: _selectedStateID,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            stateController.text = value!;
+                                            _selectedStateID = state.stateId;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      title: Text(
+                                        '${state.stateNameLanguage}',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                    Divider(color: Colors.grey.shade200),
+                                  ],
+                                );
+                              },
                             ),
-                            Divider(
-                              color: Colors.grey.shade100,
-                            )
-                          ],
-                        ),
-                      ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
@@ -172,6 +179,10 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final String mobileNumber = args?['mobileNumber'] ?? '';
+    mobileController.text = mobileNumber;
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
@@ -372,16 +383,39 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           controller: _btnController,
                           onPressed: () async {
                             if (_formKey.currentState?.validate() ?? false) {
-                              _btnController.reset();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.registerCreatePin,
-                                arguments: {
-                                  'mobileNumber': mobileController.text,
-                                },
-                              );
-                            } else {
-                              _btnController.reset();
+                              var generateOtpRes = await AuthServices()
+                                  .otpGenerate(context, mobileController.text);
+
+                              /*var registrationCreateRes = await AuthServices()
+                                  .registrationCreate(
+                                      context,
+                                      firstNameController.text,
+                                      lastNameController.text,
+                                      mobileController.text,
+                                      emailController.text,
+                                      dateController.text,
+                                      addressController.text,
+                                      stateController.text,
+                                      referralCodeController.text);*/
+
+                              if (generateOtpRes.errorCount == 0) {
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.loginOtp,
+                                  arguments: {
+                                    'pageType': AppRoutes.registerBasicDetails,
+                                    'firstName': firstNameController.text,
+                                    'lastName': lastNameController.text,
+                                    'mobileNumber': mobileController.text,
+                                    'email': emailController.text,
+                                    'dob': dateController.text,
+                                    'address': addressController.text,
+                                    'stateID': _selectedStateID,
+                                    'referralCode': referralCodeController.text,
+                                  },
+                                );
+                              }
                             }
+                            _btnController.reset();
                           },
                           color: Colors.orange.shade300,
                           child: Row(

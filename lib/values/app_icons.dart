@@ -20,4 +20,5 @@ class AppIconsData {
 
 
   /// images
+  static const String otpHeader = 'assets/icons/otp_header_image.png';
 }

@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hencafe/values/app_icons.dart';
-import 'package:hencafe/values/app_theme.dart';
+import 'package:hencafe/screens/dahboard_screen.dart';
+import 'package:hencafe/values/app_strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../values/app_icons.dart';
+import '../values/app_theme.dart';
 import 'login_screen_mobile.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -17,11 +20,26 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    var prefs = await SharedPreferences.getInstance();
+    final String? loginUUID = prefs.getString(AppStrings.prefUserID);
+
     Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPageMobile()),
-      );
+      if (loginUUID != null && loginUUID.isNotEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => DashboardScreen()), // Your home screen
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPageMobile()),
+        );
+      }
     });
   }
 

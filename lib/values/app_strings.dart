@@ -18,4 +18,15 @@ class AppStrings {
   static const String address = 'Address*';
   static const String mobileNumber1 = '+919885279787';
   static const String finish = 'Finish';
+  static const String otp = 'OTP';
+  static const String verify = 'Verify';
+
+  ///SharedPreference Strings
+  static const String prefMobileNumber = 'mobile_number';
+  static const String prefLanguage = 'language';
+  static const String prefCountryCode = 'country_code';
+  static const String prefUserID = 'user_id';
+  static const String prefUserUUID = 'user_uuid';
+  static const String prefAuthID = 'auth_id';
+  static const String prefRole = 'role';
 }

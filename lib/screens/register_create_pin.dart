@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
@@ -27,7 +29,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
   late final TextEditingController confirmPinController;
 
   final RoundedLoadingButtonController _btnController =
-  RoundedLoadingButtonController();
+      RoundedLoadingButtonController();
 
   void initializeControllers() {
     pinController = TextEditingController()..addListener(controllerListener);
@@ -68,6 +70,17 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final String pageType = args?['pageType'] ?? '';
+    final String firstName = args?['firstName'] ?? '';
+    final String lastName = args?['lastName'] ?? '';
+    final String mobileNumber = args?['mobileNumber'] ?? '';
+    final String email = args?['email'] ?? '';
+    final String dob = args?['dob'] ?? '';
+    final String address = args?['address'] ?? '';
+    final String stateID = args?['stateID'] ?? '';
+    final String referralCode = args?['referralCode'] ?? '';
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundColor,
@@ -103,7 +116,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
                             onPressed: () =>
-                            pinNotifier.value = !passwordObscure,
+                                pinNotifier.value = !passwordObscure,
                             style: IconButton.styleFrom(
                               minimumSize: const Size.square(48),
                             ),
@@ -142,7 +155,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
                             onPressed: () =>
-                            confirmPinNotifier.value = !passwordObscure,
+                                confirmPinNotifier.value = !passwordObscure,
                             style: IconButton.styleFrom(
                               minimumSize: const Size.square(48),
                             ),
@@ -174,10 +187,44 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           width: MediaQuery.of(context).size.width * 0.4,
                           controller: _btnController,
                           onPressed: () async {
+                            var prefs = await SharedPreferences.getInstance();
                             if (_formKey.currentState?.validate() ?? false) {
-                              NavigationHelper.pushNamed(
-                                AppRoutes.stateSelection,
-                              );
+                              var registrationCreateRes = await AuthServices()
+                                  .registrationCreate(
+                                      context,
+                                      firstName,
+                                      lastName,
+                                      mobileNumber,
+                                      email,
+                                      dob,
+                                      pinController.text,
+                                      address,
+                                      stateID,
+                                      referralCode);
+                              if (registrationCreateRes.errorCount == 0) {
+                                prefs.setString(
+                                    AppStrings.prefUserID,
+                                    registrationCreateRes
+                                        .regUserInfo![0].userId!);
+                                prefs.setString(
+                                    AppStrings.prefUserUUID,
+                                    registrationCreateRes
+                                        .regUserInfo![0].userUuid!);
+                                prefs.setString(
+                                    AppStrings.prefRole,
+                                    registrationCreateRes
+                                        .regUserInfo![0].userRoleType!);
+                                prefs.setString(
+                                    AppStrings.prefAuthID,
+                                    registrationCreateRes
+                                        .regUserInfo![0].authUuid!);
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.dashboardScreen,
+                                  arguments: {
+                                    'mobileNumber': mobileNumber,
+                                  },
+                                );
+                              }
                             }
                             _btnController.reset();
                           },
@@ -197,10 +244,5 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
         ),
       ),
     );
-
   }
-}
-
-bool validateFields() {
-  return true;
 }
