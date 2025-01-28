@@ -20,6 +20,13 @@ class AppStrings {
   static const String finish = 'Finish';
   static const String otp = 'OTP';
   static const String verify = 'Verify';
+  static const String forgetPin = 'Forget Pin?';
+
+  ///Headers
+  static const String createAccount = 'Create Account';
+  static const String loginWithPin = 'Login with Pin';
+  static const String verifyOtp = 'Verify OTP';
+  static const String createPinNumber = 'Create Pin Number';
 
   ///SharedPreference Strings
   static const String prefMobileNumber = 'mobile_number';

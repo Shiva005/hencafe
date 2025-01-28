@@ -1,8 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
-import 'package:hencafe/services/service_name.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_constants.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -13,7 +11,6 @@ import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
 import '../values/app_colors.dart';
-import '../values/app_regex.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
@@ -93,60 +90,50 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
 
   final List<String> languages = [
     'English',
-    'Telgu',
-    'Hindi',
-    'Telgu',
-    'Hindi',
-    'Telgu',
-    'Hindi',
-    'Telgu',
-    'Hindi',
-    'Telgu',
-    'Hindi'
+    'తెలుగు',
+    'हिन्दी',
   ];
 
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 "Change Language",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
-              ...languages
-                  .map(
-                    (lang) => Column(
-                      children: [
-                        ListTile(
-                          leading: Radio<String>(
-                            value: lang,
-                            groupValue: _selectedLanguage,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedLanguage = value!;
-                              });
-                              Navigator.pop(context);
-                            },
-                          ),
-                          title: Text(lang),
-                        ),
-                        Divider(
-                          color: Colors.grey,
-                        ),
-                      ],
+              const SizedBox(height: 20),
+              ListView.separated(
+                shrinkWrap: true,
+                itemCount: languages.length,
+                separatorBuilder: (_, __) =>
+                    Divider(height: 2, color: Colors.grey.shade200),
+                itemBuilder: (context, index) {
+                  final lang = languages[index];
+                  return ListTile(
+                    leading: Radio<String>(
+                      value: lang,
+                      groupValue: _selectedLanguage,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedLanguage = value!;
+                        });
+                        Navigator.pop(context);
+                      },
                     ),
-                  )
-                  .toList(),
+                    title: Text(lang),
+                  );
+                },
+              ),
             ],
           ),
         );
@@ -162,20 +149,37 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 45.0, right: 20.0),
+            padding: const EdgeInsets.only(top: 50.0, right: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 GestureDetector(
-                  onTap: _showLanguageBottomSheet,
-                  child: Row(
-                    children: [
-                      Icon(Icons.language),
-                      SizedBox(width: 5.0),
-                      Text(_selectedLanguage),
-                    ],
-                  ),
-                ),
+                    onTap: _showLanguageBottomSheet,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.primaryColor, // Border color
+                          width: 1.0, // Border width
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(20.0), // Rounded corners
+                      ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 6.0), // Inner padding
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.language,
+                            color: AppColors.primaryColor,
+                          ),
+                          SizedBox(width: 5.0),
+                          Text(
+                            _selectedLanguage,
+                            style: TextStyle(color: AppColors.primaryColor),
+                          ),
+                        ],
+                      ),
+                    )),
               ],
             ),
           ),
@@ -186,20 +190,20 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                   key: _formKey,
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 100, bottom: 20),
+                        left: 20, right: 20, top: 30, bottom: 20),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                          width: 150,
-                          height: 150,
+                          width: 120,
+                          height: 120,
                           child: Image.asset(
                             AppIconsData.logo,
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 40),
                         AppTextFormField(
                           controller: mobileController,
                           labelText: AppStrings.mobile,
@@ -230,7 +234,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                     _rememberMe = value;
                                   });
                                 },
-                                activeColor: Colors.orange,
+                                activeColor: AppColors.primaryColor,
                                 // Color when the switch is "on"
                                 inactiveThumbColor: Colors.black,
                                 // Thumb color when "off"
@@ -250,6 +254,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                           children: [
                             RoundedLoadingButton(
                               width: MediaQuery.of(context).size.width * 0.4,
+                              height: 40.0,
                               controller: _btnController,
                               onPressed: () async {
                                 if (_formKey.currentState?.validate() == true) {
@@ -307,7 +312,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                 }
                                 _btnController.reset();
                               },
-                              color: Colors.orange.shade300,
+                              color: AppColors.primaryColor,
                               child: Row(
                                 children: [
                                   Text(
@@ -343,15 +348,15 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('© 20224 SV Poultry Farms | v',
+                  Text('© 2024 SV Poultry Farms | v',
                       style: AppTheme.informationString),
                   Text(versionName, style: AppTheme.informationString),
                 ],
               ),
+              SizedBox(
+                height: 20.0,
+              ),
             ],
-          ),
-          SizedBox(
-            height: 20.0,
           ),
         ],
       ),

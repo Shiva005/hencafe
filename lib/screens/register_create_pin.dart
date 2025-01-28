@@ -5,11 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
+import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
-import '../values/app_theme.dart';
 
 class RegisterCreatePin extends StatefulWidget {
   const RegisterCreatePin({super.key});
@@ -84,13 +84,9 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Create Pin Number',
-          style: AppTheme.appBarText,
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: MyAppBar(title: AppStrings.createPinNumber)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: ListView(
@@ -111,7 +107,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           labelText: AppStrings.pin,
                           maxLength: 4,
                           textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.visiblePassword,
+                          keyboardType: TextInputType.number,
                           enabled: true,
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
@@ -150,7 +146,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                           labelText: AppStrings.reEnterPin,
                           maxLength: 4,
                           textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.visiblePassword,
+                          keyboardType: TextInputType.number,
                           enabled: true,
                           prefixIcon: Icon(Icons.pin),
                           suffixIcon: IconButton(
@@ -186,6 +182,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                         RoundedLoadingButton(
                           width: MediaQuery.of(context).size.width * 0.4,
                           controller: _btnController,
+                          height: 40.0,
                           onPressed: () async {
                             var prefs = await SharedPreferences.getInstance();
                             if (_formKey.currentState?.validate() ?? false) {
@@ -228,7 +225,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                             }
                             _btnController.reset();
                           },
-                          color: Colors.orange.shade400,
+                          color: AppColors.primaryColor,
                           child: Text(
                             AppStrings.finish,
                             style: TextStyle(color: Colors.white),

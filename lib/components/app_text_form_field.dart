@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/values/app_colors.dart';
 
 class AppTextFormField extends StatelessWidget {
   const AppTextFormField({
@@ -60,20 +61,20 @@ class AppTextFormField extends StatelessWidget {
         decoration: InputDecoration(
           counterText: '',
           filled: true,
-          fillColor: enabled! ? Colors.white : Colors.grey.shade300,
+          fillColor: enabled! ? Colors.white : Colors.grey.shade200,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           labelText: labelText,
           border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.orangeAccent.shade200),
+            borderSide: BorderSide(color: Colors.grey.shade400),
             borderRadius: BorderRadius.circular(10),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.orangeAccent.shade200),
+            borderSide: BorderSide(color: Colors.grey.shade400),
             borderRadius: BorderRadius.circular(10),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.green.shade200),
+            borderSide: BorderSide(color: AppColors.primaryColor),
             borderRadius: BorderRadius.circular(10),
           ),
           focusedErrorBorder: OutlineInputBorder(

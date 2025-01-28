@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,11 +8,11 @@ import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../helpers/snackbar_helper.dart';
 import '../services/services.dart';
+import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
-import '../values/app_theme.dart';
 
 class LoginPagePin extends StatefulWidget {
   const LoginPagePin({super.key});
@@ -79,13 +80,9 @@ class _LoginPagePinState extends State<LoginPagePin> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Login with Pin',
-          style: AppTheme.appBarText,
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: MyAppBar(title: AppStrings.loginWithPin)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: ListView(
@@ -94,14 +91,14 @@ class _LoginPagePinState extends State<LoginPagePin> {
               key: _formKey,
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 50, bottom: 20),
+                    left: 20, right: 20, top: 30, bottom: 20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 130,
-                      height: 130,
+                      width: 120,
+                      height: 120,
                       child: Image.asset(
                         AppIconsData.logo,
                         fit: BoxFit.contain,
@@ -155,7 +152,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -163,11 +160,15 @@ class _LoginPagePinState extends State<LoginPagePin> {
                           children: [
                             TextButton(
                                 onPressed: () async {
+                                  LoadingDialogHelper.showLoadingDialog(
+                                      context);
                                   var generateOtpRes = await AuthServices()
                                       .otpGenerate(context, mobileNumber);
                                   if (generateOtpRes.errorCount == 0) {
                                     SnackbarHelper.showSnackBar(generateOtpRes
                                         .apiResponse![0].responseDetails!);
+                                    LoadingDialogHelper.dismissLoadingDialog(
+                                        context);
                                     NavigationHelper.pushNamed(
                                       AppRoutes.loginOtp,
                                       arguments: {
@@ -177,16 +178,17 @@ class _LoginPagePinState extends State<LoginPagePin> {
                                     );
                                   }
                                 },
-                                child: Text('Forget Pin?')),
-                            Container(
-                              width: 75.0,
-                              height: 1,
-                              color: Colors.black,
-                            ),
+                                child: Text(
+                                  AppStrings.forgetPin,
+                                  style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                )),
                           ],
                         ),
                         RoundedLoadingButton(
                           width: MediaQuery.of(context).size.width * 0.4,
+                          height: 40.0,
                           controller: _btnLoginController,
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
@@ -214,7 +216,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                             }
                             _btnLoginController.reset();
                           },
-                          color: Colors.orange.shade300,
+                          color: AppColors.primaryColor,
                           child: Row(
                             children: [
                               Text(
@@ -226,28 +228,70 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 50.0, bottom: 30),
-                      child: Divider(),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            color: Colors.grey,
+                            height: 1,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: Text(
+                              'OR',
+                            ),
+                          ),
+                          Container(
+                            color: Colors.grey,
+                            height: 1,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                          ),
+                        ],
+                      ),
                     ),
-                    Text('Try another way'),
-                    SizedBox(height: 10),
-                    RoundedLoadingButton(
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: TextButton(
+                        onPressed: () async {
+                          LoadingDialogHelper.showLoadingDialog(context);
+                          var generateOtpRes = await AuthServices()
+                              .otpGenerate(context, mobileNumber);
+                          if (generateOtpRes.errorCount == 0) {
+                            SnackbarHelper.showSnackBar(generateOtpRes
+                                .apiResponse![0].responseDetails!);
+                            LoadingDialogHelper.dismissLoadingDialog(context);
+                            NavigationHelper.pushNamed(
+                              AppRoutes.loginOtp,
+                              arguments: {
+                                'pageType': 'LoginWithOtp',
+                                'mobileNumber': mobileController.text,
+                              },
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(30.0),
+                              bottom: Radius.circular(30.0),
+                            ),
+                          ),
+                          side: BorderSide(
+                            color: AppColors.primaryColor, // Black border color
+                            width: 1, // Border width
+                          ),
+                        ),
+                        child: Text(AppStrings.loginWithOtp),
+                      ),
+                    ),
+                    /*RoundedLoadingButton(
                       controller: _btnLoginWithOtpController,
                       onPressed: () async {
-                        var generateOtpRes = await AuthServices()
-                            .otpGenerate(context, mobileNumber);
-                        if (generateOtpRes.errorCount == 0) {
-                          SnackbarHelper.showSnackBar(generateOtpRes
-                              .apiResponse![0].responseDetails!);
-                          NavigationHelper.pushNamed(
-                            AppRoutes.loginOtp,
-                            arguments: {
-                              'pageType': 'LoginWithOtp',
-                              'mobileNumber': mobileController.text,
-                            },
-                          );
-                        }
+
                         _btnLoginWithOtpController.reset();
                       },
                       color: Colors.red.shade400,
@@ -255,7 +299,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         AppStrings.loginWithOtp,
                         style: TextStyle(color: Colors.white),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),

@@ -2,6 +2,9 @@ import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/values/app_icons.dart';
 
+import '../../helpers/navigation_helper.dart';
+import '../../values/app_routes.dart';
+
 class HomeFragment2 extends StatefulWidget {
   const HomeFragment2({super.key});
 
@@ -38,35 +41,57 @@ class _HomeFragment2State extends State<HomeFragment2>
             Row(
               children: [
                 Expanded(
-                    child:
-                        _buildDashboardCard(AppIconsData.colorEgg, "Egg Price")),
+                    child: GestureDetector(
+                        onTap: () {
+                          NavigationHelper.pushNamed(
+                            AppRoutes.eggPriceScreen,
+                          );
+                        },
+                        child: _buildDashboardCard(
+                            AppIconsData.colorEgg, "Egg Price"))),
                 SizedBox(width: 20),
                 Expanded(
-                    child:
-                        _buildDashboardCard(AppIconsData.colorChick, "Chick Price")),
+                    child: GestureDetector(
+                  onTap: () {
+                    NavigationHelper.pushNamed(
+                      AppRoutes.chickPriceScreen,
+                    );
+                  },
+                  child: _buildDashboardCard(
+                      AppIconsData.colorChick, "Chick Price"),
+                )),
               ],
             ),
             SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                  child:
-                      _buildDashboardCard(AppIconsData.colorChicken, "Chicken Price"),
+                  child: GestureDetector(
+                    onTap: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.chickenPriceScreen,
+                      );
+                    },
+                    child: _buildDashboardCard(
+                        AppIconsData.colorChicken, "Chicken Price"),
+                  ),
                 ),
                 SizedBox(width: 20),
                 Expanded(
-                    child:
-                        _buildDashboardCard(AppIconsData.colorFeed, "Feed Price")),
+                    child: _buildDashboardCard(
+                        AppIconsData.colorFeed, "Feed Price")),
               ],
             ),
             SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                    child: _buildDashboardCard(AppIconsData.colorVideo, "Sale Videos")),
+                    child: _buildDashboardCard(
+                        AppIconsData.colorVideo, "Sale Videos")),
                 SizedBox(width: 20),
                 Expanded(
-                    child: _buildDashboardCard(AppIconsData.colorContact, "Contact")),
+                    child: _buildDashboardCard(
+                        AppIconsData.colorContact, "Contact")),
               ],
             ),
           ],

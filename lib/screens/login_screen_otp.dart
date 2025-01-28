@@ -4,12 +4,14 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/components/app_text_form_field.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/utils/appbar_widget.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
+import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
@@ -126,14 +128,9 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: MyAppBar(title: AppStrings.verifyOtp)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Form(
@@ -143,7 +140,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
               const SizedBox(height: 30),
               Image.asset(
                 AppIconsData.otpHeader,
-                height: 160,
+                height: 120,
               ),
               const SizedBox(height: 20),
               const Text(
@@ -155,13 +152,27 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                "Enter the OTP sent to $mobileNumber",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Enter the OTP sent to ",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    mobileNumber,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 40),
               AppTextFormField(
@@ -174,12 +185,11 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                 prefixIcon: Icon(Icons.pin),
                 validator: _validateOtp, // Added validator for OTP field
               ),
-              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't receive the OTP?",
+                    "Don't receive the OTP ?",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -193,11 +203,11 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                         : null, // Set to null when button is disabled
                     child: Text(
                       _isResendEnabled
-                          ? "RESEND OTP"
-                          : "RESEND OTP in $_start s",
+                          ? " RESEND OTP"
+                          : "$_start s",
                       style: TextStyle(
                         fontSize: 14,
-                        color: _isResendEnabled ? Colors.orange : Colors.grey,
+                        color: AppColors.primaryColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -207,6 +217,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
               const SizedBox(height: 20),
               RoundedLoadingButton(
                 width: MediaQuery.of(context).size.width,
+                height: 40.0,
                 controller: _btnVerifyController,
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
@@ -268,7 +279,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                   }
                   _btnVerifyController.reset();
                 },
-                color: Colors.orange.shade300,
+                color: AppColors.primaryColor,
                 child: Text(
                   AppStrings.verify,
                   style: TextStyle(color: Colors.white),

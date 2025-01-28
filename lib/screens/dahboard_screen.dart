@@ -1,9 +1,13 @@
-import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:floating_action_bubble/floating_action_bubble.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:hencafe/screens/fragments/home_fragment2.dart';
+import 'package:hencafe/values/app_icons.dart';
+import 'package:hencafe/values/app_strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'fragments/home_fragment.dart';
+import '../helpers/navigation_helper.dart';
+import '../values/app_routes.dart';
+import '../values/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -16,7 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late PageController pageController;
   late AnimationController _animationController;
-  late Animation<double> _animation;
+  final _advancedDrawerController = AdvancedDrawerController();
   int _tabIndex = 1;
 
   int get tabIndex => _tabIndex;
@@ -29,11 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
-
-    // Initialize PageController
     pageController = PageController(initialPage: _tabIndex);
-
-    // Initialize AnimationController for FloatingActionBubble
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
@@ -44,163 +44,221 @@ class _DashboardScreenState extends State<DashboardScreen>
       curve: Curves.easeInOut,
       parent: _animationController,
     );
-
-    _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
   @override
   void dispose() {
-    // Dispose controllers
     pageController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  void _showFloatingActionMenu(BuildContext context) {
-    showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Stack(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
+  @override
+  Widget build(BuildContext context) {
+    return AdvancedDrawer(
+      backdrop: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.2)],
+          ),
+        ),
+      ),
+      controller: _advancedDrawerController,
+      animationCurve: Curves.easeInOut,
+      animationDuration: const Duration(milliseconds: 300),
+      animateChildDecoration: true,
+      rtlOpening: false,
+      // openScale: 1.0,
+      disabledGestures: false,
+      childDecoration: const BoxDecoration(
+        // NOTICE: Uncomment if you want to add shadow behind the page.
+        // Keep in mind that it may cause animation jerks.
+        // boxShadow: <BoxShadow>[
+        //   BoxShadow(
+        //     color: Colors.black12,
+        //     blurRadius: 0.0,
+        //   ),
+        // ],
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+      ),
+      drawer: SafeArea(
+        child: FutureBuilder(
+          future: Future.delayed(const Duration(milliseconds: 1000)),
+          builder: (context, snapshot) {
+            return ListTileTheme(
+              textColor: Colors.white,
+              iconColor: Colors.white,
+              minLeadingWidth: 20,
+              child: ListView(
                 children: [
-                  SizedBox(height: 15,),
-                  Text(
-                    "Support",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(color: Colors.grey.shade200),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.videocam_outlined),
-                    title: const Text("Videos"),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Handle Settings action
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.message_outlined),
-                    title: const Text("Chat"),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Handle Profile action
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.call),
-                    title: const Text("Call"),
-                    onTap: () {
-                      Navigator.pop(context);
-                      pageController.jumpToPage(0); // Navigate to Home page
-                    },
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 70.0,
+                              height: 70.0,
+                              margin: const EdgeInsets.only(
+                                top: 23.0,
+                                bottom: 23.0,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              decoration: const BoxDecoration(
+                                color: Colors.black26,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Image.asset(
+                                AppIconsData.logo,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hen Cafe',
+                                    //'${AppStrings.pre} ${AppStrings.firstName}',
+                                    style: AppTheme.primaryHeadingDrawer,
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    AppStrings.prefMobileNumber,
+                                    style: AppTheme.secondaryHeadingDrawer,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          _advancedDrawerController.hideDrawer();
+                        },
+                        visualDensity:
+                            const VisualDensity(horizontal: 0, vertical: -3),
+                        title: const Text('Home'),
+                        leading: SizedBox(
+                            width: 23,
+                            height: 23,
+                            child: Image.asset('assets/vectors/home.png')),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          _advancedDrawerController.hideDrawer();
+                          showLoadingDialog(context, 'Logout',
+                              'Are you sure you want to logout?');
+                        },
+                        visualDensity:
+                            const VisualDensity(horizontal: 0, vertical: -3),
+                        leading: SizedBox(
+                            width: 23,
+                            height: 23,
+                            child: Image.asset('assets/vectors/logout.png')),
+                        title: const Text('Logout'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              Positioned(
-                right: 0.0,
-                child: IconButton(icon: Icon(Icons.close), onPressed: () { Navigator.pop(context); }, ),
+            );
+          },
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: const Text('User Name'),
+          centerTitle: false,
+          leading: IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {},
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        body: HomeFragment2(),
+      ),
+    );
+  }
+
+  void showLoadingDialog(
+      BuildContext context, String title, String description) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        content: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                description,
+                style: AppTheme.informationString,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green.shade900,
+                        padding: const EdgeInsets.symmetric(horizontal: 20)),
+                    onPressed: () => {Navigator.pop(context)},
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 10),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 20)),
+                    onPressed: () async {
+                      var prefs = await SharedPreferences.getInstance();
+                      var mb = prefs.getString(AppStrings.prefMobileNumber);
+                      prefs.clear();
+                      prefs.setString(AppStrings.prefMobileNumber, mb!);
+                      NavigationHelper.pushReplacementNamedUntil(
+                          AppRoutes.loginMobile);
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('User Name'),
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: HomeFragment2(),
-      /*bottomNavigationBar: CircleNavBar(
-        activeIndex: tabIndex,
-        activeIcons: const [
-          Icon(Icons.home_rounded, color: Colors.orangeAccent,size: 30,),
-          Icon(Icons.currency_rupee, color: Colors.orangeAccent,size: 30,),
-          Icon(Icons.call, color: Colors.orangeAccent,size: 30,),
-        ],
-        inactiveIcons: const [
-          Column(
-            children: [
-              Icon(Icons.home, size: 20),
-              Text("Home"),
-            ],
-          ),
-          Column(
-            children: [
-              Icon(Icons.currency_rupee, size: 20),
-              Text("Sales"),
-            ],
-          ),
-          Column(
-            children: [
-              Icon(Icons.call, size: 20),
-              Text("Contact"),
-            ],
-          ),
-        ],
-        color: Colors.grey.shade200,
-        circleColor: Colors.grey.shade200,
-        height: 60,
-        circleWidth: 60,
-        onTap: (v) {
-          if (v == 2) {
-            _showFloatingActionMenu(context);
-          } else {
-            tabIndex = v;
-            pageController.jumpToPage(tabIndex);
-          }
-        },
-        cornerRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-        ),
-        elevation: 10,
-      ),
-      body: PageView(
-        controller: pageController,
-        onPageChanged: (v) {
-          tabIndex = v;
-        },
-        children: [
-          HomeFragment2(),
-          Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.green),
-          Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.blue),
-        ],
-      ),*/
-    );
-  }
-
 }

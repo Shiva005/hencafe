@@ -7,10 +7,10 @@ import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
+import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
-import '../values/app_theme.dart';
 
 class RegisterBasicDetails extends StatefulWidget {
   const RegisterBasicDetails({super.key});
@@ -156,7 +156,10 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                     ),
-                                    Divider(color: Colors.grey.shade200),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10.0,right: 15),
+                                      child: Divider(color: Colors.grey.shade200,height: 2,),
+                                    ),
                                   ],
                                 );
                               },
@@ -185,260 +188,253 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     mobileController.text = mobileNumber;
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Create account',
-          style: AppTheme.appBarText,
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: MyAppBar(title: AppStrings.createAccount)),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: ListView(
-          children: [
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 20, bottom: 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AppTextFormField(
-                      controller: firstNameController,
-                      labelText: AppStrings.firstName,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      enabled: true,
-                      prefixIcon: Icon(Icons.person),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your first name';
-                        }
-                        return null;
-                      },
-                    ),
-                    AppTextFormField(
-                      controller: lastNameController,
-                      labelText: AppStrings.lastName,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      enabled: true,
-                      prefixIcon: Icon(Icons.person),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your last name';
-                        }
-                        return null;
-                      },
-                    ),
-                    AppTextFormField(
-                      controller: mobileController,
-                      labelText: AppStrings.mobile,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      maxLength: 15,
-                      enabled: false,
-                      prefixIcon: Icon(Icons.call),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your mobile number';
-                        }
-                        return null;
-                      },
-                    ),
-                    AppTextFormField(
-                      controller: emailController,
-                      labelText: AppStrings.email,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      enabled: true,
-                      prefixIcon: Icon(Icons.alternate_email),
-                      validator: (value) {
-                        if (AppRegex.emailRegex.hasMatch(value!)) {
-                          return 'Please enter a valid email address';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: 70.0,
-                      child: GestureDetector(
-                        child: TextFormField(
-                          style: TextStyle(color: Colors.black),
-                          controller: dateController,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(color: Colors.grey),
-                            prefixIcon: Icon(Icons.calendar_month),
-                            iconColor: Colors.white,
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelText: "Date Of Birth",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.orangeAccent.shade200),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.orangeAccent.shade200),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.green.shade200),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2040));
-                            if (pickedDate != null) {
-                              String formattedDate =
-                                  DateFormat('dd-MM-yyyy').format(pickedDate);
-                              setState(
-                                  () => dateController.text = formattedDate);
-                            }
-                          },
-                        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 10,
+        ),
+        child: Card(
+          color: Colors.white,
+          child: ListView(
+            children: [
+              Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, top: 20, bottom: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      AppTextFormField(
+                        controller: firstNameController,
+                        labelText: AppStrings.firstName,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.person),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
                       ),
-                    ),
-                    AppTextFormField(
-                      controller: addressController,
-                      labelText: AppStrings.address,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      enabled: true,
-                      minLines: 2,
-                      maxLines: 2,
-                      prefixIcon: Icon(Icons.location_pin),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your address';
-                        }
-                        return null;
-                      },
-                    ),
-                    GestureDetector(
-                      child: SizedBox(
+                      AppTextFormField(
+                        controller: lastNameController,
+                        labelText: AppStrings.lastName,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.person),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
+                      ),
+                      AppTextFormField(
+                        controller: mobileController,
+                        labelText: AppStrings.mobile,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 15,
+                        enabled: false,
+                        prefixIcon: Icon(Icons.call),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your mobile number';
+                          }
+                          return null;
+                        },
+                      ),
+                      AppTextFormField(
+                        controller: emailController,
+                        labelText: AppStrings.email,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.alternate_email),
+                        validator: (value) {
+                          if (AppRegex.emailRegex.hasMatch(value!)) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(
                         height: 70.0,
-                        child: TextFormField(
-                          style: TextStyle(color: Colors.black),
-                          controller: stateController,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(color: Colors.grey),
-                            prefixIcon: Icon(Icons.location_city),
-                            iconColor: Colors.white,
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelText: "State",
-                            suffixIcon: Icon(Icons.keyboard_arrow_down),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.orangeAccent.shade200),
-                              borderRadius: BorderRadius.circular(10),
+                        child: GestureDetector(
+                          child: TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: dateController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(color: Colors.grey),
+                              prefixIcon: Icon(Icons.calendar_month),
+                              iconColor: Colors.white,
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: "Date Of Birth",
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green.shade200),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.orangeAccent.shade200),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.green.shade200),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            readOnly: true,
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime(2040));
+                              if (pickedDate != null) {
+                                String formattedDate =
+                                    DateFormat('dd-MM-yyyy').format(pickedDate);
+                                setState(
+                                    () => dateController.text = formattedDate);
+                              }
+                            },
                           ),
-                          readOnly: true,
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value == 'Select State') {
-                              return 'Please select your state';
-                            }
-                            return null;
-                          },
-                          onTap: _showLanguageBottomSheet,
                         ),
                       ),
-                    ),
-                    AppTextFormField(
-                      controller: referralCodeController,
-                      labelText: AppStrings.referralCode,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.done,
-                      enabled: true,
-                      prefixIcon: Icon(Icons.card_giftcard),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        RoundedLoadingButton(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          controller: _btnController,
-                          onPressed: () async {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              var generateOtpRes = await AuthServices()
-                                  .otpGenerate(context, mobileController.text);
-
-                              /*var registrationCreateRes = await AuthServices()
-                                  .registrationCreate(
-                                      context,
-                                      firstNameController.text,
-                                      lastNameController.text,
-                                      mobileController.text,
-                                      emailController.text,
-                                      dateController.text,
-                                      addressController.text,
-                                      stateController.text,
-                                      referralCodeController.text);*/
-
-                              if (generateOtpRes.errorCount == 0) {
-                                NavigationHelper.pushNamed(
-                                  AppRoutes.loginOtp,
-                                  arguments: {
-                                    'pageType': AppRoutes.registerBasicDetails,
-                                    'firstName': firstNameController.text,
-                                    'lastName': lastNameController.text,
-                                    'mobileNumber': mobileController.text,
-                                    'email': emailController.text,
-                                    'dob': dateController.text,
-                                    'address': addressController.text,
-                                    'stateID': _selectedStateID,
-                                    'referralCode': referralCodeController.text,
-                                  },
-                                );
+                      AppTextFormField(
+                        controller: addressController,
+                        labelText: AppStrings.address,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        enabled: true,
+                        minLines: 2,
+                        maxLines: 2,
+                        prefixIcon: Icon(Icons.location_pin),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your address';
+                          }
+                          return null;
+                        },
+                      ),
+                      GestureDetector(
+                        child: SizedBox(
+                          height: 70.0,
+                          child: TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: stateController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(color: Colors.grey),
+                              prefixIcon: Icon(Icons.location_city),
+                              iconColor: Colors.white,
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: "State",
+                              suffixIcon: Icon(Icons.keyboard_arrow_down),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green.shade200),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value == 'Select State') {
+                                return 'Please select your state';
                               }
-                            }
-                            _btnController.reset();
-                          },
-                          color: Colors.orange.shade300,
-                          child: Row(
-                            children: [
-                              Text(
-                                AppStrings.continueNext,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              SizedBox(width: 5.0),
-                              Icon(
-                                Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                              ),
-                            ],
+                              return null;
+                            },
+                            onTap: _showLanguageBottomSheet,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      AppTextFormField(
+                        controller: referralCodeController,
+                        labelText: AppStrings.referralCode,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.card_giftcard),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          RoundedLoadingButton(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            height: 40.0,
+                            controller: _btnController,
+                            onPressed: () async {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                var generateOtpRes = await AuthServices()
+                                    .otpGenerate(
+                                        context, mobileController.text);
+                                if (generateOtpRes.errorCount == 0) {
+                                  NavigationHelper.pushNamed(
+                                    AppRoutes.loginOtp,
+                                    arguments: {
+                                      'pageType':
+                                          AppRoutes.registerBasicDetails,
+                                      'firstName': firstNameController.text,
+                                      'lastName': lastNameController.text,
+                                      'mobileNumber': mobileController.text,
+                                      'email': emailController.text,
+                                      'dob': dateController.text,
+                                      'address': addressController.text,
+                                      'stateID': _selectedStateID,
+                                      'referralCode':
+                                          referralCodeController.text,
+                                    },
+                                  );
+                                }
+                              }
+                              _btnController.reset();
+                            },
+                            color: AppColors.primaryColor,
+                            child: Row(
+                              children: [
+                                Text(
+                                  AppStrings.continueNext,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                SizedBox(width: 5.0),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

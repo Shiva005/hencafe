@@ -27,7 +27,7 @@ class _WelcomePageState extends State<WelcomePage> {
     var prefs = await SharedPreferences.getInstance();
     final String? loginUUID = prefs.getString(AppStrings.prefUserID);
 
-    Timer(Duration(seconds: 3), () {
+    Timer(Duration(seconds: 1), () {
       if (loginUUID != null && loginUUID.isNotEmpty) {
         Navigator.pushReplacement(
           context,
@@ -78,7 +78,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                   SizedBox(width: 10),
                   const Text(
-                    'Hen Cafe',
+                    'HenCafe',
                     style: AppTheme.rejectedTitle,
                   ),
                 ],
