@@ -5,6 +5,7 @@ class AppStrings {
   static const String uhOhPageNotFound = 'Sorry!\nPage not found';
   static const String register = 'Register';
   static const String login = 'Login';
+  static const String logout = 'Logout';
   static const String loginWithOtp = 'Login with OTP';
   static const String continueNext = 'Continue';
   static const String forgotPassword = 'Forget Password';
@@ -29,6 +30,10 @@ class AppStrings {
   static const String createPinNumber = 'Create Pin Number';
 
   ///SharedPreference Strings
+  static const String prefFirstName = 'first_name';
+  static const String prefLastName = 'last_name';
+  static const String prefEmail = 'email';
+  static const String prefUserImage = 'user_image';
   static const String prefMobileNumber = 'mobile_number';
   static const String prefLanguage = 'language';
   static const String prefCountryCode = 'country_code';
@@ -36,4 +41,5 @@ class AppStrings {
   static const String prefUserUUID = 'user_uuid';
   static const String prefAuthID = 'auth_id';
   static const String prefRole = 'role';
+  static const String prefFavStateMaxCount = 'fav_state_max_count';
 }

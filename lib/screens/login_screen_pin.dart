@@ -253,7 +253,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         ],
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.7,
                       child: TextButton(
                         onPressed: () async {
@@ -288,18 +288,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         child: Text(AppStrings.loginWithOtp),
                       ),
                     ),
-                    /*RoundedLoadingButton(
-                      controller: _btnLoginWithOtpController,
-                      onPressed: () async {
 
-                        _btnLoginWithOtpController.reset();
-                      },
-                      color: Colors.red.shade400,
-                      child: Text(
-                        AppStrings.loginWithOtp,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),*/
                   ],
                 ),
               ),

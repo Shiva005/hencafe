@@ -36,7 +36,6 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
-  var stateRes;
   List<ApiResponse> _states = [];
   String? _selectedStateID;
 

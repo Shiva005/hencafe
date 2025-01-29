@@ -177,6 +177,12 @@ class AppTheme {
     fontSize: 16,
     fontWeight: FontWeight.w700,
   );
+  static const TextStyle primaryColorTExtStyle = TextStyle(
+    color: AppColors.primaryColor,
+    letterSpacing: 0.5,
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+  );
   static const TextStyle debitedText = TextStyle(
     color: Colors.red,
     letterSpacing: 0.5,
@@ -234,7 +240,7 @@ class AppTheme {
   static const TextStyle rejectedTitle = TextStyle(
     color: Colors.red,
     letterSpacing: 0.5,
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
   );
   static const TextStyle gameResultText = TextStyle(

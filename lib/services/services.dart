@@ -6,9 +6,11 @@ import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
+import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
+import 'package:hencafe/models/success_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -282,6 +284,79 @@ class AuthServices {
     } catch (e) {
       logger.e('Exception occurred: $e');
       rethrow; // Re-throwing the exception for the caller to handle
+    }
+  }
+
+  Future<ProfileModel> getProfile(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.GET_PROFILE),
+    );
+    request.fields['profile_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return ProfileModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return ProfileModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow; // Re-throwing the exception for the caller to handle
+    }
+  }
+
+  Future<SuccessModel> updateFavState(
+      BuildContext context, String stateID) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.UPDATE_FAV_STATE),
+    );
+    request.fields['user_favourite_state_id'] = stateID;
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 202) {
+        return SuccessModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return SuccessModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
     }
   }
 }

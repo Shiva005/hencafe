@@ -4,11 +4,14 @@ class AppColors {
   const AppColors._();
 
   static const Color primaryColor = Color(0xff5F259F);
+  static const Color primaryColor100 = Color(0xffe2c4ff);
+  static const Color primaryColor700 = Color(0xff9e38fb);
   static const Color lightBlue = Color(0xff0055bb);
   static const Color darkBlue = Color(0xff20007F);
   static const Color darkerBlue = Color(0xff152534);
   static const Color darkestBlue = Color(0xff0C1C2E);
   static const Color darkesttBlue = Color(0xff0a1a2a);
+
 
   static const Color informationScreenColor = Color(0xff3C2077);
   static const Color startColor = Color(0xff3C37B8);

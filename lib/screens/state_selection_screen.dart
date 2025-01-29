@@ -1,8 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/utils/appbar_widget.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
+import '../models/state_model.dart';
+import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
@@ -16,42 +20,38 @@ class StateSelectionPage extends StatefulWidget {
 }
 
 class _StateSelectionPageState extends State<StateSelectionPage> {
-  // List of states
-  final List<String> states = [
-    "California",
-    "Texas",
-    "New York",
-    "Florida",
-    "Illinois",
-    "Ohio",
-    "Georgia",
-    "North Carolina",
-    "California",
-    "Texas",
-    "New York",
-    "Florida",
-    "Illinois",
-    "Ohio",
-    "Georgia",
-    "North Carolina"
-  ];
-
-  final Set<String> _selectedStates = {};
-
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
+  List<ApiResponse> _states = [];
+  List<String> _selectedStateID = [];
+  var prefs;
+
+  @override
+  void initState() {
+    _fetchStates();
+    super.initState();
+  }
+
+  Future<StateModel> _fetchStates() async {
+    prefs = await SharedPreferences.getInstance();
+    final stateRes = await AuthServices().getStates(context);
+    if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
+      setState(() {
+        _states = stateRes.apiResponse!;
+      });
+    }
+    return stateRes;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Select Favourite States',
-          style: AppTheme.appBarText,
-        ),
-      ),
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: MyAppBar(
+            title: 'Select Favourite States',
+          )),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
         child: Column(
@@ -62,92 +62,105 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: Colors.orange,
+                  color: AppColors.primaryColor,
                 ),
                 SizedBox(width: 10),
                 Text(
                   "Maximum 5 Favourite States",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             SizedBox(
-              height: 20,
+              height: 15,
             ),
             Expanded(
-              child: ListView.separated(
-                itemCount: states.length,
-                itemBuilder: (context, index) {
-                  final state = states[index];
-                  return CheckboxListTile(
-                    title: Text(state),
-                    value: _selectedStates.contains(state),
-                    onChanged: (bool? isChecked) {
-                      setState(() {
-                        if (isChecked == true) {
-                          if (_selectedStates.length < 5) {
-                            _selectedStates.add(state);
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: Text("Favourite States"),
-                                content: Text(
-                                  'Only 5 selection allowed',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text("OK"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        } else {
-                          _selectedStates.remove(state);
-                        }
-                      });
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) => Padding(
-                  padding: const EdgeInsets.only(left: 15.0, right: 25.0),
-                  child: Divider(
-                    color: Colors.grey.shade300,
-                    thickness: 1,
-                    height: 1, // Reduce height to make the divider more compact
-                  ),
-                ),
-              ),
+              child: _states.isEmpty
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ))
+                  : ListView.separated(
+                      itemCount: _states.length,
+                      itemBuilder: (context, index) {
+                        final state = _states[index].stateId;
+                        return CheckboxListTile(
+                          activeColor: AppColors.primaryColor,
+                          title: Text(_states[index].stateName!),
+                          value: _selectedStateID.contains(state),
+                          onChanged: (bool? isChecked) {
+                            setState(() {
+                              if (isChecked == true) {
+                                if (_selectedStateID.length <
+                                    int.parse(prefs.getString(
+                                        AppStrings.prefFavStateMaxCount))) {
+                                  _selectedStateID.add(state!);
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: Text("Favourite States"),
+                                      content: Text(
+                                        'Only 5 selection allowed',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text("OK"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              } else {
+                                _selectedStateID.remove(state);
+                              }
+                            });
+                          },
+                        );
+                      },
+                      separatorBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.only(left: 15.0, right: 25.0),
+                        child: Divider(
+                          color: Colors.grey.shade300,
+                          thickness: 1,
+                          height:
+                              1, // Reduce height to make the divider more compact
+                        ),
+                      ),
+                    ),
             ),
             RoundedLoadingButton(
               width: double.maxFinite,
               controller: _btnController,
-              onPressed: _selectedStates.isNotEmpty
+              onPressed: _selectedStateID.isNotEmpty
                   ? () async {
-                      /*NavigationHelper.pushNamed(
-                  AppRoutes.stateSelection,
-                );*/
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Text("Selected States"),
-                          content: Text(
-                            _selectedStates.join(", "),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text("OK"),
-                            ),
-                          ],
-                        ),
-                      );
-                      _btnController.reset();
+                      var updateFavStateRes = await AuthServices()
+                          .updateFavState(context, _selectedStateID.join(","));
+                      if (updateFavStateRes.errorCount == 0) {
+                        _btnController.reset();
+                        AwesomeDialog(
+                          context: context,
+                          animType: AnimType.bottomSlide,
+                          dialogType: DialogType.success,
+                          dialogBackgroundColor: Colors.white,
+                          title:
+                              updateFavStateRes.apiResponse![0].responseDetails,
+                          titleTextStyle: AppTheme.appBarText,
+                          descTextStyle: AppTheme.appBarText,
+                          btnOkOnPress: () {
+                            NavigationHelper.pushReplacementNamed(
+                              AppRoutes.dashboardScreen,
+                            );
+                          },
+                          btnOkText: 'OK',
+                          btnOkColor: Colors.greenAccent.shade700,
+                        ).show();
+                      }
                     }
                   : null,
-              color: Colors.orange.shade400,
+              color: AppColors.primaryColor,
               child: Text(
                 AppStrings.finish,
                 style: TextStyle(color: Colors.white),
