@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
@@ -353,6 +354,46 @@ class AuthServices {
         StatusCodeHandler.handleStatusCode(
             context, response.statusCode, response.body);
         return SuccessModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
+  Future<EggPriceModel> getEggPriceList(
+      BuildContext context, String eggID, String fromDate, String toDate, String saleType) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.EGG_PRICE_LIST),
+    );
+    request.fields['eggprice_id'] = eggID;
+    request.fields['eggprice_price_effect_fromdate'] = fromDate;
+    request.fields['eggprice_price_effect_todate'] = toDate;
+    request.fields['eggprice_sale_type'] = saleType;
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return EggPriceModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return EggPriceModel.fromJson(jsonDecode(response.body));
       }
     } catch (e) {
       logger.e('Exception occurred: $e');

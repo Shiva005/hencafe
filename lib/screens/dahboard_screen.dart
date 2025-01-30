@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:hencafe/screens/fragments/home_fragment2.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:hencafe/values/app_strings.dart';
@@ -22,7 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late PageController pageController;
-  final _advancedDrawerController = AdvancedDrawerController();
+  var getProfileRes;
   int _tabIndex = 1;
   var prefs;
 
@@ -35,9 +34,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void initState() {
-    super.initState();
     pageController = PageController(initialPage: _tabIndex);
     loadProfile();
+    super.initState();
   }
 
   @override
@@ -50,22 +49,26 @@ class _DashboardScreenState extends State<DashboardScreen>
     prefs = await SharedPreferences.getInstance();
     bool favStateMaxCount = prefs.containsKey(AppStrings.prefFavStateMaxCount);
     if (!favStateMaxCount) {
-      var getProfileRes = await AuthServices().getProfile(context);
+      getProfileRes = await AuthServices().getProfile(context);
       if (getProfileRes.errorCount == 0) {
-        setState(() {
-          prefs.setString(AppStrings.prefFirstName,
-              getProfileRes.apiResponse![0].userFirstName);
-          prefs.setString(AppStrings.prefLastName,
-              getProfileRes.apiResponse![0].userLastName);
-          prefs.setString(AppStrings.prefFavStateMaxCount,
-              getProfileRes.apiResponse![0].userFavStateMaxCount);
-          prefs.setString(AppStrings.prefUserImage,
-              getProfileRes.apiResponse![0].userProfileImg![0].attachmentPath);
-          prefs.setString(
-              AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
-        });
+        prefs.setString(AppStrings.prefFirstName,
+            getProfileRes.apiResponse![0].userFirstName);
+        prefs.setString(AppStrings.prefLastName,
+            getProfileRes.apiResponse![0].userLastName);
+        prefs.setString(AppStrings.prefFavStateMaxCount,
+            getProfileRes.apiResponse![0].userFavStateMaxCount);
+        prefs.setString(AppStrings.prefUserImage,
+            getProfileRes.apiResponse![0].userProfileImg![0].attachmentPath);
+        prefs.setString(
+            AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
+      }
+      if (getProfileRes.apiResponse![0].userFavouriteStateInfo!.isEmpty) {
+        NavigationHelper.pushNamed(
+          AppRoutes.stateSelection,
+        );
       }
     }
+    setState(() {});
   }
 
   @override

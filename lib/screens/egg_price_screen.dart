@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/navigation_helper.dart';
+import '../models/egg_price_model.dart';
+import '../services/services.dart';
+import '../values/app_colors.dart';
 import '../values/app_icons.dart';
 import '../values/app_theme.dart';
 
@@ -12,46 +17,78 @@ class EggPriceScreen extends StatefulWidget {
 
 class _EggPriceScreenState extends State<EggPriceScreen> {
   bool cardVisibility = false;
+  var prefs;
+  late Future<List<ApiResponse>> eggPriceData;
 
   @override
   void initState() {
     super.initState();
+    eggPriceData = _fetchData();
+  }
+
+  Future<List<ApiResponse>> _fetchData() async {
+    prefs = await SharedPreferences.getInstance();
+    final getEggListRes = await AuthServices()
+        .getEggPriceList(context, '', '2024-12-14', '2024-12-19', 'G');
+
+    if (getEggListRes.errorCount == 0 && getEggListRes.apiResponse != null) {
+      return getEggListRes.apiResponse!;
+    } else {
+      return [];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Egg Price',
-          style: AppTheme.appBarText,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: AppColors.primaryColor,
+          elevation: 1.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              NavigationHelper.pop();
+            },
+          ),
+          title: Text(
+            'Egg Price',
+            style: AppTheme.primaryHeadingDrawer,
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  cardVisibility = !cardVisibility;
+                });
+              },
+              icon: Icon(
+                Icons.filter_list_alt,
+                color: Colors.white,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {});
+              },
+              icon: Icon(
+                Icons.refresh,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (cardVisibility) {
-                  cardVisibility = false;
-                } else {
-                  cardVisibility = true;
-                }
-              });
-            },
-            icon: Icon(
-              Icons.filter_list_alt,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {});
-            },
-            icon: Icon(
-              Icons.refresh,
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -64,7 +101,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                 color: Colors.white,
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
                   child: SizedBox(
                     width: double.infinity,
                     child: Wrap(
@@ -100,12 +137,28 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
               ),
             ),
           ),
-          // Egg Price List
+          // Egg Price List using FutureBuilder
           Expanded(
-            child: ListView.builder(
-              itemCount: 8, // Adjust the count as per your requirement
-              itemBuilder: (context, index) {
-                return const EggPriceCard();
+            child: FutureBuilder<List<ApiResponse>>(
+              future: eggPriceData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text("No data available"));
+                } else {
+                  // List of data
+                  final eggList = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: eggList.length,
+                    itemBuilder: (context, index) {
+                      ApiResponse response = eggList[index];
+                      return EggPriceCard(response: response);
+                    },
+                  );
+                }
               },
             ),
           ),
@@ -118,7 +171,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   void _showBottomSheet(BuildContext context, String filter) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allows the height to expand dynamically
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
@@ -127,7 +180,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
           builder: (context, constraints) {
             return ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8, // 90% of screen height
+                maxHeight: constraints.maxHeight * 0.8,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -146,11 +199,10 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
-                      // Add dynamic content here
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 20, // Example content
+                        itemCount: 20,
                         itemBuilder: (context, index) => ListTile(
                           title: Text("Item $index"),
                         ),
@@ -172,37 +224,10 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   }
 }
 
-class FilterChipWidget extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-
-  const FilterChipWidget({
-    required this.label,
-    required this.onPressed,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Chip(
-        label: Text(
-          label,
-          style: TextStyle(color: Colors.black54,fontSize: 11),
-        ),
-        backgroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.0), // Adjust radius for curve
-        ),
-      ),
-    );
-  }
-}
-
 class EggPriceCard extends StatelessWidget {
-  const EggPriceCard({super.key});
+  final ApiResponse response;
+
+  const EggPriceCard({required this.response, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -217,13 +242,13 @@ class EggPriceCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Price Section
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Card(
                     color: Colors.white,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -231,24 +256,19 @@ class EggPriceCard extends StatelessWidget {
                             'Rs/egg',
                             style: TextStyle(fontSize: 10, color: Colors.grey),
                           ),
-                          Column(
-                            children: [
-                              Text(
-                                '6.60',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange.shade700,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            response.eggpriceCost ?? '',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                // Details Section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +281,7 @@ class EggPriceCard extends StatelessWidget {
                             size: 18,
                           ),
                           const SizedBox(width: 3),
-                          const Text('Nellore'),
+                          Text(response.locationInfo?.stateNameDisplay ?? ''),
                         ],
                       ),
                       Row(
@@ -275,7 +295,7 @@ class EggPriceCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          const Text('Layer'),
+                          Text(response.birdbreedInfo?.birdbreedName ?? ''),
                         ],
                       ),
                       Row(
@@ -286,13 +306,12 @@ class EggPriceCard extends StatelessWidget {
                             size: 18,
                           ),
                           const SizedBox(width: 3),
-                          const Text('Sri Venkateswara Hatcheries'),
+                          Text(response.companyInfo?.companyNameDisplay ?? ''),
                         ],
                       ),
                     ],
                   ),
                 ),
-                // Icons Section
                 Column(
                   children: [
                     SizedBox(
@@ -314,15 +333,46 @@ class EggPriceCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Suresh Ch',
+                Text('${response.userInfo?.userLastName} ${response.userInfo?.userFirstName}',
                     style:
-                        TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                const Text('10-Dec-2024 Monday',
+                    TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                Text(response.eggpricePriceEffectFromdateDisplay ?? '',
                     style: TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class FilterChipWidget extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const FilterChipWidget({
+    required this.label,
+    required this.onPressed,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: Colors.orange.shade700,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      selected: false,
+      onSelected: (_) => onPressed(),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.orange.shade700, width: 1),
       ),
     );
   }

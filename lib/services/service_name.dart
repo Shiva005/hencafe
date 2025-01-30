@@ -13,5 +13,6 @@ class ServiceNames {
   static String STATE_LIST = '${BASE_URL}country_state_city/v1.0/state_list.php';
   static String GET_PROFILE = '${BASE_URL}user/v1.0/user_profile_list.php';
   static String UPDATE_FAV_STATE = '${BASE_URL}user/v1.0/user_favourite_state_update.php';
+  static String EGG_PRICE_LIST = '${BASE_URL}eggprice/v1.0/eggprice_list.php';
 
 }

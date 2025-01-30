@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../helpers/navigation_helper.dart';
+import '../values/app_colors.dart';
 import '../values/app_icons.dart';
 import '../values/app_theme.dart';
 
@@ -22,36 +24,53 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade100,
-        title: Text(
-          'Chick Price',
-          style: AppTheme.appBarText,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: AppColors.primaryColor,
+          elevation: 1.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              NavigationHelper.pop();
+            },
+          ),
+          title: Text(
+            'Chick Price',
+            style: AppTheme.primaryHeadingDrawer,
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  cardVisibility = !cardVisibility;
+                });
+              },
+              icon: Icon(
+                Icons.filter_list_alt,
+                color: Colors.white,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {});
+              },
+              icon: Icon(
+                Icons.refresh,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (cardVisibility) {
-                  cardVisibility = false;
-                } else {
-                  cardVisibility = true;
-                }
-              });
-            },
-            icon: Icon(
-              Icons.filter_list_alt,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {});
-            },
-            icon: Icon(
-              Icons.refresh,
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [

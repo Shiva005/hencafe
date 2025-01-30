@@ -47,40 +47,20 @@ class _HomeFragment2State extends State<HomeFragment2>
                 Row(
                   children: [
                     Expanded(
-                        child: GestureDetector(
-                            onTap: () {
-                              NavigationHelper.pushNamed(
-                                AppRoutes.eggPriceScreen,
-                              );
-                            },
-                            child: _buildDashboardCard(
-                                AppIconsData.colorEgg, "Egg Price"))),
+                        child: _buildDashboardCard(
+                            AppIconsData.colorEgg, "Egg Price")),
                     SizedBox(width: 20),
                     Expanded(
-                        child: GestureDetector(
-                      onTap: () {
-                        NavigationHelper.pushNamed(
-                          AppRoutes.chickPriceScreen,
-                        );
-                      },
-                      child: _buildDashboardCard(
-                          AppIconsData.colorChick, "Chick Price"),
-                    )),
+                        child: _buildDashboardCard(
+                            AppIconsData.colorChick, "Chick Price")),
                   ],
                 ),
                 SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          NavigationHelper.pushNamed(
-                            AppRoutes.chickenPriceScreen,
-                          );
-                        },
-                        child: _buildDashboardCard(
-                            AppIconsData.colorChicken, "Chicken Price"),
-                      ),
+                      child: _buildDashboardCard(
+                          AppIconsData.colorChicken, "Chicken Price"),
                     ),
                     SizedBox(width: 20),
                     Expanded(
@@ -172,7 +152,21 @@ class _HomeFragment2State extends State<HomeFragment2>
         margin: EdgeInsets.zero,
         // Removes extra margin from the card
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            if (label == 'Egg Price') {
+              NavigationHelper.pushNamed(
+                AppRoutes.eggPriceScreen,
+              );
+            } else if (label == 'Chick Price') {
+              NavigationHelper.pushNamed(
+                AppRoutes.chickPriceScreen,
+              );
+            } else if (label == 'Chicken Price') {
+              NavigationHelper.pushNamed(
+                AppRoutes.chickenPriceScreen,
+              );
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Column(

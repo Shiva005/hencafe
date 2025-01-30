@@ -22,25 +22,41 @@ class StateSelectionPage extends StatefulWidget {
 class _StateSelectionPageState extends State<StateSelectionPage> {
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
-  List<ApiResponse> _states = [];
+  late Future<List<ApiResponse>> _dataFuture;
   List<String> _selectedStateID = [];
+  List<String> _previousSelectedStateID = [];
   var prefs;
 
   @override
   void initState() {
-    _fetchStates();
+    _dataFuture = _fetchStates();
+    loadProfile();
     super.initState();
   }
 
-  Future<StateModel> _fetchStates() async {
+  Future<List<ApiResponse>> _fetchStates() async {
     prefs = await SharedPreferences.getInstance();
     final stateRes = await AuthServices().getStates(context);
+
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
+      return stateRes.apiResponse!;
+    } else {
+      return [];
+    }
+  }
+
+  Future<void> loadProfile() async {
+    var getProfileRes = await AuthServices().getProfile(context);
+    if (getProfileRes.errorCount == 0) {
       setState(() {
-        _states = stateRes.apiResponse!;
+        for (var favState
+            in getProfileRes.apiResponse![0].userFavouriteStateInfo!) {
+          String stateId = favState.stateId!;
+          _previousSelectedStateID.add(stateId);
+          _selectedStateID.add(stateId);
+        }
       });
     }
-    return stateRes;
   }
 
   @override
@@ -48,8 +64,8 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(
+          preferredSize: const Size.fromHeight(60.0),
+          child: const MyAppBar(
             title: 'Select Favourite States',
           )),
       body: Padding(
@@ -64,72 +80,85 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                   Icons.info_outline,
                   color: AppColors.primaryColor,
                 ),
-                SizedBox(width: 10),
-                Text(
+                const SizedBox(width: 10),
+                const Text(
                   "Maximum 5 Favourite States",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             Expanded(
-              child: _states.isEmpty
-                  ? const Center(
+              child: FutureBuilder<List<ApiResponse>>(
+                future: _dataFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
                       child: CircularProgressIndicator(
-                      color: AppColors.primaryColor,
-                    ))
-                  : ListView.separated(
-                      itemCount: _states.length,
+                        color: AppColors.primaryColor,
+                        strokeWidth: 2,
+                      ),
+                    );
+                  } else if (snapshot.hasError ||
+                      snapshot.data == null ||
+                      snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No Data Found!!',
+                        style: AppTheme.rejectedTitle,
+                      ),
+                    );
+                  } else {
+                    List<ApiResponse> data2 = snapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: data2.length,
                       itemBuilder: (context, index) {
-                        final state = _states[index].stateId;
                         return CheckboxListTile(
                           activeColor: AppColors.primaryColor,
-                          title: Text(_states[index].stateName!),
-                          value: _selectedStateID.contains(state),
+                          title: Text(data2[index].stateName!),
+                          value:
+                              _selectedStateID.contains(data2[index].stateId!),
                           onChanged: (bool? isChecked) {
                             setState(() {
+                              int maxSelections = int.tryParse(prefs.getString(
+                                          AppStrings.prefFavStateMaxCount) ??
+                                      '5') ??
+                                  5;
+                              String stateId = data2[index].stateId!;
+
                               if (isChecked == true) {
-                                if (_selectedStateID.length <
-                                    int.parse(prefs.getString(
-                                        AppStrings.prefFavStateMaxCount))) {
-                                  _selectedStateID.add(state!);
+                                if (_selectedStateID.length < maxSelections) {
+                                  _selectedStateID.add(stateId);
                                 } else {
                                   showDialog(
                                     context: context,
                                     builder: (_) => AlertDialog(
-                                      title: Text("Favourite States"),
-                                      content: Text(
-                                        'Only 5 selection allowed',
-                                      ),
+                                      title: const Text("Favourite States"),
+                                      content: const Text(
+                                          'Only 5 selections allowed'),
                                       actions: [
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context),
-                                          child: Text("OK"),
+                                          child: const Text("OK"),
                                         ),
                                       ],
                                     ),
                                   );
                                 }
                               } else {
-                                _selectedStateID.remove(state);
+                                _selectedStateID.remove(stateId);
                               }
                             });
                           },
                         );
                       },
-                      separatorBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.only(left: 15.0, right: 25.0),
-                        child: Divider(
-                          color: Colors.grey.shade300,
-                          thickness: 1,
-                          height:
-                              1, // Reduce height to make the divider more compact
-                        ),
-                      ),
-                    ),
+                    );
+                  }
+                },
+              ),
             ),
             RoundedLoadingButton(
               width: double.maxFinite,
@@ -150,7 +179,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                           titleTextStyle: AppTheme.appBarText,
                           descTextStyle: AppTheme.appBarText,
                           btnOkOnPress: () {
-                            NavigationHelper.pushReplacementNamed(
+                            NavigationHelper.pushReplacementNamedUntil(
                               AppRoutes.dashboardScreen,
                             );
                           },
@@ -161,7 +190,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                     }
                   : null,
               color: AppColors.primaryColor,
-              child: Text(
+              child: const Text(
                 AppStrings.finish,
                 style: TextStyle(color: Colors.white),
               ),
