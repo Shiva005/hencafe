@@ -70,6 +70,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  board_datetime_picker:
+    dependency: "direct main"
+    description:
+      name: board_datetime_picker
+      sha256: "798eeaa866a9d6053071b056d7a08c6b2be93385b33163e779465a3037b2aac8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   boolean_selector:
     dependency: transitive
     description:

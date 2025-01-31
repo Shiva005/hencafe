@@ -26,6 +26,9 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   List<String> _selectedStateID = [];
   List<String> _previousSelectedStateID = [];
   var prefs;
+  TextEditingController _searchController = TextEditingController();
+  List<ApiResponse> _allStates = [];
+  List<ApiResponse> _filteredStates = [];
 
   @override
   void initState() {
@@ -39,10 +42,27 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
     final stateRes = await AuthServices().getStates(context);
 
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
+      setState(() {
+        _allStates = stateRes.apiResponse!;
+        _filteredStates = _allStates;
+      });
       return stateRes.apiResponse!;
     } else {
       return [];
     }
+  }
+
+  void _filterStates(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredStates = _allStates;
+      } else {
+        _filteredStates = _allStates
+            .where((state) =>
+                state.stateName!.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   Future<void> loadProfile() async {
@@ -63,13 +83,14 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: const MyAppBar(
             title: 'Select Favourite States',
           )),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
+        padding: const EdgeInsets.only(top:20,bottom: 20,left: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -88,6 +109,22 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
               ],
             ),
             const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.only(left: 10,right: 30),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search states...",
+                  prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
+                  ),
+                ),
+                onChanged: _filterStates,
+              ),
+            ),
+            const SizedBox(height: 10),
             Expanded(
               child: FutureBuilder<List<ApiResponse>>(
                 future: _dataFuture,
@@ -109,27 +146,24 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                       ),
                     );
                   } else {
-                    List<ApiResponse> data2 = snapshot.data!;
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const BouncingScrollPhysics(),
-                      itemCount: data2.length,
+                      itemCount: _filteredStates.length,
                       itemBuilder: (context, index) {
                         return CheckboxListTile(
                           activeColor: AppColors.primaryColor,
-                          title: Text(data2[index].stateName!),
-                          value:
-                              _selectedStateID.contains(data2[index].stateId!),
+                          title: Text(_filteredStates[index].stateName!),
+                          value: _selectedStateID
+                              .contains(_filteredStates[index].stateId!),
                           onChanged: (bool? isChecked) {
                             setState(() {
-                              int maxSelections = int.tryParse(prefs.getString(
-                                          AppStrings.prefFavStateMaxCount) ??
-                                      '5') ??
-                                  5;
-                              String stateId = data2[index].stateId!;
+                              int? maxSelections = int.tryParse(prefs
+                                  .getString(AppStrings.prefFavStateMaxCount));
+                              String stateId = _filteredStates[index].stateId!;
 
                               if (isChecked == true) {
-                                if (_selectedStateID.length < maxSelections) {
+                                if (_selectedStateID.length < maxSelections!) {
                                   _selectedStateID.add(stateId);
                                 } else {
                                   showDialog(
@@ -160,39 +194,42 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                 },
               ),
             ),
-            RoundedLoadingButton(
-              width: double.maxFinite,
-              controller: _btnController,
-              onPressed: _selectedStateID.isNotEmpty
-                  ? () async {
-                      var updateFavStateRes = await AuthServices()
-                          .updateFavState(context, _selectedStateID.join(","));
-                      if (updateFavStateRes.errorCount == 0) {
-                        _btnController.reset();
-                        AwesomeDialog(
-                          context: context,
-                          animType: AnimType.bottomSlide,
-                          dialogType: DialogType.success,
-                          dialogBackgroundColor: Colors.white,
-                          title:
-                              updateFavStateRes.apiResponse![0].responseDetails,
-                          titleTextStyle: AppTheme.appBarText,
-                          descTextStyle: AppTheme.appBarText,
-                          btnOkOnPress: () {
-                            NavigationHelper.pushReplacementNamedUntil(
-                              AppRoutes.dashboardScreen,
-                            );
-                          },
-                          btnOkText: 'OK',
-                          btnOkColor: Colors.greenAccent.shade700,
-                        ).show();
+            Padding(
+              padding: const EdgeInsets.only(left: 10,right: 30),
+              child: RoundedLoadingButton(
+                width: double.maxFinite,
+                controller: _btnController,
+                onPressed: _selectedStateID.isNotEmpty
+                    ? () async {
+                        var updateFavStateRes = await AuthServices()
+                            .updateFavState(context, _selectedStateID.join(","));
+                        if (updateFavStateRes.errorCount == 0) {
+                          _btnController.reset();
+                          AwesomeDialog(
+                            context: context,
+                            animType: AnimType.bottomSlide,
+                            dialogType: DialogType.success,
+                            dialogBackgroundColor: Colors.white,
+                            title:
+                                updateFavStateRes.apiResponse![0].responseDetails,
+                            titleTextStyle: AppTheme.appBarText,
+                            descTextStyle: AppTheme.appBarText,
+                            btnOkOnPress: () {
+                              NavigationHelper.pushReplacementNamedUntil(
+                                AppRoutes.dashboardScreen,
+                              );
+                            },
+                            btnOkText: 'OK',
+                            btnOkColor: Colors.greenAccent.shade700,
+                          ).show();
+                        }
                       }
-                    }
-                  : null,
-              color: AppColors.primaryColor,
-              child: const Text(
-                AppStrings.finish,
-                style: TextStyle(color: Colors.white),
+                    : null,
+                color: AppColors.primaryColor,
+                child: const Text(
+                  AppStrings.submit,
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

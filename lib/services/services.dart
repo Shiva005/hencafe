@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/models/bird_breed_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
@@ -12,6 +13,7 @@ import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/success_model.dart';
+import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -360,8 +362,9 @@ class AuthServices {
       rethrow;
     }
   }
-  Future<EggPriceModel> getEggPriceList(
-      BuildContext context, String eggID, String fromDate, String toDate, String saleType) async {
+
+  Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
+      String fromDate, String toDate, String saleType) async {
     var prefs = await SharedPreferences.getInstance();
 
     var request = http.MultipartRequest(
@@ -394,6 +397,74 @@ class AuthServices {
         StatusCodeHandler.handleStatusCode(
             context, response.statusCode, response.body);
         return EggPriceModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
+
+  Future<BirdBreedModel> getBirdList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.GET_BIRD_LIST),
+    );
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return BirdBreedModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return BirdBreedModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserFavouriteStateModel> getFavouriteStateList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.GET_FAV_STATE_LIST),
+    );
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
       }
     } catch (e) {
       logger.e('Exception occurred: $e');
