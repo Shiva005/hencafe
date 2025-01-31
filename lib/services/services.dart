@@ -4,6 +4,8 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
+import 'package:hencafe/models/city_list_model.dart';
+import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
@@ -261,7 +263,7 @@ class AuthServices {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse(ServiceNames.STATE_LIST),
+      Uri.parse(ServiceNames.GET_STATE_LIST),
     );
     request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
     request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
@@ -437,7 +439,80 @@ class AuthServices {
     }
   }
 
-  Future<UserFavouriteStateModel> getFavouriteStateList(BuildContext context) async {
+  Future<CompanyListModel> getCompanyList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.GET_COMPANY_LIST),
+    );
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return CompanyListModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return CompanyListModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
+
+  Future<CityListModel> getCityList(
+      BuildContext context, String stateID) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.GET_CITY_LIST),
+    );
+    request.fields['state_id'] = stateID;
+    request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return CityListModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return CityListModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserFavouriteStateModel> getFavouriteStateList(
+      BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
 
     var request = http.MultipartRequest(

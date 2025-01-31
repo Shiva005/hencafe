@@ -335,9 +335,7 @@ class EggPriceCard extends StatelessWidget {
                             size: 18,
                           ),
                           const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index].companyInfo
-                                  ?.companyNameDisplay ??
-                              ''),
+                          Text(eggPriceModel.apiResponse![index].companyInfo![0].companyNameLanguage!),
                         ],
                       ),
                     ],

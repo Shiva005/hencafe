@@ -29,6 +29,7 @@ class AppStrings {
   static const String loginWithPin = 'Login with Pin';
   static const String verifyOtp = 'Verify OTP';
   static const String createPinNumber = 'Create Pin Number';
+  static const String sellEgg = 'Sell Egg';
 
   ///SharedPreference Strings
   static const String prefFirstName = 'first_name';

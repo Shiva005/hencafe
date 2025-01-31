@@ -10,11 +10,13 @@ class ServiceNames {
   static String OTP_GENERATE = '${BASE_URL}otp/v1.0/otp_generate.php';
   static String OTP_VALIDATE = '${BASE_URL}otp/v1.0/otp_validate.php';
   static String FORGET_PIN = '${BASE_URL}forget_pin/v1.0/forget_pin.php';
-  static String STATE_LIST = '${BASE_URL}country_state_city/v1.0/state_list.php';
   static String GET_PROFILE = '${BASE_URL}user/v1.0/user_profile_list.php';
   static String UPDATE_FAV_STATE = '${BASE_URL}user/v1.0/user_favourite_state_update.php';
   static String EGG_PRICE_LIST = '${BASE_URL}eggprice/v1.0/eggprice_list.php';
   static String GET_BIRD_LIST = '${BASE_URL}birdbreed/v1.0/birdbreed_list.php';
+  static String GET_STATE_LIST = '${BASE_URL}country_state_city/v1.0/state_list.php';
+  static String GET_CITY_LIST = '${BASE_URL}country_state_city/v1.0/city_list.php';
+  static String GET_COMPANY_LIST = '${BASE_URL}company/v1.0/company_list.php';
   static String GET_FAV_STATE_LIST = '${BASE_URL}user/v1.0/user_favourite_state_list.php';
 
 }

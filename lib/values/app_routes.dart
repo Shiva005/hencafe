@@ -14,4 +14,5 @@ class AppRoutes {
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';
   static const String dashboardScreen = 'dashboard_screen';
+  static const String sellEggScreen = 'sell_egg_screen';
 }

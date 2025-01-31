@@ -77,9 +77,12 @@ class ApiResponse {
     locationInfo = json['location_info'] != null
         ? LocationInfo.fromJson(json['location_info'])
         : null;
-    companyInfo = json['company_info'] != null
-        ? CompanyInfo.fromJson(json['company_info'])
-        : null;
+    if (json['company_info'] != null) {
+      companyInfo = [];
+      json['company_info'].forEach((v) {
+        companyInfo?.add(CompanyInfo.fromJson(v));
+      });
+    }
     userInfo =
         json['user_info'] != null ? UserInfo.fromJson(json['user_info']) : null;
     if (json['eggprice_images'] != null) {
@@ -101,7 +104,7 @@ class ApiResponse {
   String? eggpriceStatus;
   BirdbreedInfo? birdbreedInfo;
   LocationInfo? locationInfo;
-  CompanyInfo? companyInfo;
+  List<CompanyInfo>? companyInfo;
   UserInfo? userInfo;
   List<dynamic>? eggpriceImages;
 
@@ -124,7 +127,7 @@ class ApiResponse {
       map['location_info'] = locationInfo?.toJson();
     }
     if (companyInfo != null) {
-      map['company_info'] = companyInfo?.toJson();
+      map['company_info'] = companyInfo?.map((v) => v.toJson()).toList();
     }
     if (userInfo != null) {
       map['user_info'] = userInfo?.toJson();
@@ -190,43 +193,67 @@ class CompanyInfo {
     this.companyId,
     this.companyUuid,
     this.companyName,
-    this.companyNameDisplay,
+    this.companyNameLanguage,
     this.companyDetails,
     this.companyPocUserName,
     this.companyPocUserMobile,
     this.companyStatus,
+    this.companySupplytypeInfo,
+    this.companyAddresInfo,
   });
 
   CompanyInfo.fromJson(dynamic json) {
     companyId = json['company_id'];
     companyUuid = json['company_uuid'];
     companyName = json['company_name'];
-    companyNameDisplay = json['company_name_display'];
+    companyNameLanguage = json['company_name_language'];
     companyDetails = json['company_details'];
     companyPocUserName = json['company_poc_user_name'];
     companyPocUserMobile = json['company_poc_user_mobile'];
     companyStatus = json['company_status'];
+    if (json['company_supplytype_info'] != null) {
+      companySupplytypeInfo = [];
+      json['company_supplytype_info'].forEach((v) {
+        companySupplytypeInfo?.add(CompanyInfo.fromJson(v));
+      });
+    }
+    if (json['company_addres_info'] != null) {
+      companyAddresInfo = [];
+      json['company_addres_info'].forEach((v) {
+        companyAddresInfo?.add(CompanyInfo.fromJson(v));
+      });
+    }
   }
 
   String? companyId;
   String? companyUuid;
   String? companyName;
-  String? companyNameDisplay;
+  String? companyNameLanguage;
   String? companyDetails;
   String? companyPocUserName;
   String? companyPocUserMobile;
   String? companyStatus;
+  List<dynamic>? companySupplytypeInfo;
+  List<dynamic>? companyAddresInfo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['company_id'] = companyId;
     map['company_uuid'] = companyUuid;
     map['company_name'] = companyName;
-    map['company_name_display'] = companyNameDisplay;
+    map['company_name_language'] = companyNameLanguage;
     map['company_details'] = companyDetails;
     map['company_poc_user_name'] = companyPocUserName;
     map['company_poc_user_mobile'] = companyPocUserMobile;
     map['company_status'] = companyStatus;
+    if (companySupplytypeInfo != null) {
+      map['company_supplytype_info'] =
+          companySupplytypeInfo?.map((v) => v.toJson()).toList();
+    }
+    if (companyAddresInfo != null) {
+      map['company_addres_info'] =
+          companyAddresInfo?.map((v) => v.toJson()).toList();
+    }
     return map;
   }
 }
