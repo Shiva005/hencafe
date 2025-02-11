@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/city_list_model.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
+import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:uuid/uuid.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
@@ -32,24 +33,27 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   late final TextEditingController birdTypeController;
   late final TextEditingController eggPriceController;
+  late final TextEditingController qtyController;
   late final TextEditingController dateController;
   late final TextEditingController stateController;
   late final TextEditingController cityController;
   late final TextEditingController companyController;
-
+  var uuid = Uuid();
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
   Map<String, String> birdBreedList = {};
   Map<String, String> companyList = {};
-  Map<String, String> _states = {};
+  Map<String, String> statelist = {};
   Map<String, String> cityList = {};
-  String? _selectedStateID;
-  bool _hatchingEggs = false;
-  bool _specialSale = false;
+  bool isHatchingEggs = false;
+  bool isSpecialSale = false;
+  var hatchingType = "N";
+  var saleType = "G";
 
   void initializeControllers() {
     eggPriceController = TextEditingController()
       ..addListener(controllerListener);
+    qtyController = TextEditingController()..addListener(controllerListener);
     dateController = TextEditingController()..addListener(controllerListener);
     birdTypeController = TextEditingController()
       ..addListener(controllerListener);
@@ -61,6 +65,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   void disposeControllers() {
     eggPriceController.dispose();
+    qtyController.dispose();
     dateController.dispose();
     birdTypeController.dispose();
     stateController.dispose();
@@ -77,6 +82,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   void initState() {
     initializeControllers();
     _fetchStates();
+    getBirdBreedData();
+    getCompanyData();
     super.initState();
   }
 
@@ -91,7 +98,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
-          _states[favStateRes.apiResponse![i].stateNameLanguage!] =
+          statelist[favStateRes.apiResponse![i].stateNameLanguage!] =
               favStateRes.apiResponse![i].stateId!;
         }
       });
@@ -127,10 +134,11 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     return getCompanyRes;
   }
 
-  Future<CityListModel> getCityData() async {
-    var getCityRes = await AuthServices().getCityList(context, "");
+  Future<CityListModel> getCityData(String state) async {
+    var getCityRes = await AuthServices().getCityList(context, state);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
+        LoadingDialogHelper.dismissLoadingDialog(context);
         for (int i = 0; i < getCityRes.apiResponse!.length; i++) {
           cityList[getCityRes.apiResponse![i].cityNameLanguage!] =
               getCityRes.apiResponse![i].cityId!;
@@ -140,106 +148,98 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     return getCityRes;
   }
 
-  // Function to show a bottom sheet
-  void _showLanguageBottomSheet() async {
-    await _fetchStates();
-
+  void _showSelectionBottomSheet({
+    required String title,
+    required Future<Map<String, String>> Function() fetchData, // Fetch function
+    required TextEditingController controller,
+  }) {
     showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-      ),
-      builder: (context) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Select State",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      _states.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : ListView.builder(
+        backgroundColor: Colors.white,
+        context: context,
+        isScrollControlled: true,
+        // Allows the height to expand dynamically
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+        ),
+        builder: (context) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return FutureBuilder<Map<String, String>>(
+                future: fetchData(), // Fetch data dynamically
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final data = snapshot.data!;
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight:
+                          constraints.maxHeight * 0.9, // 90% of screen height
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Select $title",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                            const SizedBox(height: 20),
+                            ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _states.length,
+                              itemCount: data.length, // Example content
                               itemBuilder: (context, index) {
-                                // Accessing the map key-value pairs
-                                final stateName = _states.keys.elementAt(index);
-                                final stateId = _states[stateName];
-
+                                final key = data.keys.elementAt(index);
                                 return Column(
                                   children: [
                                     ListTile(
-                                      trailing: Radio<String>(
-                                        value: stateId!,
-                                        groupValue: _selectedStateID,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            stateController.text = stateName;
-                                            _selectedStateID = value!;
-                                          });
-                                          SnackbarHelper.showSnackBar(
-                                              _selectedStateID);
-                                          Navigator.pop(context);
-                                        },
-                                      ),
                                       title: Text(
-                                        stateName, // Using the state name as text
+                                        key,
                                         style: const TextStyle(fontSize: 16),
                                       ),
+                                      onTap: () {
+                                        controller.text = key;
+                                        Navigator.pop(context);
+                                        if (title == "State") {
+                                          cityList.clear();
+                                          cityController.text = "";
+                                          LoadingDialogHelper.showLoadingDialog(
+                                              context);
+                                          getCityData(
+                                              statelist[key].toString());
+                                        }
+                                      },
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0, right: 15),
-                                      child: Divider(
-                                        color: Colors.grey.shade200,
-                                        height: 2,
-                                      ),
-                                    ),
+                                    Divider(
+                                        color: Colors.grey.shade200, height: 2),
                                   ],
                                 );
                               },
                             ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Close"),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Close"),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic>? args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final String mobileNumber = args?['mobileNumber'] ?? '';
-    eggPriceController.text = mobileNumber;
+    qtyController.text = "1";
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
@@ -302,24 +302,56 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               }
                               return null;
                             },
-                            onTap: _showLanguageBottomSheet,
+                            onTap: () async => _showSelectionBottomSheet(
+                              title: "Bird Type",
+                              fetchData: () async => birdBreedList,
+                              controller: birdTypeController,
+                            ),
                           ),
                         ),
                       ),
-                      AppTextFormField(
-                        controller: eggPriceController,
-                        labelText: "Egg Price (1)",
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 10,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.currency_rupee_outlined),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter egg price';
-                          }
-                          return null;
-                        },
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: AppTextFormField(
+                              controller: qtyController,
+                              labelText: "Qty",
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              maxLength: 3,
+                              enabled: false,
+                              prefixIcon:
+                                  Icon(Icons.production_quantity_limits),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter Quantity';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            flex: 3,
+                            child: AppTextFormField(
+                              controller: eggPriceController,
+                              labelText: "Egg Price",
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              maxLength: 6,
+                              enabled: true,
+                              prefixIcon: Icon(Icons.currency_rupee_outlined),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter egg price';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 70.0,
@@ -359,7 +391,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                   lastDate: DateTime(2040));
                               if (pickedDate != null) {
                                 String formattedDate =
-                                    DateFormat('dd-MM-yyyy').format(pickedDate);
+                                    DateFormat('yyyy-MM-dd').format(pickedDate);
                                 setState(
                                     () => dateController.text = formattedDate);
                               }
@@ -379,10 +411,15 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             alignment: Alignment.centerRight,
                             scale: 0.7, // Adjust the scale to reduce the size
                             child: Switch(
-                              value: _hatchingEggs,
+                              value: isHatchingEggs,
                               onChanged: (value) {
                                 setState(() {
-                                  _hatchingEggs = value;
+                                  isHatchingEggs = value;
+                                  if (value) {
+                                    hatchingType = "Y";
+                                  } else {
+                                    hatchingType = "N";
+                                  }
                                 });
                               },
                               activeColor: AppColors.primaryColor,
@@ -434,7 +471,11 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               }
                               return null;
                             },
-                            onTap: _showLanguageBottomSheet,
+                            onTap: () async => _showSelectionBottomSheet(
+                              title: "State",
+                              fetchData: () async => statelist,
+                              controller: stateController,
+                            ),
                           ),
                         ),
                       ),
@@ -477,7 +518,11 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               }
                               return null;
                             },
-                            onTap: _showLanguageBottomSheet,
+                            onTap: () async => _showSelectionBottomSheet(
+                              title: "City",
+                              fetchData: () async => cityList,
+                              controller: cityController,
+                            ),
                           ),
                         ),
                       ),
@@ -512,7 +557,11 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               ),
                             ),
                             readOnly: true,
-                            onTap: _showLanguageBottomSheet,
+                            onTap: () async => _showSelectionBottomSheet(
+                              title: "Company",
+                              fetchData: () async => companyList,
+                              controller: companyController,
+                            ),
                           ),
                         ),
                       ),
@@ -528,10 +577,15 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             alignment: Alignment.centerRight,
                             scale: 0.7, // Adjust the scale to reduce the size
                             child: Switch(
-                              value: _specialSale,
+                              value: isSpecialSale,
                               onChanged: (value) {
                                 setState(() {
-                                  _specialSale = value;
+                                  isSpecialSale = value;
+                                  if (value) {
+                                    saleType = "S";
+                                  } else {
+                                    saleType = "G";
+                                  }
                                 });
                               },
                               activeColor: AppColors.primaryColor,
@@ -552,14 +606,27 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             height: 40.0,
                             controller: _btnController,
                             onPressed: () async {
+
                               if (_formKey.currentState?.validate() ?? false) {
-                                var generateOtpRes = await AuthServices()
-                                    .otpGenerate(
-                                        context, eggPriceController.text);
-                                if (generateOtpRes.errorCount == 0) {
+                                var sellEggRes = await AuthServices().sellEgg(
+                                    context,
+                                    companyList[companyController.text]
+                                        .toString(),
+                                    birdBreedList[birdTypeController.text]
+                                        .toString(),
+                                    qtyController.text,
+                                    eggPriceController.text,
+                                    dateController.text,
+                                    saleType,
+                                    hatchingType,
+                                    statelist[stateController.text].toString(),
+                                    cityList[cityController.text].toString(),
+                                    uuid.v1());
+                                if (sellEggRes.errorCount == 0) {
                                   NavigationHelper.pushNamed(
-                                    AppRoutes.loginOtp,
+                                    AppRoutes.dashboardScreen,
                                     arguments: {
+                                      'uuid':uuid,
                                       'pageType':
                                           AppRoutes.registerBasicDetails,
                                     },

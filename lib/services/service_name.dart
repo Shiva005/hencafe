@@ -18,5 +18,6 @@ class ServiceNames {
   static String GET_CITY_LIST = '${BASE_URL}country_state_city/v1.0/city_list.php';
   static String GET_COMPANY_LIST = '${BASE_URL}company/v1.0/company_list.php';
   static String GET_FAV_STATE_LIST = '${BASE_URL}user/v1.0/user_favourite_state_list.php';
+  static String SELL_EGG = '${BASE_URL}eggprice/v1.0/eggprice_create.php';
 
 }

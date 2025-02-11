@@ -546,6 +546,64 @@ class AuthServices {
       rethrow;
     }
   }
+
+  Future<SuccessModel> sellEgg(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String effectDate,
+      String saleType,
+      String isHatchingEgg,
+      String stateID,
+      String cityID,
+      String uuid) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ServiceNames.SELL_EGG),
+    );
+    request.fields['company_id'] = companyID;
+    request.fields['birdbreed_id'] = breedID;
+    request.fields['eggprice_qty'] = qty;
+    request.fields['eggprice_cost'] = cost;
+    request.fields['eggprice_price_effect_fromdate'] = effectDate;
+    request.fields['eggprice_sale_type'] = saleType;
+    request.fields['is_hatching_egg'] = isHatchingEgg;
+    request.fields['state_id'] = stateID;
+    request.fields['city_id'] = cityID;
+    request.fields['uuid'] = uuid;
+    request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
+    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
+    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
+    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
+    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${jsonDecode(response.body)}');
+
+      if (response.statusCode == 200) {
+        return SuccessModel.fromJson(jsonDecode(response.body));
+      } else {
+        StatusCodeHandler.handleStatusCode(
+            context, response.statusCode, response.body);
+        return SuccessModel.fromJson(jsonDecode(response.body));
+      }
+    } catch (e) {
+      logger.e('Exception occurred: $e');
+      rethrow;
+    }
+  }
 }
 
 class StatusCodeHandler {

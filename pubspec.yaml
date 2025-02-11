@@ -41,6 +41,7 @@ dependencies:
   circle_nav_bar: ^2.2.0
   board_datetime_picker: ^2.4.1
   lucide_icons_flutter: ^1.2.6
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
