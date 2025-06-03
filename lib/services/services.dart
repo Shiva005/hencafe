@@ -26,39 +26,122 @@ import '../values/app_strings.dart';
 import 'service_name.dart';
 
 class AuthServices {
-  Future<RegistrationCheckModel> registrationCheck(
+  Future<RegistrationCheckModel> userExists(
       BuildContext context, String mobileNumber) async {
     var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.REGISTRATION_CHECK),
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.REGISTRATION_CHECK}mobile_number=$mobileNumber"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
     );
-    request.fields['user_login_uid'] = mobileNumber;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
 
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
+    logger.d('TAG Registration Check: ${jsonDecode(response.body)}');
+    return RegistrationCheckModel.fromJson(jsonDecode(response.body));
+  }
 
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
+  Future<OtpGenerateModel> otpGenerate(
+      BuildContext context, String mobileNumber) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile': mobileNumber,
+    };
 
-      if (response.statusCode == 200) {
-        return RegistrationCheckModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        throw Exception('Failed to create post: ${response.statusCode}');
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
+    final response = await http.post(
+      Uri.parse(ServiceNames.OTP_GENERATE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG OTP Generate: $payload');
+    logger.d('TAG OTP Generate: ${jsonDecode(response.body)}');
+    return OtpGenerateModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<ValidateOtpModel> otpValidate(
+      BuildContext context, String mobileNumber, String otp) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile': mobileNumber,
+      'otp': otp,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.OTP_VALIDATE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG OTP Validate: $payload');
+    logger.d('TAG OTP Validate: ${jsonDecode(response.body)}');
+    return ValidateOtpModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<LoginPinCheckModel> loginPinCheck(BuildContext context,
+      String mobileNumber, String pin, String loginType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile_number': mobileNumber,
+      'password_otp': pin,
+      'login_type': loginType,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.LOGIN_PIN_CHECK),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Login: $payload');
+    logger.d('TAG Login: ${jsonDecode(response.body)}');
+    return LoginPinCheckModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<StateModel> getStates(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          '${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG State List: ${jsonDecode(response.body)}');
+    return StateModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<CityListModel> getCityList(BuildContext context, String stateID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states/$stateID/cities"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Registration Check: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states/$stateID/cities');
+    return CityListModel.fromJson(jsonDecode(response.body));
   }
 
   Future<RegistrationCreateModel> registrationCreate(
@@ -115,113 +198,6 @@ class AuthServices {
     }
   }
 
-  Future<LoginPinCheckModel> loginPinCheck(
-      BuildContext context, String mobileNumber, String pin) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.LOGIN_PIN_CHECK),
-    );
-    request.fields['user_login_uid'] = mobileNumber;
-    request.fields['user_login_pwd'] = pin;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return LoginPinCheckModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return LoginPinCheckModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
-  Future<OtpGenerateModel> otpGenerate(
-      BuildContext context, String mobileNumber) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.OTP_GENERATE),
-    );
-    request.fields['otp_login_uid'] = mobileNumber;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return OtpGenerateModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return OtpGenerateModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
-  Future<ValidateOtpModel> otpValidate(
-      BuildContext context, String mobileNumber, String otp) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.OTP_VALIDATE),
-    );
-    request.fields['otp_login_uid'] = mobileNumber;
-    request.fields['otp_4_digit_otp'] = otp;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return ValidateOtpModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return ValidateOtpModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
   Future<ForgetPinModel> forgetPin(
       BuildContext context, String mobileNumber, String otp) async {
     var prefs = await SharedPreferences.getInstance();
@@ -251,40 +227,6 @@ class AuthServices {
         StatusCodeHandler.handleStatusCode(
             context, response.statusCode, response.body);
         return ForgetPinModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
-  Future<StateModel> getStates(BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_STATE_LIST),
-    );
-    request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.e('Request Data: ${request.fields}');
-      logger.e('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return StateModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return StateModel.fromJson(jsonDecode(response.body));
       }
     } catch (e) {
       logger.e('Exception occurred: $e');
@@ -468,42 +410,6 @@ class AuthServices {
         StatusCodeHandler.handleStatusCode(
             context, response.statusCode, response.body);
         return CompanyListModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
-
-  Future<CityListModel> getCityList(
-      BuildContext context, String stateID) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_CITY_LIST),
-    );
-    request.fields['state_id'] = stateID;
-    request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return CityListModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return CityListModel.fromJson(jsonDecode(response.body));
       }
     } catch (e) {
       logger.e('Exception occurred: $e');

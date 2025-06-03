@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/state_model.dart';
+import 'package:hencafe/models/city_list_model.dart' as city;
+import 'package:hencafe/models/state_model.dart' as state;
+import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/values/app_regex.dart';
 import 'package:intl/intl.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
@@ -33,11 +35,14 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
   late final TextEditingController referralCodeController;
   late final TextEditingController addressController;
   late final TextEditingController stateController;
+  late final TextEditingController cityController;
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
-  List<ApiResponse> _states = [];
+  List<state.ApiResponse> _states = [];
+  List<city.ApiResponse> _city = [];
   String? _selectedStateID;
+  String? _selectedCityID;
 
   void initializeControllers() {
     firstNameController = TextEditingController()
@@ -48,6 +53,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     dateController = TextEditingController()..addListener(controllerListener);
     emailController = TextEditingController()..addListener(controllerListener);
     stateController = TextEditingController()..addListener(controllerListener);
+    cityController = TextEditingController()..addListener(controllerListener);
     addressController = TextEditingController()
       ..addListener(controllerListener);
     referralCodeController = TextEditingController()
@@ -63,6 +69,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     referralCodeController.dispose();
     addressController.dispose();
     stateController.dispose();
+    cityController.dispose();
   }
 
   void controllerListener() {
@@ -83,18 +90,33 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     super.dispose();
   }
 
-  Future<StateModel> _fetchStates() async {
+  Future<state.StateModel> _fetchStates() async {
+    LoadingDialogHelper.showLoadingDialog(context);
     final stateRes = await AuthServices().getStates(context);
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
       setState(() {
         _states = stateRes.apiResponse!;
       });
     }
+    LoadingDialogHelper.dismissLoadingDialog(context);
     return stateRes;
   }
 
+  Future<city.CityListModel> _fetchCity() async {
+    LoadingDialogHelper.showLoadingDialog(context);
+    final cityRes =
+        await AuthServices().getCityList(context, _selectedStateID!);
+    if (cityRes.errorCount == 0 && cityRes.apiResponse != null) {
+      setState(() {
+        _city = cityRes.apiResponse!;
+      });
+    }
+    LoadingDialogHelper.dismissLoadingDialog(context);
+    return cityRes;
+  }
+
   // Function to show a bottom sheet
-  void _showLanguageBottomSheet() async {
+  void _showStateBottomSheet() async {
     // Fetch states before showing the bottom sheet
     await _fetchStates();
 
@@ -146,6 +168,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                           setState(() {
                                             stateController.text = value!;
                                             _selectedStateID = state.stateId;
+                                            cityController.clear();
                                           });
                                           Navigator.pop(context);
                                         },
@@ -156,8 +179,101 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 10.0,right: 15),
-                                      child: Divider(color: Colors.grey.shade200,height: 2,),
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 15),
+                                      child: Divider(
+                                        color: Colors.grey.shade200,
+                                        height: 2,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Close"),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Function to show a bottom sheet
+  void _showCityBottomSheet() async {
+    await _fetchCity();
+
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (context) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: constraints.maxHeight * 0.8,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Select City",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      _city.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _city.length,
+                              itemBuilder: (context, index) {
+                                final city = _city[index];
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      trailing: Radio<String>(
+                                        value: city.cityNameLanguage ?? '',
+                                        groupValue: _selectedCityID,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            cityController.text = value!;
+                                            _selectedCityID = city.cityId;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      title: Text(
+                                        '${city.cityNameLanguage}',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 15),
+                                      child: Divider(
+                                        color: Colors.grey.shade200,
+                                        height: 2,
+                                      ),
                                     ),
                                   ],
                                 );
@@ -265,49 +381,53 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           return null;
                         },
                       ),
-                      SizedBox(
-                        height: 70.0,
-                        child: GestureDetector(
-                          child: TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: dateController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.grey),
-                              prefixIcon: Icon(Icons.calendar_month),
-                              iconColor: Colors.white,
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "Date Of Birth",
-                              border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
+                      Visibility(
+                        visible: false,
+                        child: SizedBox(
+                          height: 70.0,
+                          child: GestureDetector(
+                            child: TextFormField(
+                              style: TextStyle(color: Colors.black),
+                              controller: dateController,
+                              decoration: InputDecoration(
+                                labelStyle: TextStyle(color: Colors.grey),
+                                prefixIcon: Icon(Icons.calendar_month),
+                                iconColor: Colors.white,
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: "Date Of Birth",
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.green.shade200),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              readOnly: true,
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime(2040));
+                                if (pickedDate != null) {
+                                  String formattedDate =
+                                      DateFormat('dd-MM-yyyy')
+                                          .format(pickedDate);
+                                  setState(() =>
+                                      dateController.text = formattedDate);
+                                }
+                              },
                             ),
-                            readOnly: true,
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime(2040));
-                              if (pickedDate != null) {
-                                String formattedDate =
-                                    DateFormat('dd-MM-yyyy').format(pickedDate);
-                                setState(
-                                    () => dateController.text = formattedDate);
-                              }
-                            },
                           ),
                         ),
                       ),
@@ -366,7 +486,50 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                               }
                               return null;
                             },
-                            onTap: _showLanguageBottomSheet,
+                            onTap: _showStateBottomSheet,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        child: SizedBox(
+                          height: 70.0,
+                          child: TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: cityController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(color: Colors.grey),
+                              prefixIcon: Icon(Icons.location_city),
+                              iconColor: Colors.white,
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: "City",
+                              suffixIcon: Icon(Icons.keyboard_arrow_down),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green.shade200),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value == 'Select City') {
+                                return 'Please select your city';
+                              }
+                              return null;
+                            },
+                            onTap: _showCityBottomSheet,
                           ),
                         ),
                       ),

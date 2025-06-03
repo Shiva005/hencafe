@@ -126,6 +126,13 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                       onChanged: (value) {
                         setState(() {
                           _selectedLanguage = value!;
+                          if (value == 'हिन्दी') {
+                            prfs.setString(AppStrings.prefLanguage, "hi");
+                          } else if (value == 'తెలుగు') {
+                            prfs.setString(AppStrings.prefLanguage, "te");
+                          } else {
+                            prfs.setString(AppStrings.prefLanguage, "en");
+                          }
                         });
                         Navigator.pop(context);
                       },
@@ -264,8 +271,6 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                           AppStrings.prefMobileNumber,
                                           mobileController.text);
                                       prfs.setString(
-                                          AppStrings.prefLanguage, 'english');
-                                      prfs.setString(
                                           AppStrings.prefCountryCode, '101');
                                     });
                                   } else {
@@ -273,7 +278,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                   }
 
                                   var registrationCheckRes =
-                                      await AuthServices().registrationCheck(
+                                      await AuthServices().userExists(
                                           context, mobileController.text);
 
                                   if (registrationCheckRes

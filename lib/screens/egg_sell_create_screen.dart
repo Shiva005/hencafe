@@ -134,7 +134,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     return getCompanyRes;
   }
 
-  Future<CityListModel> getCityData(String state) async {
+  /*Future<CityListModel> getCityData(String state) async {
     var getCityRes = await AuthServices().getCityList(context, state);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
@@ -146,7 +146,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
       });
     }
     return getCityRes;
-  }
+  }*/
 
   void _showSelectionBottomSheet({
     required String title,
@@ -209,8 +209,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                           cityController.text = "";
                                           LoadingDialogHelper.showLoadingDialog(
                                               context);
-                                          getCityData(
-                                              statelist[key].toString());
+                                          /*getCityData(
+                                              statelist[key].toString());*/
                                         }
                                       },
                                     ),

@@ -54,7 +54,7 @@ class ApiResponse {
   });
 
   ApiResponse.fromJson(dynamic json) {
-    registrationStatus = json['registration_status'];
+    registrationStatus = json['response_status'];
     responseCode = json['response_code'];
     responseDetails = json['response_details'];
     responseDetailsLanguage = json['response_details_language'];
@@ -69,7 +69,7 @@ class ApiResponse {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['registration_status'] = registrationStatus;
+    map['response_status'] = registrationStatus;
     map['response_code'] = responseCode;
     map['response_details'] = responseDetails;
     map['response_details_language'] = responseDetailsLanguage;

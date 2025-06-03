@@ -194,24 +194,26 @@ class _LoginPagePinState extends State<LoginPagePin> {
                             if (_formKey.currentState!.validate()) {
                               var loginPinRes = await AuthServices()
                                   .loginPinCheck(context, mobileController.text,
-                                      pinController.text);
-                              if (loginPinRes.errorCount == 0) {
+                                      pinController.text, "password");
+                              if (loginPinRes.apiResponse![0].responseStatus == true) {
                                 var prefs =
                                     await SharedPreferences.getInstance();
                                 prefs.setString(AppStrings.prefUserID,
-                                    loginPinRes.apiResponse![0].userId!);
+                                    loginPinRes.apiResponse![0].userLoginInfo!.userId!);
                                 prefs.setString(AppStrings.prefUserUUID,
-                                    loginPinRes.apiResponse![0].userUuid!);
+                                    loginPinRes.apiResponse![0].userLoginInfo!.userUuid!);
                                 prefs.setString(AppStrings.prefRole,
-                                    loginPinRes.apiResponse![0].userRoleType!);
+                                    loginPinRes.apiResponse![0].userLoginInfo!.userRoleType!);
                                 prefs.setString(AppStrings.prefAuthID,
-                                    loginPinRes.apiResponse![0].authUuid!);
+                                    loginPinRes.apiResponse![0].userLoginInfo!.authUuid!);
                                 NavigationHelper.pushNamed(
                                   AppRoutes.dashboardScreen,
                                   arguments: {
                                     'mobileNumber': mobileController.text
                                   },
                                 );
+                              }else{
+                                SnackbarHelper.showSnackBar(loginPinRes.apiResponse![0].responseDetails!);
                               }
                             }
                             _btnLoginController.reset();
@@ -288,7 +290,6 @@ class _LoginPagePinState extends State<LoginPagePin> {
                         child: Text(AppStrings.loginWithOtp),
                       ),
                     ),
-
                   ],
                 ),
               ),

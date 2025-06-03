@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import file_selector_macos
 import flutter_localization
 import package_info_plus
 import rive_common
@@ -13,6 +14,7 @@ import url_launcher_macos
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FlutterLocalizationPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalizationPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   RivePlugin.register(with: registry.registrar(forPlugin: "RivePlugin"))

@@ -26,8 +26,12 @@ class _WelcomePageState extends State<WelcomePage> {
   Future<void> _checkLoginStatus() async {
     var prefs = await SharedPreferences.getInstance();
     final String? loginUUID = prefs.getString(AppStrings.prefUserID);
+    final String? language = prefs.getString(AppStrings.prefLanguage);
 
     Timer(Duration(seconds: 1), () {
+      if (language == null) {
+        prefs.setString(AppStrings.prefLanguage, "en");
+      }
       if (loginUUID != null && loginUUID.isNotEmpty) {
         Navigator.pushReplacement(
           context,

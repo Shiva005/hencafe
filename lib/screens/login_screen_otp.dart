@@ -167,10 +167,9 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                     mobileNumber,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.bold
-                    ),
+                        fontSize: 16,
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -202,9 +201,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                           }
                         : null, // Set to null when button is disabled
                     child: Text(
-                      _isResendEnabled
-                          ? " RESEND OTP"
-                          : "$_start s",
+                      _isResendEnabled ? " RESEND OTP" : "$_start s",
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.primaryColor,
@@ -267,13 +264,31 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                         }
                       }
                     } else if (pageType == 'LoginWithOtp') {
-                      var validateOtpRes = await AuthServices().otpValidate(
-                          context, mobileNumber, otpController.text);
-                      if (validateOtpRes.errorCount == 0) {
+                      var loginPinRes = await AuthServices().loginPinCheck(
+                          context, mobileNumber, otpController.text, "otp");
+                      if (loginPinRes.apiResponse?[0].responseStatus == true) {
+                        var prefs = await SharedPreferences.getInstance();
+                        prefs.setString(AppStrings.prefUserID,
+                            loginPinRes.apiResponse![0].userLoginInfo!.userId!);
+                        prefs.setString(
+                            AppStrings.prefUserUUID,
+                            loginPinRes
+                                .apiResponse![0].userLoginInfo!.userUuid!);
+                        prefs.setString(
+                            AppStrings.prefRole,
+                            loginPinRes
+                                .apiResponse![0].userLoginInfo!.userRoleType!);
+                        prefs.setString(
+                            AppStrings.prefAuthID,
+                            loginPinRes
+                                .apiResponse![0].userLoginInfo!.authUuid!);
                         NavigationHelper.pushReplacementNamedUntil(
                           AppRoutes.dashboardScreen,
                           arguments: {'mobileNumber': mobileNumber},
                         );
+                      } else {
+                        SnackbarHelper.showSnackBar(
+                            loginPinRes.apiResponse![0].responseDetails!);
                       }
                     }
                   }
