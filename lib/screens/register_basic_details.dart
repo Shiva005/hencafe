@@ -8,6 +8,7 @@ import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
+import '../helpers/snackbar_helper.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
@@ -375,7 +376,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                         enabled: true,
                         prefixIcon: Icon(Icons.alternate_email),
                         validator: (value) {
-                          if (AppRegex.emailRegex.hasMatch(value!)) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email address';
+                          } else if (!AppRegex.emailRegex.hasMatch(value)) {
                             return 'Please enter a valid email address';
                           }
                           return null;
@@ -553,7 +556,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                 var generateOtpRes = await AuthServices()
                                     .otpGenerate(
                                         context, mobileController.text);
-                                if (generateOtpRes.errorCount == 0) {
+                                if (generateOtpRes.apiResponse![0].responseStatus == true) {
                                   NavigationHelper.pushNamed(
                                     AppRoutes.loginOtp,
                                     arguments: {
@@ -563,13 +566,16 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                       'lastName': lastNameController.text,
                                       'mobileNumber': mobileController.text,
                                       'email': emailController.text,
-                                      'dob': dateController.text,
+                                      'city_id': _selectedCityID,
                                       'address': addressController.text,
                                       'stateID': _selectedStateID,
                                       'referralCode':
                                           referralCodeController.text,
                                     },
                                   );
+                                }else{
+                                  SnackbarHelper.showSnackBar(
+                                      generateOtpRes.apiResponse![0].responseDetails!);
                                 }
                               }
                               _btnController.reset();

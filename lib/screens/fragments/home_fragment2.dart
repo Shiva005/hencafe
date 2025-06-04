@@ -36,53 +36,46 @@ class _HomeFragment2State extends State<HomeFragment2>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Card(
-          elevation: 3.0,
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                        child: _buildDashboardCard(
-                            AppIconsData.colorEgg, "Egg Price")),
-                    SizedBox(width: 20),
-                    Expanded(
-                        child: _buildDashboardCard(
-                            AppIconsData.colorChick, "Chick Price")),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDashboardCard(
-                          AppIconsData.colorChicken, "Chicken Price"),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                        child: _buildDashboardCard(
-                            AppIconsData.colorFeed, "Feed Price")),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                        child: _buildDashboardCard(
-                            AppIconsData.colorVideo, "Sale Videos")),
-                    SizedBox(width: 20),
-                    Expanded(
-                        child: _buildDashboardCard(
-                            AppIconsData.colorContact, "Contact")),
-                  ],
-                ),
+                Expanded(
+                    child: _buildDashboardCard(
+                        AppIconsData.colorEgg, "Egg Price")),
+                SizedBox(width: 20),
+                Expanded(
+                    child: _buildDashboardCard(
+                        AppIconsData.colorChick, "Chick Price")),
               ],
             ),
-          ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDashboardCard(
+                      AppIconsData.colorChicken, "Chicken Price"),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                    child: _buildDashboardCard(
+                        AppIconsData.colorFeed, "Feed Price")),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                    child: _buildDashboardCard(
+                        AppIconsData.colorVideo, "Sale Videos")),
+                SizedBox(width: 20),
+                Expanded(
+                    child: _buildDashboardCard(
+                        AppIconsData.colorContact, "Contact")),
+              ],
+            ),
+          ],
         ),
       ),
 
@@ -171,12 +164,12 @@ class _HomeFragment2State extends State<HomeFragment2>
             }
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: Column(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 50, width: 50.0, child: Image.asset(icon)),
-                const SizedBox(height: 8),
+                SizedBox(height: 30, width: 30.0, child: Image.asset(icon)),
+                const SizedBox(width: 8),
                 Text(label, style: const TextStyle(fontSize: 16)),
               ],
             ),

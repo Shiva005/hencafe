@@ -77,7 +77,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
     final String lastName = args?['lastName'] ?? '';
     final String mobileNumber = args?['mobileNumber'] ?? '';
     final String email = args?['email'] ?? '';
-    final String dob = args?['dob'] ?? '';
+    final String cityID = args?['cityID'] ?? '';
     final String address = args?['address'] ?? '';
     final String stateID = args?['stateID'] ?? '';
     final String referralCode = args?['referralCode'] ?? '';
@@ -193,7 +193,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                                       lastName,
                                       mobileNumber,
                                       email,
-                                      dob,
+                                      cityID,
                                       pinController.text,
                                       address,
                                       stateID,
@@ -202,19 +202,19 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                                 prefs.setString(
                                     AppStrings.prefUserID,
                                     registrationCreateRes
-                                        .regUserInfo![0].userId!);
+                                        .regUserInfo!.userId!);
                                 prefs.setString(
                                     AppStrings.prefUserUUID,
                                     registrationCreateRes
-                                        .regUserInfo![0].userUuid!);
+                                        .regUserInfo!.userUuid!);
                                 prefs.setString(
                                     AppStrings.prefRole,
                                     registrationCreateRes
-                                        .regUserInfo![0].userRoleType!);
+                                        .regUserInfo!.userRoleType!);
                                 prefs.setString(
                                     AppStrings.prefAuthID,
                                     registrationCreateRes
-                                        .regUserInfo![0].authUuid!);
+                                        .regUserInfo!.authUuid!);
                                 NavigationHelper.pushNamed(
                                   AppRoutes.dashboardScreen,
                                   arguments: {

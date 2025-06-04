@@ -22,19 +22,16 @@ class RegistrationCreateModel {
         apiResponse?.add(ApiResponse.fromJson(v));
       });
     }
-    if (json['reg_user_info'] != null) {
-      regUserInfo = [];
-      json['reg_user_info'].forEach((v) {
-        regUserInfo?.add(RegUserInfo.fromJson(v));
-      });
-    }
+    regUserInfo = json['reg_user_info'] != null
+        ? RegUserInfo.fromJson(json['reg_user_info'])
+        : null;
   }
 
   int? apiCode;
   int? errorCount;
   List<dynamic>? errorMessage;
   List<ApiResponse>? apiResponse;
-  List<RegUserInfo>? regUserInfo;
+  RegUserInfo? regUserInfo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -47,7 +44,7 @@ class RegistrationCreateModel {
       map['api_response'] = apiResponse?.map((v) => v.toJson()).toList();
     }
     if (regUserInfo != null) {
-      map['reg_user_info'] = regUserInfo?.map((v) => v.toJson()).toList();
+      map['reg_user_info'] = regUserInfo?.toJson();
     }
     return map;
   }
@@ -56,56 +53,64 @@ class RegistrationCreateModel {
 class RegUserInfo {
   RegUserInfo({
     this.userId,
-    this.userLoginUid,
     this.userUuid,
-    this.userRoleType,
+    this.userLoginUid,
     this.authUuid,
+    this.userRoleType,
+    this.userWorkType,
   });
 
   RegUserInfo.fromJson(dynamic json) {
     userId = json['user_id'];
-    userLoginUid = json['user_login_uid'];
     userUuid = json['user_uuid'];
-    userRoleType = json['user_role_type'];
+    userLoginUid = json['user_login_uid'];
     authUuid = json['auth_uuid'];
+    userRoleType = json['user_role_type'];
+    userWorkType = json['user_work_type'];
   }
 
   String? userId;
-  String? userLoginUid;
   String? userUuid;
-  String? userRoleType;
+  String? userLoginUid;
   String? authUuid;
+  String? userRoleType;
+  String? userWorkType;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['user_id'] = userId;
-    map['user_login_uid'] = userLoginUid;
     map['user_uuid'] = userUuid;
-    map['user_role_type'] = userRoleType;
+    map['user_login_uid'] = userLoginUid;
     map['auth_uuid'] = authUuid;
+    map['user_role_type'] = userRoleType;
+    map['user_work_type'] = userWorkType;
     return map;
   }
 }
 
 class ApiResponse {
   ApiResponse({
+    this.responseStatus,
     this.responseCode,
     this.responseDetails,
     this.responseLogs,
   });
 
   ApiResponse.fromJson(dynamic json) {
+    responseStatus = json['response_status'];
     responseCode = json['response_code'];
     responseDetails = json['response_details'];
     responseLogs = json['response_logs'];
   }
 
+  bool? responseStatus;
   String? responseCode;
   String? responseDetails;
   String? responseLogs;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+    map['response_status'] = responseStatus;
     map['response_code'] = responseCode;
     map['response_details'] = responseDetails;
     map['response_logs'] = responseLogs;

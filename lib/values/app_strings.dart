@@ -44,4 +44,5 @@ class AppStrings {
   static const String prefAuthID = 'auth_id';
   static const String prefRole = 'role';
   static const String prefFavStateMaxCount = 'fav_state_max_count';
+  static const String prefIsUserVerified = 'is_user_verified';
 }

@@ -29,6 +29,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   TextEditingController _searchController = TextEditingController();
   List<ApiResponse> _allStates = [];
   List<ApiResponse> _filteredStates = [];
+  int? maxSelections = 0;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
 
   Future<List<ApiResponse>> _fetchStates() async {
     prefs = await SharedPreferences.getInstance();
+    maxSelections = prefs.getInt(AppStrings.prefFavStateMaxCount);
     final stateRes = await AuthServices().getStates(context);
 
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
@@ -71,7 +73,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
       setState(() {
         for (var favState
             in getProfileRes.apiResponse![0].userFavouriteStateInfo!) {
-          String stateId = favState.stateId!;
+          String stateId = favState.stateInfo![0].stateId!;
           _previousSelectedStateID.add(stateId);
           _selectedStateID.add(stateId);
         }
@@ -90,7 +92,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
             title: 'Select Favourite States',
           )),
       body: Padding(
-        padding: const EdgeInsets.only(top:20,bottom: 20,left: 20),
+        padding: const EdgeInsets.only(top: 20, bottom: 20, left: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -102,15 +104,15 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                   color: AppColors.primaryColor,
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  "Maximum 5 Favourite States",
+                Text(
+                  "Maximum $maxSelections Favourite States",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: 15),
             Padding(
-              padding: const EdgeInsets.only(left: 10,right: 30),
+              padding: const EdgeInsets.only(left: 10, right: 30),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -158,8 +160,6 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                               .contains(_filteredStates[index].stateId!),
                           onChanged: (bool? isChecked) {
                             setState(() {
-                              int? maxSelections = int.tryParse(prefs
-                                  .getString(AppStrings.prefFavStateMaxCount));
                               String stateId = _filteredStates[index].stateId!;
 
                               if (isChecked == true) {
@@ -170,8 +170,8 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                                     context: context,
                                     builder: (_) => AlertDialog(
                                       title: const Text("Favourite States"),
-                                      content: const Text(
-                                          'Only 5 selections allowed'),
+                                      content: Text(
+                                          'Only $maxSelections selections allowed'),
                                       actions: [
                                         TextButton(
                                           onPressed: () =>
@@ -195,14 +195,15 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 10,right: 30),
+              padding: const EdgeInsets.only(left: 10, right: 30),
               child: RoundedLoadingButton(
                 width: double.maxFinite,
                 controller: _btnController,
                 onPressed: _selectedStateID.isNotEmpty
                     ? () async {
                         var updateFavStateRes = await AuthServices()
-                            .updateFavState(context, _selectedStateID.join(","));
+                            .updateFavState(
+                                context, _selectedStateID.join(","));
                         if (updateFavStateRes.errorCount == 0) {
                           _btnController.reset();
                           AwesomeDialog(
@@ -210,8 +211,8 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                             animType: AnimType.bottomSlide,
                             dialogType: DialogType.success,
                             dialogBackgroundColor: Colors.white,
-                            title:
-                                updateFavStateRes.apiResponse![0].responseDetails,
+                            title: updateFavStateRes
+                                .apiResponse![0].responseDetails,
                             titleTextStyle: AppTheme.appBarText,
                             descTextStyle: AppTheme.appBarText,
                             btnOkOnPress: () {

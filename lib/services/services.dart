@@ -128,7 +128,8 @@ class AuthServices {
     return StateModel.fromJson(jsonDecode(response.body));
   }
 
-  Future<CityListModel> getCityList(BuildContext context, String stateID) async {
+  Future<CityListModel> getCityList(
+      BuildContext context, String stateID) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
@@ -140,7 +141,7 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Registration Check: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states/$stateID/cities');
+    logger.d('TAG City List: ${jsonDecode(response.body)}');
     return CityListModel.fromJson(jsonDecode(response.body));
   }
 
@@ -150,53 +151,81 @@ class AuthServices {
       String lastName,
       String mobileNumber,
       String email,
-      String dob,
+      String cityID,
       String password,
       String address,
-      String stateId,
+      String stateID,
       String referralCode) async {
     var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'first_name': firstName,
+      'last_name': lastName,
+      'mobile': mobileNumber,
+      'email': email,
+      'password': password,
+      'refferal_code': referralCode,
+      'address': address,
+      'country_id': prefs.getString(AppStrings.prefCountryCode),
+      'state_id': stateID,
+      'city_id': cityID,
+    };
 
-    var request = http.MultipartRequest(
-      'POST',
+    final response = await http.post(
       Uri.parse(ServiceNames.REGISTRATION_CREATE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
     );
-    request.fields['user_first_name'] = firstName;
-    request.fields['user_last_name'] = lastName;
-    request.fields['user_mobile_primary'] = mobileNumber;
-    request.fields['user_email'] = email;
-    request.fields['user_dob'] = dob;
-    request.fields['user_login_pwd'] = password;
-    request.fields['address_address'] = address;
-    request.fields['address_state_id'] = stateId;
-    request.fields['user_referral_from_code'] = referralCode;
-    request.fields['address_country_id'] =
-        prefs.getString(AppStrings.prefCountryCode)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
 
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 201) {
-        return RegistrationCreateModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return RegistrationCreateModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
+    logger.d('TAG Register: $payload');
+    logger.d('TAG Register: ${jsonDecode(response.body)}');
+    return RegistrationCreateModel.fromJson(jsonDecode(response.body));
   }
+
+  Future<ProfileModel> getProfile(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile/"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d(
+        'TAG Get Profile: ${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile/');
+    return ProfileModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> updateFavState(
+      BuildContext context, String stateID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+      'state_id_list': stateID,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.UPDATE_FAV_STATE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update State: $payload');
+    logger.d('TAG Update State: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+
 
   Future<ForgetPinModel> forgetPin(
       BuildContext context, String mobileNumber, String otp) async {
@@ -234,78 +263,7 @@ class AuthServices {
     }
   }
 
-  Future<ProfileModel> getProfile(BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
 
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_PROFILE),
-    );
-    request.fields['profile_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return ProfileModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return ProfileModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
-  Future<SuccessModel> updateFavState(
-      BuildContext context, String stateID) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.UPDATE_FAV_STATE),
-    );
-    request.fields['user_favourite_state_id'] = stateID;
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 202) {
-        return SuccessModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return SuccessModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
 
   Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
       String fromDate, String toDate, String saleType) async {

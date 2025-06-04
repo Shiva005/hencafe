@@ -47,26 +47,27 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
-    bool favStateMaxCount = prefs.containsKey(AppStrings.prefFavStateMaxCount);
-    if (!favStateMaxCount) {
-      getProfileRes = await AuthServices().getProfile(context);
-      if (getProfileRes.errorCount == 0) {
-        prefs.setString(AppStrings.prefFirstName,
-            getProfileRes.apiResponse![0].userFirstName);
-        prefs.setString(AppStrings.prefLastName,
-            getProfileRes.apiResponse![0].userLastName);
-        prefs.setString(AppStrings.prefFavStateMaxCount,
-            getProfileRes.apiResponse![0].userFavStateMaxCount);
-        prefs.setString(AppStrings.prefUserImage,
-            getProfileRes.apiResponse![0].userProfileImg![0].attachmentPath);
-        prefs.setString(
-            AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
-      }
-      if (getProfileRes.apiResponse![0].userFavouriteStateInfo!.isEmpty) {
-        NavigationHelper.pushNamed(
-          AppRoutes.stateSelection,
-        );
-      }
+    getProfileRes = await AuthServices().getProfile(context);
+    if (getProfileRes.errorCount == 0) {
+      prefs.setString(AppStrings.prefFirstName,
+          getProfileRes.apiResponse![0].userFirstName);
+      prefs.setString(
+          AppStrings.prefLastName, getProfileRes.apiResponse![0].userLastName);
+      prefs.setString(AppStrings.prefIsUserVerified,
+          getProfileRes.apiResponse![0].userIsVerfied);
+      prefs.setInt(
+          AppStrings.prefFavStateMaxCount,
+          getProfileRes
+              .apiResponse![0].userMembershipInfo[0].userFavStateMaxCount);
+      prefs.setString(AppStrings.prefUserImage,
+          getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath);
+      prefs.setString(
+          AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
+    }
+    if (getProfileRes.apiResponse![0].userFavouriteStateInfo!.isEmpty) {
+      NavigationHelper.pushNamed(
+        AppRoutes.stateSelection,
+      );
     }
     setState(() {});
   }
@@ -349,7 +350,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         onPressed: () {
                           var mb = prefs.getString(AppStrings.prefMobileNumber);
-                          var language = prefs.getString(AppStrings.prefLanguage);
+                          var language =
+                              prefs.getString(AppStrings.prefLanguage);
                           prefs.clear();
                           prefs.setString(AppStrings.prefLanguage, language!);
                           prefs.setString(AppStrings.prefMobileNumber, mb!);

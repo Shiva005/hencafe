@@ -121,7 +121,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
     final String lastName = args?['lastName'] ?? '';
     final String mobileNumber = args?['mobileNumber'] ?? '';
     final String email = args?['email'] ?? '';
-    final String dob = args?['dob'] ?? '';
+    final String cityID = args?['city_id'] ?? '';
     final String address = args?['address'] ?? '';
     final String stateID = args?['stateID'] ?? '';
     final String referralCode = args?['referralCode'] ?? '';
@@ -221,7 +221,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                     if (pageType == AppRoutes.registerBasicDetails) {
                       var validateOtpRes = await AuthServices().otpValidate(
                           context, mobileNumber, otpController.text);
-                      if (validateOtpRes.errorCount == 0) {
+                      if (validateOtpRes.apiResponse![0].responseStatus == true) {
                         NavigationHelper.pushNamed(
                           AppRoutes.registerCreatePin,
                           arguments: {
@@ -230,12 +230,15 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                             'lastName': lastName,
                             'mobileNumber': mobileNumber,
                             'email': email,
-                            'dob': dob,
+                            'cityID': cityID,
                             'address': address,
                             'stateID': stateID,
                             'referralCode': referralCode,
                           },
                         );
+                      }else{
+                        SnackbarHelper.showSnackBar(
+                            validateOtpRes.apiResponse![0].responseDetails!);
                       }
                     } else if (pageType == AppRoutes.loginPin) {
                       var validateOtpRes = await AuthServices().otpValidate(
