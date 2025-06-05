@@ -12,14 +12,13 @@ class ServiceNames {
   static String REGISTRATION_CREATE = '${BASE_URL}v1/user/register';
   static String GET_PROFILE = '${BASE_URL}v1/user';
   static String UPDATE_FAV_STATE = '${BASE_URL}v1/user/favourite-states';
-
+  static String GET_FAV_STATE_LIST = '${BASE_URL}v1/user';
+  static String GET_BIRD_BREED_LIST = '${BASE_URL}v1/birdbreed/';
+  static String GET_COMPANY_LIST = '${BASE_URL}v1/company/';
+  static String SELL_EGG = '${BASE_URL}v1/egg-sale/create';
+  static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
 
 
   static String FORGET_PIN = '${BASE_URL}forget_pin/v1.0/forget_pin.php';
-  static String EGG_PRICE_LIST = '${BASE_URL}eggprice/v1.0/eggprice_list.php';
-  static String GET_BIRD_LIST = '${BASE_URL}birdbreed/v1.0/birdbreed_list.php';
-  static String GET_COMPANY_LIST = '${BASE_URL}company/v1.0/company_list.php';
-  static String GET_FAV_STATE_LIST = '${BASE_URL}user/v1.0/user_favourite_state_list.php';
-  static String SELL_EGG = '${BASE_URL}eggprice/v1.0/eggprice_create.php';
 
 }

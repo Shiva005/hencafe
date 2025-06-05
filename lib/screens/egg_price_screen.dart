@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +6,7 @@ import '../helpers/navigation_helper.dart';
 import '../models/egg_price_model.dart';
 import '../models/user_favourite_state_model.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
 import '../values/app_theme.dart';
@@ -36,8 +36,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
 
   Future<EggPriceModel> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
-    final getEggListRes = await AuthServices()
-        .getEggPriceList(context, '', '2024-12-14', '2024-12-19', '');
+    final getEggListRes = await AuthServices().getEggPriceList(context, '',
+        Utils.getTodayDateFormatted(), Utils.getTodayDateFormatted(), '');
     return getEggListRes;
   }
 
@@ -61,8 +61,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
         getFaveStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < getFaveStateRes.apiResponse!.length; i++) {
-          favouriteStateList
-              .add(getFaveStateRes.apiResponse![i].stateNameLanguage!);
+          favouriteStateList.add(
+              getFaveStateRes.apiResponse![i].stateInfo![0].stateNameLanguage!);
         }
       });
     }
@@ -281,8 +281,7 @@ class EggPriceCard extends StatelessWidget {
                             style: TextStyle(fontSize: 10, color: Colors.grey),
                           ),
                           Text(
-                            eggPriceModel.apiResponse![index].eggpriceCost ??
-                                '',
+                            eggPriceModel.apiResponse![index].eggsaleCost ?? '',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -306,9 +305,8 @@ class EggPriceCard extends StatelessWidget {
                             size: 18,
                           ),
                           const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index].locationInfo
-                                  ?.stateNameDisplay ??
-                              ''),
+                          Text(
+                              "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
                         ],
                       ),
                       Row(
@@ -322,8 +320,8 @@ class EggPriceCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index].birdbreedInfo
-                                  ?.birdbreedName ??
+                          Text(eggPriceModel.apiResponse![index]
+                                  .birdBreedInfo![0].birdbreedNameLanguage ??
                               ''),
                         ],
                       ),
@@ -335,7 +333,8 @@ class EggPriceCard extends StatelessWidget {
                             size: 18,
                           ),
                           const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index].companyInfo![0].companyNameLanguage!),
+                          Text(eggPriceModel.apiResponse![index]
+                              .companyBasicInfo![0].companyNameLanguage!),
                         ],
                       ),
                     ],
@@ -364,14 +363,16 @@ class EggPriceCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                    '${eggPriceModel.apiResponse![index].userInfo?.userLastName} ${eggPriceModel.apiResponse![index].userInfo?.userFirstName}',
+                    'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
+                    style:
+                        TextStyle(fontSize: 12, color: Colors.green.shade700)),
+                Text(
+                    'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                Text(
+                    '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
                     style:
                         TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                Text(
-                    eggPriceModel.apiResponse![index]
-                            .eggpricePriceEffectFromdateDisplay ??
-                        '',
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/city_list_model.dart';
+import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/utils/loading_dialog_helper.dart';
@@ -11,6 +11,7 @@ import 'package:uuid/uuid.dart';
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../models/bird_breed_model.dart';
+import '../models/city_list_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
@@ -33,8 +34,10 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   late final TextEditingController birdTypeController;
   late final TextEditingController eggPriceController;
+  late final TextEditingController commentController;
   late final TextEditingController qtyController;
-  late final TextEditingController dateController;
+  late final TextEditingController startDateController;
+  late final TextEditingController endDateController;
   late final TextEditingController stateController;
   late final TextEditingController cityController;
   late final TextEditingController companyController;
@@ -48,13 +51,18 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   bool isHatchingEggs = false;
   bool isSpecialSale = false;
   var hatchingType = "N";
-  var saleType = "G";
+  var saleType = "N";
 
   void initializeControllers() {
     eggPriceController = TextEditingController()
       ..addListener(controllerListener);
+    commentController = TextEditingController()
+      ..addListener(controllerListener);
     qtyController = TextEditingController()..addListener(controllerListener);
-    dateController = TextEditingController()..addListener(controllerListener);
+    startDateController = TextEditingController()
+      ..addListener(controllerListener);
+    endDateController = TextEditingController()
+      ..addListener(controllerListener);
     birdTypeController = TextEditingController()
       ..addListener(controllerListener);
     stateController = TextEditingController()..addListener(controllerListener);
@@ -65,8 +73,10 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   void disposeControllers() {
     eggPriceController.dispose();
+    commentController.dispose();
     qtyController.dispose();
-    dateController.dispose();
+    startDateController.dispose();
+    endDateController.dispose();
     birdTypeController.dispose();
     stateController.dispose();
     cityController.dispose();
@@ -98,8 +108,9 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
-          statelist[favStateRes.apiResponse![i].stateNameLanguage!] =
-              favStateRes.apiResponse![i].stateId!;
+          statelist[favStateRes
+                  .apiResponse![i].stateInfo![0].stateNameLanguage!] =
+              favStateRes.apiResponse![i].stateInfo![0].stateId!;
         }
       });
     }
@@ -134,7 +145,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     return getCompanyRes;
   }
 
-  /*Future<CityListModel> getCityData(String state) async {
+  Future<CityListModel> getCityData(String state) async {
     var getCityRes = await AuthServices().getCityList(context, state);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
@@ -146,7 +157,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
       });
     }
     return getCityRes;
-  }*/
+  }
 
   void _showSelectionBottomSheet({
     required String title,
@@ -209,8 +220,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                           cityController.text = "";
                                           LoadingDialogHelper.showLoadingDialog(
                                               context);
-                                          /*getCityData(
-                                              statelist[key].toString());*/
+                                          getCityData(
+                                              statelist[key].toString());
                                         }
                                       },
                                     ),
@@ -314,7 +325,6 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Expanded(
-                            flex: 2,
                             child: AppTextFormField(
                               controller: qtyController,
                               labelText: "Qty",
@@ -334,10 +344,9 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            flex: 3,
                             child: AppTextFormField(
                               controller: eggPriceController,
-                              labelText: "Egg Price",
+                              labelText: "Price",
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               maxLength: 6,
@@ -353,51 +362,108 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 70.0,
-                        child: GestureDetector(
-                          child: TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: dateController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.grey),
-                              prefixIcon: Icon(Icons.calendar_month),
-                              iconColor: Colors.white,
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "Effect from date",
-                              border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
-                                borderRadius: BorderRadius.circular(10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 70.0,
+                              child: GestureDetector(
+                                child: TextFormField(
+                                  style: TextStyle(color: Colors.black),
+                                  controller: startDateController,
+                                  decoration: InputDecoration(
+                                    labelStyle: TextStyle(color: Colors.grey),
+                                    prefixIcon: Icon(Icons.calendar_month),
+                                    iconColor: Colors.white,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    labelText: "Start Date",
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.green.shade200),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  readOnly: true,
+                                  onTap: () async {
+                                    DateTime? pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime(2040));
+                                    if (pickedDate != null) {
+                                      String formattedDate =
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(pickedDate);
+                                      setState(() => startDateController.text =
+                                          formattedDate);
+                                    }
+                                  },
+                                ),
                               ),
                             ),
-                            readOnly: true,
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime(2040));
-                              if (pickedDate != null) {
-                                String formattedDate =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
-                                setState(
-                                    () => dateController.text = formattedDate);
-                              }
-                            },
                           ),
-                        ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: SizedBox(
+                              height: 70.0,
+                              child: GestureDetector(
+                                child: TextFormField(
+                                  style: TextStyle(color: Colors.black),
+                                  controller: endDateController,
+                                  decoration: InputDecoration(
+                                    labelStyle: TextStyle(color: Colors.grey),
+                                    prefixIcon: Icon(Icons.calendar_month),
+                                    iconColor: Colors.white,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    labelText: "End Date",
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.green.shade200),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  readOnly: true,
+                                  onTap: () async {
+                                    DateTime? pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime(2040));
+                                    if (pickedDate != null) {
+                                      String formattedDate =
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(pickedDate);
+                                      setState(() => endDateController.text =
+                                          formattedDate);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       Row(
                         children: [
@@ -431,6 +497,9 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(
+                        height: 10,
                       ),
                       GestureDetector(
                         child: SizedBox(
@@ -565,6 +634,22 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                           ),
                         ),
                       ),
+                      AppTextFormField(
+                        controller: commentController,
+                        labelText: "Enter Comment",
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        enabled: true,
+                        minLines: 2,
+                        maxLines: 2,
+                        prefixIcon: Icon(Icons.comment),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter comment';
+                          }
+                          return null;
+                        },
+                      ),
                       Row(
                         children: [
                           Expanded(
@@ -582,9 +667,9 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                 setState(() {
                                   isSpecialSale = value;
                                   if (value) {
-                                    saleType = "S";
+                                    saleType = "Y";
                                   } else {
-                                    saleType = "G";
+                                    saleType = "N";
                                   }
                                 });
                               },
@@ -598,15 +683,15 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           RoundedLoadingButton(
                             width: MediaQuery.of(context).size.width * 0.4,
-                            height: 40.0,
+                            height: 45.0,
                             controller: _btnController,
                             onPressed: () async {
-
                               if (_formKey.currentState?.validate() ?? false) {
                                 var sellEggRes = await AuthServices().sellEgg(
                                     context,
@@ -616,21 +701,29 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                         .toString(),
                                     qtyController.text,
                                     eggPriceController.text,
-                                    dateController.text,
+                                    commentController.text,
+                                    startDateController.text,
+                                    endDateController.text,
                                     saleType,
                                     hatchingType,
                                     statelist[stateController.text].toString(),
                                     cityList[cityController.text].toString(),
                                     uuid.v1());
-                                if (sellEggRes.errorCount == 0) {
+                                if (sellEggRes.apiResponse![0].responseStatus ==
+                                    true) {
                                   NavigationHelper.pushNamed(
                                     AppRoutes.dashboardScreen,
                                     arguments: {
-                                      'uuid':uuid,
+                                      'uuid': uuid,
                                       'pageType':
                                           AppRoutes.registerBasicDetails,
                                     },
                                   );
+                                  SnackbarHelper.showSnackBar(sellEggRes
+                                      .apiResponse![0].responseDetails);
+                                } else {
+                                  SnackbarHelper.showSnackBar(sellEggRes
+                                      .apiResponse![0].responseDetails);
                                 }
                               }
                               _btnController.reset();

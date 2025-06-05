@@ -1,10 +1,9 @@
 class SuccessModel {
   SuccessModel({
-    this.apiCode,
-    this.errorCount,
-    this.errorMessage,
-    this.apiResponse,
-  });
+      this.apiCode, 
+      this.errorCount, 
+      this.errorMessage, 
+      this.apiResponse,});
 
   SuccessModel.fromJson(dynamic json) {
     apiCode = json['api_code'];
@@ -22,7 +21,6 @@ class SuccessModel {
       });
     }
   }
-
   int? apiCode;
   int? errorCount;
   List<dynamic>? errorMessage;
@@ -40,30 +38,34 @@ class SuccessModel {
     }
     return map;
   }
+
 }
 
 class ApiResponse {
   ApiResponse({
-    this.responseCode,
-    this.responseDetails,
-    this.responseLogs,
-  });
+      this.responseStatus, 
+      this.responseCode, 
+      this.responseDetails, 
+      this.responseLogs,});
 
   ApiResponse.fromJson(dynamic json) {
+    responseStatus = json['response_status'];
     responseCode = json['response_code'];
     responseDetails = json['response_details'];
     responseLogs = json['response_logs'];
   }
-
+  bool? responseStatus;
   String? responseCode;
   String? responseDetails;
   String? responseLogs;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+    map['response_status'] = responseStatus;
     map['response_code'] = responseCode;
     map['response_details'] = responseDetails;
     map['response_logs'] = responseLogs;
     return map;
   }
+
 }

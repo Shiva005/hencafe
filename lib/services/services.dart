@@ -197,8 +197,7 @@ class AuthServices {
       },
     );
 
-    logger.d(
-        'TAG Get Profile: ${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile/');
+    logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
     return ProfileModel.fromJson(jsonDecode(response.body));
   }
 
@@ -225,7 +224,122 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> sellEgg(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String comment,
+      String effectFromDate,
+      String effectTillDate,
+      String saleType,
+      String isHatchingEgg,
+      String stateID,
+      String cityID,
+      String uuid) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'qty': qty,
+      'cost': cost,
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'is_special_sale': saleType,
+      'is_hatching_egg': isHatchingEgg,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'company_id': companyID,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'eggsale_uuid': uuid,
+    };
 
+    final response = await http.post(
+      Uri.parse(ServiceNames.SELL_EGG),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<UserFavouriteStateModel> getFavouriteStateList(
+      BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states/"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Get Fav State: ${jsonDecode(response.body)}');
+    return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<BirdBreedModel> getBirdList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(ServiceNames.GET_BIRD_BREED_LIST),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Get Bird Breed: ${jsonDecode(response.body)}');
+    return BirdBreedModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<CompanyListModel> getCompanyList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(ServiceNames.GET_COMPANY_LIST),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Get Company List: ${jsonDecode(response.body)}');
+    return CompanyListModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
+      String fromDate, String toDate, String saleType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse('${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+    );
+
+    logger.d(
+        'TAG Get Egg Price List: ${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate');
+    return EggPriceModel.fromJson(jsonDecode(response.body));
+  }
 
   Future<ForgetPinModel> forgetPin(
       BuildContext context, String mobileNumber, String otp) async {
@@ -260,212 +374,6 @@ class AuthServices {
     } catch (e) {
       logger.e('Exception occurred: $e');
       rethrow; // Re-throwing the exception for the caller to handle
-    }
-  }
-
-
-
-  Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
-      String fromDate, String toDate, String saleType) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.EGG_PRICE_LIST),
-    );
-    request.fields['eggprice_id'] = eggID;
-    request.fields['eggprice_price_effect_fromdate'] = fromDate;
-    request.fields['eggprice_price_effect_todate'] = toDate;
-    request.fields['eggprice_sale_type'] = saleType;
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return EggPriceModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return EggPriceModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
-
-  Future<BirdBreedModel> getBirdList(BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_BIRD_LIST),
-    );
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return BirdBreedModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return BirdBreedModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
-
-  Future<CompanyListModel> getCompanyList(BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_COMPANY_LIST),
-    );
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return CompanyListModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return CompanyListModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
-
-  Future<UserFavouriteStateModel> getFavouriteStateList(
-      BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.GET_FAV_STATE_LIST),
-    );
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
-    }
-  }
-
-  Future<SuccessModel> sellEgg(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String effectDate,
-      String saleType,
-      String isHatchingEgg,
-      String stateID,
-      String cityID,
-      String uuid) async {
-    var prefs = await SharedPreferences.getInstance();
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ServiceNames.SELL_EGG),
-    );
-    request.fields['company_id'] = companyID;
-    request.fields['birdbreed_id'] = breedID;
-    request.fields['eggprice_qty'] = qty;
-    request.fields['eggprice_cost'] = cost;
-    request.fields['eggprice_price_effect_fromdate'] = effectDate;
-    request.fields['eggprice_sale_type'] = saleType;
-    request.fields['is_hatching_egg'] = isHatchingEgg;
-    request.fields['state_id'] = stateID;
-    request.fields['city_id'] = cityID;
-    request.fields['uuid'] = uuid;
-    request.fields['country_id'] = prefs.getString(AppStrings.prefCountryCode)!;
-    request.fields['user_id'] = prefs.getString(AppStrings.prefUserID)!;
-    request.fields['user_role_type'] = prefs.getString(AppStrings.prefRole)!;
-    request.fields['auth_uuid'] = prefs.getString(AppStrings.prefAuthID)!;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
-
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return SuccessModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return SuccessModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow;
     }
   }
 }

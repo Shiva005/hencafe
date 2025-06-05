@@ -1,9 +1,10 @@
 class CompanyListModel {
   CompanyListModel({
-      this.apiCode, 
-      this.errorCount, 
-      this.errorMessage, 
-      this.apiResponse,});
+    this.apiCode,
+    this.errorCount,
+    this.errorMessage,
+    this.apiResponse,
+  });
 
   CompanyListModel.fromJson(dynamic json) {
     apiCode = json['api_code'];
@@ -21,6 +22,7 @@ class CompanyListModel {
       });
     }
   }
+
   int? apiCode;
   int? errorCount;
   List<dynamic>? errorMessage;
@@ -38,21 +40,20 @@ class CompanyListModel {
     }
     return map;
   }
-
 }
 
 class ApiResponse {
   ApiResponse({
-      this.companyId, 
-      this.companyUuid, 
-      this.companyName, 
-      this.companyNameLanguage, 
-      this.companyDetails, 
-      this.companyPocUserName, 
-      this.companyPocUserMobile, 
-      this.companyStatus, 
-      this.companyAddresInfo, 
-      this.companyLikeDislikeRatingsInfo,});
+    this.companyId,
+    this.companyUuid,
+    this.companyName,
+    this.companyNameLanguage,
+    this.companyDetails,
+    this.companyContactUserName,
+    this.companyContactUserMobile,
+    this.companyContactUserEmail,
+    this.attachmentInfo,
+  });
 
   ApiResponse.fromJson(dynamic json) {
     companyId = json['company_id'];
@@ -60,32 +61,26 @@ class ApiResponse {
     companyName = json['company_name'];
     companyNameLanguage = json['company_name_language'];
     companyDetails = json['company_details'];
-    companyPocUserName = json['company_poc_user_name'];
-    companyPocUserMobile = json['company_poc_user_mobile'];
-    companyStatus = json['company_status'];
-    if (json['company_addres_info'] != null) {
-      companyAddresInfo = [];
-      json['company_addres_info'].forEach((v) {
-        companyAddresInfo?.add(CompanyAddresInfo.fromJson(v));
-      });
-    }
-    if (json['company_likeDislikeRatings_info'] != null) {
-      companyLikeDislikeRatingsInfo = [];
-      json['company_likeDislikeRatings_info'].forEach((v) {
-        companyLikeDislikeRatingsInfo?.add(CompanyLikeDislikeRatingsInfo.fromJson(v));
+    companyContactUserName = json['company_contact_user_name'];
+    companyContactUserMobile = json['company_contact_user_mobile'];
+    companyContactUserEmail = json['company_contact_user_email'];
+    if (json['attachment_info'] != null) {
+      attachmentInfo = [];
+      json['attachment_info'].forEach((v) {
+        attachmentInfo?.add(AttachmentInfo.fromJson(v));
       });
     }
   }
+
   String? companyId;
   String? companyUuid;
   String? companyName;
   String? companyNameLanguage;
   String? companyDetails;
-  String? companyPocUserName;
-  String? companyPocUserMobile;
-  String? companyStatus;
-  List<CompanyAddresInfo>? companyAddresInfo;
-  List<CompanyLikeDislikeRatingsInfo>? companyLikeDislikeRatingsInfo;
+  String? companyContactUserName;
+  String? companyContactUserMobile;
+  String? companyContactUserEmail;
+  List<AttachmentInfo>? attachmentInfo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -94,149 +89,50 @@ class ApiResponse {
     map['company_name'] = companyName;
     map['company_name_language'] = companyNameLanguage;
     map['company_details'] = companyDetails;
-    map['company_poc_user_name'] = companyPocUserName;
-    map['company_poc_user_mobile'] = companyPocUserMobile;
-    map['company_status'] = companyStatus;
-    if (companyAddresInfo != null) {
-      map['company_addres_info'] = companyAddresInfo?.map((v) => v.toJson()).toList();
-    }
-    if (companyLikeDislikeRatingsInfo != null) {
-      map['company_likeDislikeRatings_info'] = companyLikeDislikeRatingsInfo?.map((v) => v.toJson()).toList();
+    map['company_contact_user_name'] = companyContactUserName;
+    map['company_contact_user_mobile'] = companyContactUserMobile;
+    map['company_contact_user_email'] = companyContactUserEmail;
+    if (attachmentInfo != null) {
+      map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
     }
     return map;
   }
-
 }
 
-class CompanyLikeDislikeRatingsInfo {
-  CompanyLikeDislikeRatingsInfo({
-      this.likeratingsActionCode, 
-      this.likeratingsActionName, 
-      this.likeratingsActionCount, 
-      this.likeratingsActionValue,});
+class AttachmentInfo {
+  AttachmentInfo({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
 
-  CompanyLikeDislikeRatingsInfo.fromJson(dynamic json) {
-    likeratingsActionCode = json['likeratings_action_code'];
-    likeratingsActionName = json['likeratings_action_name '];
-    likeratingsActionCount = json['likeratings_action_count'];
-    likeratingsActionValue = json['likeratings_action_value'];
+  AttachmentInfo.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
   }
-  String? likeratingsActionCode;
-  String? likeratingsActionName;
-  String? likeratingsActionCount;
-  String? likeratingsActionValue;
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['likeratings_action_code'] = likeratingsActionCode;
-    map['likeratings_action_name '] = likeratingsActionName;
-    map['likeratings_action_count'] = likeratingsActionCount;
-    map['likeratings_action_value'] = likeratingsActionValue;
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
     return map;
   }
-
-}
-
-class CompanyAddresInfo {
-  CompanyAddresInfo({
-      this.addressId, 
-      this.addressReferenceFrom, 
-      this.addressReferenceUuid, 
-      this.addressType, 
-      this.addressAddress, 
-      this.addressZipcode, 
-      this.addressGeoCode, 
-      this.addressGeoAddress, 
-      this.addressStatus, 
-      this.locationInfo,});
-
-  CompanyAddresInfo.fromJson(dynamic json) {
-    addressId = json['address_id'];
-    addressReferenceFrom = json['address_reference_from'];
-    addressReferenceUuid = json['address_reference_uuid'];
-    addressType = json['address_type'];
-    addressAddress = json['address_address'];
-    addressZipcode = json['address_zipcode'];
-    addressGeoCode = json['address_geo_code'];
-    addressGeoAddress = json['address_geo_address'];
-    addressStatus = json['address_status'];
-    locationInfo = json['location_info'] != null ? LocationInfo.fromJson(json['location_info']) : null;
-  }
-  String? addressId;
-  String? addressReferenceFrom;
-  String? addressReferenceUuid;
-  String? addressType;
-  String? addressAddress;
-  String? addressZipcode;
-  String? addressGeoCode;
-  String? addressGeoAddress;
-  String? addressStatus;
-  LocationInfo? locationInfo;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['address_id'] = addressId;
-    map['address_reference_from'] = addressReferenceFrom;
-    map['address_reference_uuid'] = addressReferenceUuid;
-    map['address_type'] = addressType;
-    map['address_address'] = addressAddress;
-    map['address_zipcode'] = addressZipcode;
-    map['address_geo_code'] = addressGeoCode;
-    map['address_geo_address'] = addressGeoAddress;
-    map['address_status'] = addressStatus;
-    if (locationInfo != null) {
-      map['location_info'] = locationInfo?.toJson();
-    }
-    return map;
-  }
-
-}
-
-class LocationInfo {
-  LocationInfo({
-      this.countryId, 
-      this.countryName, 
-      this.countryNameDisplay, 
-      this.stateId, 
-      this.stateName, 
-      this.stateNameDisplay, 
-      this.cityId, 
-      this.cityName, 
-      this.cityNameDisplay,});
-
-  LocationInfo.fromJson(dynamic json) {
-    countryId = json['country_id'];
-    countryName = json['country_name'];
-    countryNameDisplay = json['country_name_display'];
-    stateId = json['state_id'];
-    stateName = json['state_name'];
-    stateNameDisplay = json['state_name_display'];
-    cityId = json['city_id'];
-    cityName = json['city_name'];
-    cityNameDisplay = json['city_name_display'];
-  }
-  String? countryId;
-  String? countryName;
-  String? countryNameDisplay;
-  String? stateId;
-  String? stateName;
-  String? stateNameDisplay;
-  String? cityId;
-  String? cityName;
-  String? cityNameDisplay;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['country_id'] = countryId;
-    map['country_name'] = countryName;
-    map['country_name_display'] = countryNameDisplay;
-    map['state_id'] = stateId;
-    map['state_name'] = stateName;
-    map['state_name_display'] = stateNameDisplay;
-    map['city_id'] = cityId;
-    map['city_name'] = cityName;
-    map['city_name_display'] = cityNameDisplay;
-    return map;
-  }
-
 }

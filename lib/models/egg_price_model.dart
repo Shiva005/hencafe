@@ -44,197 +44,229 @@ class EggPriceModel {
 
 class ApiResponse {
   ApiResponse({
-    this.eggpriceId,
-    this.eggpriceUuid,
-    this.eggpriceQty,
-    this.eggpriceCost,
-    this.eggpricePriceEffectFromdate,
-    this.eggpricePriceEffectFromdateDisplay,
-    this.eggpriceSaleType,
+    this.eggsaleId,
+    this.eggsaleUuid,
+    this.eggsaleQty,
+    this.eggsaleCost,
+    this.eggsaleEffectFrom,
+    this.eggsaleEffectTo,
+    this.isSpecialSale,
     this.isHatchingEgg,
-    this.eggpriceStatus,
-    this.birdbreedInfo,
-    this.locationInfo,
-    this.companyInfo,
-    this.userInfo,
-    this.eggpriceImages,
+    this.eggsaleComment,
+    this.eggsaleStatus,
+    this.eggsaleCreatedon,
+    this.eggsaleUpdatedon,
+    this.birdBreedInfo,
+    this.userBasicInfo,
+    this.companyBasicInfo,
+    this.attachmentInfo,
+    this.addressDetails,
   });
 
   ApiResponse.fromJson(dynamic json) {
-    eggpriceId = json['eggprice_id'];
-    eggpriceUuid = json['eggprice_uuid'];
-    eggpriceQty = json['eggprice_qty'];
-    eggpriceCost = json['eggprice_cost'];
-    eggpricePriceEffectFromdate = json['eggprice_price_effect_fromdate'];
-    eggpricePriceEffectFromdateDisplay =
-        json['eggprice_price_effect_fromdate_display'];
-    eggpriceSaleType = json['eggprice_sale_type'];
+    eggsaleId = json['eggsale_id'];
+    eggsaleUuid = json['eggsale_uuid'];
+    eggsaleQty = json['eggsale_qty'];
+    eggsaleCost = json['eggsale_cost'];
+    eggsaleEffectFrom = json['eggsale_effect_from'];
+    eggsaleEffectTo = json['eggsale_effect_to'];
+    isSpecialSale = json['is_special_sale'];
     isHatchingEgg = json['is_hatching_egg'];
-    eggpriceStatus = json['eggprice_status'];
-    birdbreedInfo = json['birdbreed_info'] != null
-        ? BirdbreedInfo.fromJson(json['birdbreed_info'])
-        : null;
-    locationInfo = json['location_info'] != null
-        ? LocationInfo.fromJson(json['location_info'])
-        : null;
-    if (json['company_info'] != null) {
-      companyInfo = [];
-      json['company_info'].forEach((v) {
-        companyInfo?.add(CompanyInfo.fromJson(v));
+    eggsaleComment = json['eggsale_comment'];
+    eggsaleStatus = json['eggsale_status'];
+    eggsaleCreatedon = json['eggsale_createdon'];
+    eggsaleUpdatedon = json['eggsale_updatedon'];
+    if (json['bird_breed_info'] != null) {
+      birdBreedInfo = [];
+      json['bird_breed_info'].forEach((v) {
+        birdBreedInfo?.add(BirdBreedInfo.fromJson(v));
       });
     }
-    userInfo =
-        json['user_info'] != null ? UserInfo.fromJson(json['user_info']) : null;
-    if (json['eggprice_images'] != null) {
-      eggpriceImages = [];
-      json['eggprice_images'].forEach((v) {
-        eggpriceImages?.add(ApiResponse.fromJson(v));
+    if (json['user_basic_info'] != null) {
+      userBasicInfo = [];
+      json['user_basic_info'].forEach((v) {
+        userBasicInfo?.add(UserBasicInfo.fromJson(v));
+      });
+    }
+    if (json['company_basic_info'] != null) {
+      companyBasicInfo = [];
+      json['company_basic_info'].forEach((v) {
+        companyBasicInfo?.add(CompanyBasicInfo.fromJson(v));
+      });
+    }
+    if (json['attachment_info'] != null) {
+      attachmentInfo = [];
+      json['attachment_info'].forEach((v) {
+        attachmentInfo?.add(AttachmentInfo.fromJson(v));
+      });
+    }
+    if (json['address_details'] != null) {
+      addressDetails = [];
+      json['address_details'].forEach((v) {
+        addressDetails?.add(AddressDetails.fromJson(v));
       });
     }
   }
 
-  String? eggpriceId;
-  String? eggpriceUuid;
-  String? eggpriceQty;
-  String? eggpriceCost;
-  String? eggpricePriceEffectFromdate;
-  String? eggpricePriceEffectFromdateDisplay;
-  String? eggpriceSaleType;
+  String? eggsaleId;
+  String? eggsaleUuid;
+  int? eggsaleQty;
+  String? eggsaleCost;
+  String? eggsaleEffectFrom;
+  String? eggsaleEffectTo;
+  String? isSpecialSale;
   String? isHatchingEgg;
-  String? eggpriceStatus;
-  BirdbreedInfo? birdbreedInfo;
-  LocationInfo? locationInfo;
-  List<CompanyInfo>? companyInfo;
-  UserInfo? userInfo;
-  List<dynamic>? eggpriceImages;
+  String? eggsaleComment;
+  String? eggsaleStatus;
+  String? eggsaleCreatedon;
+  String? eggsaleUpdatedon;
+  List<BirdBreedInfo>? birdBreedInfo;
+  List<UserBasicInfo>? userBasicInfo;
+  List<CompanyBasicInfo>? companyBasicInfo;
+  List<AttachmentInfo>? attachmentInfo;
+  List<AddressDetails>? addressDetails;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['eggprice_id'] = eggpriceId;
-    map['eggprice_uuid'] = eggpriceUuid;
-    map['eggprice_qty'] = eggpriceQty;
-    map['eggprice_cost'] = eggpriceCost;
-    map['eggprice_price_effect_fromdate'] = eggpricePriceEffectFromdate;
-    map['eggprice_price_effect_fromdate_display'] =
-        eggpricePriceEffectFromdateDisplay;
-    map['eggprice_sale_type'] = eggpriceSaleType;
+    map['eggsale_id'] = eggsaleId;
+    map['eggsale_uuid'] = eggsaleUuid;
+    map['eggsale_qty'] = eggsaleQty;
+    map['eggsale_cost'] = eggsaleCost;
+    map['eggsale_effect_from'] = eggsaleEffectFrom;
+    map['eggsale_effect_to'] = eggsaleEffectTo;
+    map['is_special_sale'] = isSpecialSale;
     map['is_hatching_egg'] = isHatchingEgg;
-    map['eggprice_status'] = eggpriceStatus;
-    if (birdbreedInfo != null) {
-      map['birdbreed_info'] = birdbreedInfo?.toJson();
+    map['eggsale_comment'] = eggsaleComment;
+    map['eggsale_status'] = eggsaleStatus;
+    map['eggsale_createdon'] = eggsaleCreatedon;
+    map['eggsale_updatedon'] = eggsaleUpdatedon;
+    if (birdBreedInfo != null) {
+      map['bird_breed_info'] = birdBreedInfo?.map((v) => v.toJson()).toList();
     }
-    if (locationInfo != null) {
-      map['location_info'] = locationInfo?.toJson();
+    if (userBasicInfo != null) {
+      map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
     }
-    if (companyInfo != null) {
-      map['company_info'] = companyInfo?.map((v) => v.toJson()).toList();
+    if (companyBasicInfo != null) {
+      map['company_basic_info'] =
+          companyBasicInfo?.map((v) => v.toJson()).toList();
     }
-    if (userInfo != null) {
-      map['user_info'] = userInfo?.toJson();
+    if (attachmentInfo != null) {
+      map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
     }
-    if (eggpriceImages != null) {
-      map['eggprice_images'] = eggpriceImages?.map((v) => v.toJson()).toList();
+    if (addressDetails != null) {
+      map['address_details'] = addressDetails?.map((v) => v.toJson()).toList();
     }
     return map;
   }
 }
 
-class UserInfo {
-  UserInfo({
-    this.userId,
-    this.userFirstName,
-    this.userLastName,
-    this.userMobilePrimary,
-    this.userHideMobile,
-    this.userHideProfileImage,
-    this.userImages,
+class AddressDetails {
+  AddressDetails({
+    this.countryId,
+    this.countryName,
+    this.countryNameLanguage,
+    this.stateId,
+    this.stateName,
+    this.stateNameLanguage,
+    this.cityId,
+    this.cityName,
+    this.cityNameLanguage,
   });
 
-  UserInfo.fromJson(dynamic json) {
-    userId = json['user_id'];
-    userFirstName = json['user_first_name'];
-    userLastName = json['user_last_name'];
-    userMobilePrimary = json['user_mobile_primary'];
-    userHideMobile = json['user_hide_mobile'];
-    userHideProfileImage = json['user_hide_profile_image'];
-    if (json['user_images'] != null) {
-      userImages = [];
-      json['user_images'].forEach((v) {
-        userImages?.add(UserInfo.fromJson(v));
-      });
-    }
+  AddressDetails.fromJson(dynamic json) {
+    countryId = json['country_id'];
+    countryName = json['country_name'];
+    countryNameLanguage = json['country_name_language'];
+    stateId = json['state_id'];
+    stateName = json['state_name'];
+    stateNameLanguage = json['state_name_language'];
+    cityId = json['city_id'];
+    cityName = json['city_name'];
+    cityNameLanguage = json['city_name_language'];
   }
 
-  String? userId;
-  String? userFirstName;
-  String? userLastName;
-  String? userMobilePrimary;
-  String? userHideMobile;
-  String? userHideProfileImage;
-  List<dynamic>? userImages;
+  String? countryId;
+  String? countryName;
+  String? countryNameLanguage;
+  String? stateId;
+  String? stateName;
+  String? stateNameLanguage;
+  String? cityId;
+  String? cityName;
+  String? cityNameLanguage;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['user_id'] = userId;
-    map['user_first_name'] = userFirstName;
-    map['user_last_name'] = userLastName;
-    map['user_mobile_primary'] = userMobilePrimary;
-    map['user_hide_mobile'] = userHideMobile;
-    map['user_hide_profile_image'] = userHideProfileImage;
-    if (userImages != null) {
-      map['user_images'] = userImages?.map((v) => v.toJson()).toList();
-    }
+    map['country_id'] = countryId;
+    map['country_name'] = countryName;
+    map['country_name_language'] = countryNameLanguage;
+    map['state_id'] = stateId;
+    map['state_name'] = stateName;
+    map['state_name_language'] = stateNameLanguage;
+    map['city_id'] = cityId;
+    map['city_name'] = cityName;
+    map['city_name_language'] = cityNameLanguage;
     return map;
   }
 }
 
-class CompanyInfo {
-  CompanyInfo({
+class AttachmentInfo {
+  AttachmentInfo({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
+
+  AttachmentInfo.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
+  }
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
+    return map;
+  }
+}
+
+class CompanyBasicInfo {
+  CompanyBasicInfo({
     this.companyId,
     this.companyUuid,
     this.companyName,
     this.companyNameLanguage,
-    this.companyDetails,
-    this.companyPocUserName,
-    this.companyPocUserMobile,
-    this.companyStatus,
-    this.companySupplytypeInfo,
-    this.companyAddresInfo,
   });
 
-  CompanyInfo.fromJson(dynamic json) {
+  CompanyBasicInfo.fromJson(dynamic json) {
     companyId = json['company_id'];
     companyUuid = json['company_uuid'];
     companyName = json['company_name'];
     companyNameLanguage = json['company_name_language'];
-    companyDetails = json['company_details'];
-    companyPocUserName = json['company_poc_user_name'];
-    companyPocUserMobile = json['company_poc_user_mobile'];
-    companyStatus = json['company_status'];
-    if (json['company_supplytype_info'] != null) {
-      companySupplytypeInfo = [];
-      json['company_supplytype_info'].forEach((v) {
-        companySupplytypeInfo?.add(CompanyInfo.fromJson(v));
-      });
-    }
-    if (json['company_addres_info'] != null) {
-      companyAddresInfo = [];
-      json['company_addres_info'].forEach((v) {
-        companyAddresInfo?.add(CompanyInfo.fromJson(v));
-      });
-    }
   }
 
   String? companyId;
   String? companyUuid;
   String? companyName;
   String? companyNameLanguage;
-  String? companyDetails;
-  String? companyPocUserName;
-  String? companyPocUserMobile;
-  String? companyStatus;
-  List<dynamic>? companySupplytypeInfo;
-  List<dynamic>? companyAddresInfo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -242,102 +274,86 @@ class CompanyInfo {
     map['company_uuid'] = companyUuid;
     map['company_name'] = companyName;
     map['company_name_language'] = companyNameLanguage;
-    map['company_details'] = companyDetails;
-    map['company_poc_user_name'] = companyPocUserName;
-    map['company_poc_user_mobile'] = companyPocUserMobile;
-    map['company_status'] = companyStatus;
-    if (companySupplytypeInfo != null) {
-      map['company_supplytype_info'] =
-          companySupplytypeInfo?.map((v) => v.toJson()).toList();
-    }
-    if (companyAddresInfo != null) {
-      map['company_addres_info'] =
-          companyAddresInfo?.map((v) => v.toJson()).toList();
-    }
     return map;
   }
 }
 
-class LocationInfo {
-  LocationInfo({
-    this.countryId,
-    this.countryName,
-    this.countryNameDisplay,
-    this.stateId,
-    this.stateName,
-    this.stateNameDisplay,
-    this.cityId,
-    this.cityName,
-    this.cityNameDisplay,
+class UserBasicInfo {
+  UserBasicInfo({
+    this.userId,
+    this.userUuid,
+    this.userFirstName,
+    this.userLastName,
+    this.userMobile,
+    this.userEmail,
+    this.userRoleType,
+    this.userWorkType,
+    this.userIsVerfied,
   });
 
-  LocationInfo.fromJson(dynamic json) {
-    countryId = json['country_id'];
-    countryName = json['country_name'];
-    countryNameDisplay = json['country_name_display'];
-    stateId = json['state_id'];
-    stateName = json['state_name'];
-    stateNameDisplay = json['state_name_display'];
-    cityId = json['city_id'];
-    cityName = json['city_name'];
-    cityNameDisplay = json['city_name_display'];
+  UserBasicInfo.fromJson(dynamic json) {
+    userId = json['user_id'];
+    userUuid = json['user_uuid'];
+    userFirstName = json['user_first_name'];
+    userLastName = json['user_last_name'];
+    userMobile = json['user_mobile'];
+    userEmail = json['user_email'];
+    userRoleType = json['user_role_type'];
+    userWorkType = json['user_work_type'];
+    userIsVerfied = json['user_is_verfied'];
   }
 
-  String? countryId;
-  String? countryName;
-  String? countryNameDisplay;
-  String? stateId;
-  String? stateName;
-  String? stateNameDisplay;
-  String? cityId;
-  String? cityName;
-  String? cityNameDisplay;
+  String? userId;
+  String? userUuid;
+  String? userFirstName;
+  String? userLastName;
+  String? userMobile;
+  String? userEmail;
+  String? userRoleType;
+  String? userWorkType;
+  String? userIsVerfied;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['country_id'] = countryId;
-    map['country_name'] = countryName;
-    map['country_name_display'] = countryNameDisplay;
-    map['state_id'] = stateId;
-    map['state_name'] = stateName;
-    map['state_name_display'] = stateNameDisplay;
-    map['city_id'] = cityId;
-    map['city_name'] = cityName;
-    map['city_name_display'] = cityNameDisplay;
+    map['user_id'] = userId;
+    map['user_uuid'] = userUuid;
+    map['user_first_name'] = userFirstName;
+    map['user_last_name'] = userLastName;
+    map['user_mobile'] = userMobile;
+    map['user_email'] = userEmail;
+    map['user_role_type'] = userRoleType;
+    map['user_work_type'] = userWorkType;
+    map['user_is_verfied'] = userIsVerfied;
     return map;
   }
 }
 
-class BirdbreedInfo {
-  BirdbreedInfo({
+class BirdBreedInfo {
+  BirdBreedInfo({
     this.birdbreedId,
     this.birdbreedName,
-    this.birdbreedNameLanguage,
     this.birdbreedSno,
-    this.birdbreedStatus,
+    this.birdbreedNameLanguage,
   });
 
-  BirdbreedInfo.fromJson(dynamic json) {
+  BirdBreedInfo.fromJson(dynamic json) {
     birdbreedId = json['birdbreed_id'];
     birdbreedName = json['birdbreed_name'];
-    birdbreedNameLanguage = json['birdbreed_name_language'];
     birdbreedSno = json['birdbreed_sno'];
-    birdbreedStatus = json['birdbreed_status'];
+    birdbreedNameLanguage = json['birdbreed_name_language'];
   }
 
   String? birdbreedId;
   String? birdbreedName;
-  String? birdbreedNameLanguage;
   String? birdbreedSno;
-  String? birdbreedStatus;
+  String? birdbreedNameLanguage;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['birdbreed_id'] = birdbreedId;
     map['birdbreed_name'] = birdbreedName;
-    map['birdbreed_name_language'] = birdbreedNameLanguage;
     map['birdbreed_sno'] = birdbreedSno;
-    map['birdbreed_status'] = birdbreedStatus;
+    map['birdbreed_name_language'] = birdbreedNameLanguage;
     return map;
   }
 }

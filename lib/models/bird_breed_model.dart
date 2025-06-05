@@ -1,9 +1,10 @@
 class BirdBreedModel {
   BirdBreedModel({
-      this.apiCode, 
-      this.errorCount, 
-      this.errorMessage, 
-      this.apiResponse,});
+    this.apiCode,
+    this.errorCount,
+    this.errorMessage,
+    this.apiResponse,
+  });
 
   BirdBreedModel.fromJson(dynamic json) {
     apiCode = json['api_code'];
@@ -21,6 +22,7 @@ class BirdBreedModel {
       });
     }
   }
+
   int? apiCode;
   int? errorCount;
   List<dynamic>? errorMessage;
@@ -38,29 +40,27 @@ class BirdBreedModel {
     }
     return map;
   }
-
 }
 
 class ApiResponse {
   ApiResponse({
-      this.birdbreedId, 
-      this.birdbreedName, 
-      this.birdbreedNameLanguage, 
-      this.birdbreedSno, 
-      this.birdbreedStatus,});
+    this.birdbreedId,
+    this.birdbreedName,
+    this.birdbreedNameLanguage,
+    this.birdbreedSno,
+  });
 
   ApiResponse.fromJson(dynamic json) {
     birdbreedId = json['birdbreed_id'];
     birdbreedName = json['birdbreed_name'];
     birdbreedNameLanguage = json['birdbreed_name_language'];
     birdbreedSno = json['birdbreed_sno'];
-    birdbreedStatus = json['birdbreed_status'];
   }
+
   String? birdbreedId;
   String? birdbreedName;
   String? birdbreedNameLanguage;
   String? birdbreedSno;
-  String? birdbreedStatus;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -68,8 +68,6 @@ class ApiResponse {
     map['birdbreed_name'] = birdbreedName;
     map['birdbreed_name_language'] = birdbreedNameLanguage;
     map['birdbreed_sno'] = birdbreedSno;
-    map['birdbreed_status'] = birdbreedStatus;
     return map;
   }
-
 }
