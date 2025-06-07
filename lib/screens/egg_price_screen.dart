@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/utils/my_logger.dart';
+import 'package:hencafe/values/app_strings.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -140,9 +140,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   }
 
   List<Map<String, dynamic>> applyLocalFilters(
-      List<Map<String, dynamic>> allItems,
-      Map<String, String> selectedFilters,
-      ) {
+    List<Map<String, dynamic>> allItems,
+    Map<String, String> selectedFilters,
+  ) {
     final filterMapping = {
       "Special Sale": {
         "key": "is_special_sale",
@@ -151,6 +151,25 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
       "Hatching Eggs": {
         "key": "is_hatching_egg",
         "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+      },
+      "Birds": {
+        "key": "bird_breed_info.0.birdbreed_name_language",
+        "transform": (String value) => value.toLowerCase()
+      },
+      "State": {
+        "key": "address_details.0.state_name_language",
+        "transform": (String value) => value.toLowerCase()
+      },
+      "My Data Only": {
+        "key": "user_basic_info.0.user_id",
+        "transform": (String value) {
+          final trimmed = value.trim().toLowerCase();
+          if (trimmed == "my data only") {
+            final uid = prefs.getString(AppStrings.prefUserID);
+            return uid ?? "n";
+          }
+          return "n";
+        }
       },
     };
 
@@ -165,13 +184,35 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
         final key = mapping['key'] as String;
         final transform = mapping['transform'] as String Function(String);
 
-        final itemValue = item[key]?.toString().toLowerCase() ?? '';
-        if (itemValue != transform(filterValue)) return false;
+        final itemValueRaw =
+            getNestedValue(item, key); // 'key' from the filter map
+        final itemValue = itemValueRaw?.toString().toLowerCase() ?? '';
+        final transformedValue = transform(filterValue.toLowerCase());
+        if (itemValue != transformedValue) return false;
       }
       return true;
     }).toList();
   }
 
+  dynamic getNestedValue(dynamic data, String keyPath) {
+    final keys = keyPath.split('.');
+    dynamic value = data;
+    for (final key in keys) {
+      if (value is Map<String, dynamic>) {
+        value = value[key];
+      } else if (value is List) {
+        final index = int.tryParse(key);
+        if (index != null && index >= 0 && index < value.length) {
+          value = value[index];
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -344,7 +385,7 @@ class EggPriceCard extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
@@ -429,18 +470,32 @@ class EggPriceCard extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    SizedBox(
-                      height: 24.0,
-                      width: 24.0,
-                      child: Image.asset(
-                        AppIconsData.chick,
-                        color: AppColors.primaryColor,
-                        fit: BoxFit.contain,
+                    Visibility(
+                      visible:
+                          eggPriceModel.apiResponse![index].isHatchingEgg ==
+                              "Y",
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 24.0,
+                            width: 24.0,
+                            child: Image.asset(
+                              AppIconsData.chick,
+                              color: AppColors.primaryColor,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Icon(Icons.card_giftcard,
-                        color: AppColors.primaryColor, size: 20.0),
+                    Visibility(
+                      visible:
+                          eggPriceModel.apiResponse![index].isSpecialSale ==
+                              "Y",
+                      child: Icon(Icons.card_giftcard,
+                          color: AppColors.primaryColor, size: 20.0),
+                    ),
                   ],
                 ),
               ],
