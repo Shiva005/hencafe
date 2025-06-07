@@ -52,6 +52,7 @@ class ApiResponse {
     this.companyContactUserName,
     this.companyContactUserMobile,
     this.companyContactUserEmail,
+    this.userBasicInfo,
     this.attachmentInfo,
   });
 
@@ -64,6 +65,12 @@ class ApiResponse {
     companyContactUserName = json['company_contact_user_name'];
     companyContactUserMobile = json['company_contact_user_mobile'];
     companyContactUserEmail = json['company_contact_user_email'];
+    if (json['user_basic_info'] != null) {
+      userBasicInfo = [];
+      json['user_basic_info'].forEach((v) {
+        userBasicInfo?.add(UserBasicInfo.fromJson(v));
+      });
+    }
     if (json['attachment_info'] != null) {
       attachmentInfo = [];
       json['attachment_info'].forEach((v) {
@@ -80,6 +87,7 @@ class ApiResponse {
   String? companyContactUserName;
   String? companyContactUserMobile;
   String? companyContactUserEmail;
+  List<UserBasicInfo>? userBasicInfo;
   List<AttachmentInfo>? attachmentInfo;
 
   Map<String, dynamic> toJson() {
@@ -92,6 +100,9 @@ class ApiResponse {
     map['company_contact_user_name'] = companyContactUserName;
     map['company_contact_user_mobile'] = companyContactUserMobile;
     map['company_contact_user_email'] = companyContactUserEmail;
+    if (userBasicInfo != null) {
+      map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
+    }
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
     }
@@ -133,6 +144,56 @@ class AttachmentInfo {
     map['attachment_path'] = attachmentPath;
     map['attachment_status'] = attachmentStatus;
     map['attachment_createdon'] = attachmentCreatedon;
+    return map;
+  }
+}
+
+class UserBasicInfo {
+  UserBasicInfo({
+    this.userId,
+    this.userUuid,
+    this.userFirstName,
+    this.userLastName,
+    this.userMobile,
+    this.userEmail,
+    this.userRoleType,
+    this.userWorkType,
+    this.userIsVerfied,
+  });
+
+  UserBasicInfo.fromJson(dynamic json) {
+    userId = json['user_id'];
+    userUuid = json['user_uuid'];
+    userFirstName = json['user_first_name'];
+    userLastName = json['user_last_name'];
+    userMobile = json['user_mobile'];
+    userEmail = json['user_email'];
+    userRoleType = json['user_role_type'];
+    userWorkType = json['user_work_type'];
+    userIsVerfied = json['user_is_verfied'];
+  }
+
+  String? userId;
+  String? userUuid;
+  String? userFirstName;
+  String? userLastName;
+  String? userMobile;
+  String? userEmail;
+  String? userRoleType;
+  String? userWorkType;
+  String? userIsVerfied;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['user_id'] = userId;
+    map['user_uuid'] = userUuid;
+    map['user_first_name'] = userFirstName;
+    map['user_last_name'] = userLastName;
+    map['user_mobile'] = userMobile;
+    map['user_email'] = userEmail;
+    map['user_role_type'] = userRoleType;
+    map['user_work_type'] = userWorkType;
+    map['user_is_verfied'] = userIsVerfied;
     return map;
   }
 }

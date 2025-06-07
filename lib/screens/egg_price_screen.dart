@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/bird_breed_model.dart';
+import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/utils/my_logger.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../models/egg_price_model.dart';
-import '../models/user_favourite_state_model.dart';
 import '../services/services.dart';
 import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
+import '../values/app_routes.dart';
 import '../values/app_theme.dart';
 
 class EggPriceScreen extends StatefulWidget {
@@ -23,66 +25,61 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   late SharedPreferences prefs;
   late Future<EggPriceModel> eggPriceData;
   Map<String, String> selectedFilters = {};
-  late List<String> birdBreedList = [];
-  late List<String> favouriteStateList = [];
+  List<String> birdBreedList = [];
+  List<String> favouriteStateList = [];
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     getBirdBreedData();
     getFavouriteStateData();
-    eggPriceData = _fetchData();
+    eggPriceData = _fetchData(Utils.formatDate(selectedDate));
   }
 
-  Future<EggPriceModel> _fetchData() async {
+  Future<EggPriceModel> _fetchData(String selectedDate) async {
     prefs = await SharedPreferences.getInstance();
-    final getEggListRes = await AuthServices().getEggPriceList(context, '',
-        Utils.getTodayDateFormatted(), Utils.getTodayDateFormatted(), '');
-    return getEggListRes;
+    return await AuthServices()
+        .getEggPriceList(context, '', selectedDate, selectedDate, '');
   }
 
-  Future<BirdBreedModel> getBirdBreedData() async {
-    var getBirdBreedRes = await AuthServices().getBirdList(context);
-    if (getBirdBreedRes.errorCount == 0 &&
-        getBirdBreedRes.apiResponse != null) {
+  Future<void> getBirdBreedData() async {
+    final res = await AuthServices().getBirdList(context);
+    if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
-        for (int i = 0; i < getBirdBreedRes.apiResponse!.length; i++) {
-          birdBreedList
-              .add(getBirdBreedRes.apiResponse![i].birdbreedNameLanguage!);
-        }
+        birdBreedList = res.apiResponse!
+            .map((e) => e.birdbreedNameLanguage ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
       });
     }
-    return getBirdBreedRes;
   }
 
-  Future<UserFavouriteStateModel> getFavouriteStateData() async {
-    var getFaveStateRes = await AuthServices().getFavouriteStateList(context);
-    if (getFaveStateRes.errorCount == 0 &&
-        getFaveStateRes.apiResponse != null) {
+  Future<void> getFavouriteStateData() async {
+    final res = await AuthServices().getFavouriteStateList(context);
+    if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
-        for (int i = 0; i < getFaveStateRes.apiResponse!.length; i++) {
-          favouriteStateList.add(
-              getFaveStateRes.apiResponse![i].stateInfo![0].stateNameLanguage!);
-        }
+        favouriteStateList = res.apiResponse!
+            .map((e) => e.stateInfo?.first.stateNameLanguage ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
       });
     }
-    return getFaveStateRes;
   }
 
   List<String> _getFilterItems(String filter) {
-    return {
-          "Sale Type": ["All", "General Sale", "Special Sale"],
-          "Status": ["All", "Active", "In-active", "Pending"],
-          "State": favouriteStateList,
-          "Birds": birdBreedList,
-          "Hatching Eggs": ["All", "Yes", "No"],
-          "My Data": ["All", "My Data"],
-        }[filter] ??
-        [];
+    final filterMap = {
+      "Special Sale": ["All", "Yes", "No"],
+      "State": favouriteStateList,
+      "Birds": birdBreedList,
+      "Hatching Eggs": ["All", "Yes", "No"],
+      "My Data Only": ["All", "My Data Only"],
+    };
+    return filterMap[filter] ?? [];
   }
 
   void _showBottomSheet(BuildContext context, String filter) {
-    List<String> items = _getFilterItems(filter);
+    final items = _getFilterItems(filter);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -101,40 +98,38 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 10),
-                  items.isEmpty
-                      ? const Text("No items available for this filter.",
-                          textAlign: TextAlign.center)
-                      : ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: items.length,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Text(items[index]),
-                            trailing: Radio<String>(
-                              value: items[index],
-                              groupValue: selectedFilters[filter],
-                              onChanged: (value) {
-                                setModalState(() {
-                                  selectedFilters[filter] = value!;
-                                });
-                                setState(() {
-                                  selectedFilters[filter] = value!;
-                                  if (selectedFilters["Sale Type"] == "All") {}
-                                  _fetchData();
-                                });
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                          separatorBuilder: (context, index) => Divider(
-                              thickness: 1,
-                              height: 2.0,
-                              color: Colors.grey.shade300),
+                  if (items.isEmpty)
+                    const Text("No items available for this filter.",
+                        textAlign: TextAlign.center)
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(items[index]),
+                        trailing: Radio<String>(
+                          value: items[index],
+                          groupValue: selectedFilters[filter],
+                          onChanged: (value) {
+                            setModalState(() {});
+                            setState(() {
+                              selectedFilters[filter] = value!;
+                            });
+                            Navigator.pop(context);
+                          },
                         ),
+                      ),
+                      separatorBuilder: (context, index) => Divider(
+                          thickness: 1,
+                          height: 2.0,
+                          color: Colors.grey.shade300),
+                    ),
                   const SizedBox(height: 10),
                   ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Close")),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  ),
                 ],
               ),
             );
@@ -143,6 +138,40 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
       },
     );
   }
+
+  List<Map<String, dynamic>> applyLocalFilters(
+      List<Map<String, dynamic>> allItems,
+      Map<String, String> selectedFilters,
+      ) {
+    final filterMapping = {
+      "Special Sale": {
+        "key": "is_special_sale",
+        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+      },
+      "Hatching Eggs": {
+        "key": "is_hatching_egg",
+        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+      },
+    };
+
+    return allItems.where((item) {
+      for (final filterLabel in selectedFilters.keys) {
+        final filterValue = selectedFilters[filterLabel]?.toLowerCase() ?? '';
+        if (filterValue.isEmpty || filterValue == 'all') continue;
+
+        final mapping = filterMapping[filterLabel];
+        if (mapping == null) continue;
+
+        final key = mapping['key'] as String;
+        final transform = mapping['transform'] as String Function(String);
+
+        final itemValue = item[key]?.toString().toLowerCase() ?? '';
+        if (itemValue != transform(filterValue)) return false;
+      }
+      return true;
+    }).toList();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -155,27 +184,66 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
           backgroundColor: AppColors.primaryColor,
           elevation: 1.0,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          ),
           leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: NavigationHelper.pop),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: NavigationHelper.pop,
+          ),
           title: Text('Egg Price', style: AppTheme.primaryHeadingDrawer),
           actions: [
+            GestureDetector(
+              onTap: () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2040),
+                );
+                if (pickedDate != null) {
+                  final formattedDate =
+                      DateFormat('yyyy-MM-dd').format(pickedDate);
+                  setState(() {
+                    selectedDate = pickedDate;
+                    eggPriceData = _fetchData(formattedDate);
+                  });
+                }
+              },
+              child: Chip(
+                label: Row(
+                  children: [
+                    const Icon(Icons.calendar_month,
+                        color: AppColors.primaryColor, size: 16),
+                    const SizedBox(width: 5),
+                    Text(
+                      Utils.threeLetterDateFormatted(selectedDate.toString()),
+                      style: const TextStyle(
+                          color: AppColors.primaryColor, fontSize: 11),
+                    ),
+                  ],
+                ),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+            ),
             IconButton(
-                onPressed: () =>
-                    setState(() => cardVisibility = !cardVisibility),
-                icon: const Icon(Icons.filter_list_alt, color: Colors.white)),
+              onPressed: () => setState(() => cardVisibility = !cardVisibility),
+              icon: const Icon(Icons.filter_list_alt, color: Colors.white),
+            ),
             IconButton(
-                onPressed: () => setState(() {}),
-                icon: const Icon(Icons.refresh, color: Colors.white)),
+              onPressed: () => NavigationHelper.pushReplacementNamed(
+                  AppRoutes.eggPriceScreen),
+              icon: const Icon(Icons.refresh, color: Colors.white),
+            ),
           ],
         ),
       ),
       body: Column(
         children: [
-          Visibility(
-            visible: cardVisibility,
-            child: Padding(
+          if (cardVisibility)
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SizedBox(
                 width: double.infinity,
@@ -187,12 +255,12 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     child: Wrap(
                       spacing: 7.0,
                       children: [
-                        for (var filter in [
-                          "Sale Type",
-                          "Status",
+                        for (final filter in [
+                          "Special Sale",
                           "State",
                           "Birds",
-                          "Hatching Eggs"
+                          "Hatching Eggs",
+                          "My Data Only"
                         ])
                           FilterChipWidget(
                             label: filter,
@@ -205,25 +273,44 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                 ),
               ),
             ),
-          ),
           Expanded(
             child: FutureBuilder<EggPriceModel>(
               future: eggPriceData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
+                }
+                if (snapshot.hasError) {
                   return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData) {
+                }
+                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
                   return const Center(child: Text("No data available"));
                 }
-                return ListView.builder(
-                  itemCount: snapshot.data!.apiResponse!.length,
-                  itemBuilder: (context, index) => EggPriceCard(
-                    eggPriceModel: snapshot.data!,
-                    index: index,
-                  ),
+
+                final filteredItems = applyLocalFilters(
+                  snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
+                  selectedFilters,
                 );
+
+                logger.d(selectedFilters);
+                logger.d(filteredItems);
+
+                return filteredItems.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: filteredItems.length,
+                        itemBuilder: (context, index) {
+                          final filteredIndex = snapshot.data!.apiResponse!
+                              .indexWhere((e) =>
+                                  e.toJson().toString() ==
+                                  filteredItems[index].toString());
+                          return EggPriceCard(
+                            eggPriceModel: snapshot.data!,
+                            index: filteredIndex,
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text("No matching data for selected filters"));
               },
             ),
           ),

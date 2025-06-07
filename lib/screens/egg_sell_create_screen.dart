@@ -715,8 +715,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                     AppRoutes.dashboardScreen,
                                     arguments: {
                                       'uuid': uuid,
-                                      'pageType':
-                                          AppRoutes.registerBasicDetails,
+                                      'pageType': AppRoutes.sellEggScreen,
                                     },
                                   );
                                   SnackbarHelper.showSnackBar(sellEggRes

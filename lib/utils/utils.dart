@@ -1,6 +1,12 @@
 import 'package:intl/intl.dart';
 
 class Utils {
+  static String formatDate(DateTime date) {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    return formatter.format(now);
+  }
+
   static String getTodayDateFormatted() {
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
