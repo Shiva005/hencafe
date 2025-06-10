@@ -15,6 +15,7 @@ import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/success_model.dart';
+import 'package:hencafe/models/user_address_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
@@ -201,6 +202,22 @@ class AuthServices {
     return ProfileModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<UserAddressModel> getAddress(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_ADDRESS}${prefs.getString(AppStrings.prefUserUUID)}"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
+    return UserAddressModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuccessModel> updateFavState(
       BuildContext context, String stateID) async {
     var prefs = await SharedPreferences.getInstance();
@@ -344,37 +361,23 @@ class AuthServices {
   Future<ForgetPinModel> forgetPin(
       BuildContext context, String mobileNumber, String otp) async {
     var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile': mobileNumber,
+    };
 
-    var request = http.MultipartRequest(
-      'POST',
+    final response = await http.post(
       Uri.parse(ServiceNames.FORGET_PIN),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+      body: jsonEncode(payload),
     );
-    request.fields['user_login_uid'] = mobileNumber;
-    request.fields['otp_otp'] = otp;
-    request.fields['language'] = prefs.getString(AppStrings.prefLanguage)!;
 
-    request.headers.addAll({
-      'Content-Type': 'multipart/form-data',
-      'Accept': 'application/json',
-    });
-
-    try {
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${jsonDecode(response.body)}');
-
-      if (response.statusCode == 200) {
-        return ForgetPinModel.fromJson(jsonDecode(response.body));
-      } else {
-        StatusCodeHandler.handleStatusCode(
-            context, response.statusCode, response.body);
-        return ForgetPinModel.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      logger.e('Exception occurred: $e');
-      rethrow; // Re-throwing the exception for the caller to handle
-    }
+    logger.d('TAG Forget Pin: $payload');
+    logger.d('TAG Forget Pin: ${jsonDecode(response.body)}');
+    return ForgetPinModel.fromJson(jsonDecode(response.body));
   }
 }
 

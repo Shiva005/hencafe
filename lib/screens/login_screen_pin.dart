@@ -195,25 +195,35 @@ class _LoginPagePinState extends State<LoginPagePin> {
                               var loginPinRes = await AuthServices()
                                   .loginPinCheck(context, mobileController.text,
                                       pinController.text, "password");
-                              if (loginPinRes.apiResponse![0].responseStatus == true) {
+                              if (loginPinRes.apiResponse![0].responseStatus ==
+                                  true) {
                                 var prefs =
                                     await SharedPreferences.getInstance();
-                                prefs.setString(AppStrings.prefUserID,
-                                    loginPinRes.apiResponse![0].userLoginInfo!.userId!);
-                                prefs.setString(AppStrings.prefUserUUID,
-                                    loginPinRes.apiResponse![0].userLoginInfo!.userUuid!);
-                                prefs.setString(AppStrings.prefRole,
-                                    loginPinRes.apiResponse![0].userLoginInfo!.userRoleType!);
-                                prefs.setString(AppStrings.prefAuthID,
-                                    loginPinRes.apiResponse![0].userLoginInfo!.authUuid!);
+                                prefs.setString(
+                                    AppStrings.prefUserID,
+                                    loginPinRes.apiResponse![0].userLoginInfo!
+                                        .userId!);
+                                prefs.setString(
+                                    AppStrings.prefUserUUID,
+                                    loginPinRes.apiResponse![0].userLoginInfo!
+                                        .userUuid!);
+                                prefs.setString(
+                                    AppStrings.prefRole,
+                                    loginPinRes.apiResponse![0].userLoginInfo!
+                                        .userRoleType!);
+                                prefs.setString(
+                                    AppStrings.prefAuthID,
+                                    loginPinRes.apiResponse![0].userLoginInfo!
+                                        .authUuid!);
                                 NavigationHelper.pushNamed(
                                   AppRoutes.dashboardScreen,
                                   arguments: {
                                     'mobileNumber': mobileController.text
                                   },
                                 );
-                              }else{
-                                SnackbarHelper.showSnackBar(loginPinRes.apiResponse![0].responseDetails!);
+                              } else {
+                                SnackbarHelper.showSnackBar(loginPinRes
+                                    .apiResponse![0].responseDetails!);
                               }
                             }
                             _btnLoginController.reset();

@@ -8,6 +8,7 @@ import 'package:hencafe/screens/egg_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
+import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
@@ -119,6 +120,14 @@ class Routes {
             mobile:  EggSellCreateScreen(),
             tablet: EggSellCreateScreen(),
             desktop: EggSellCreateScreen(),
+          ),
+        );
+      case AppRoutes.myProfileScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile:  MyProfileScreen(),
+            tablet: MyProfileScreen(),
+            desktop: MyProfileScreen(),
           ),
         );
       default:

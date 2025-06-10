@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/screens/fragments/home_fragment2.dart';
-import 'package:hencafe/values/app_icons.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -129,24 +128,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                       padding: const EdgeInsets.only(left: 20.0, top: 40.0),
                       child: Row(
                         children: [
-                          Container(
-                            width: 70.0,
-                            height: 70.0,
-                            margin: const EdgeInsets.only(
-                              top: 23.0,
-                              bottom: 23.0,
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Image.network(
-                              prefs.getString(AppStrings.prefUserImage) ?? '',
-                              // Provide a default empty string
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset(
-                                      AppIconsData.logo), // Fallback icon
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(prefs.getString(AppStrings.prefUserImage) ?? ''
                             ),
                           ),
                           Padding(
@@ -171,8 +155,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ],
                       ),
                     ),
-                    Divider(
-                      color: Colors.grey.shade300,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Divider(
+                        color: Colors.grey.shade300,
+                      ),
                     ),
                     ListTile(
                       onTap: () {
@@ -182,17 +169,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Home'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.home_sharp)),
+                          width: 23, height: 23, child: Icon(Icons.home_sharp,color: AppColors.primaryColor,)),
                     ),
                     ListTile(
                       onTap: () {
                         _scaffoldKey.currentState?.closeDrawer();
+                        NavigationHelper.pushNamed(
+                          AppRoutes.myProfileScreen,
+                        );
                       },
                       visualDensity:
                           const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Profile'),
+                      title: const Text('My Profile'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.person)),
+                          width: 23, height: 23, child: Icon(Icons.person,color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -202,7 +192,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Change Language'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.language)),
+                          width: 23, height: 23, child: Icon(Icons.language,color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -217,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.location_pin)),
+                          child: Icon(Icons.location_pin,color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -227,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Share App'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.share)),
+                          width: 23, height: 23, child: Icon(Icons.share,color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -239,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.star_purple500)),
+                          child: Icon(Icons.star_purple500,color: AppColors.primaryColor)),
                     ),
                   ],
                 ),

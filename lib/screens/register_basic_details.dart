@@ -556,7 +556,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                 var generateOtpRes = await AuthServices()
                                     .otpGenerate(
                                         context, mobileController.text);
-                                if (generateOtpRes.apiResponse![0].responseStatus == true) {
+                                if (generateOtpRes
+                                        .apiResponse![0].responseStatus ==
+                                    true) {
                                   NavigationHelper.pushNamed(
                                     AppRoutes.loginOtp,
                                     arguments: {
@@ -573,9 +575,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                           referralCodeController.text,
                                     },
                                   );
-                                }else{
-                                  SnackbarHelper.showSnackBar(
-                                      generateOtpRes.apiResponse![0].responseDetails!);
+                                } else {
+                                  SnackbarHelper.showSnackBar(generateOtpRes
+                                      .apiResponse![0].responseDetails!);
                                 }
                               }
                               _btnController.reset();

@@ -14,8 +14,12 @@ class Utils {
   }
 
   static String threeLetterDateFormatted(String date) {
-    final DateTime parsedDate = DateTime.parse(date);
-    final DateFormat formatter = DateFormat('dd-MMM-yyyy');
-    return formatter.format(parsedDate);
+    try {
+      final DateTime parsedDate = DateTime.parse(date);
+      final DateFormat formatter = DateFormat('dd-MMM-yyyy');
+      return formatter.format(parsedDate);
+    } catch (_) {
+      return formatDate(DateTime.now());
+    }
   }
 }

@@ -17,8 +17,7 @@ class ServiceNames {
   static String GET_COMPANY_LIST = '${BASE_URL}v1/company/';
   static String SELL_EGG = '${BASE_URL}v1/egg-sale/create';
   static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
-
-
-  static String FORGET_PIN = '${BASE_URL}forget_pin/v1.0/forget_pin.php';
+  static String GET_ADDRESS = '${BASE_URL}v1/address?reference_from=USER&reference_uuid=';
+  static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
 
 }
