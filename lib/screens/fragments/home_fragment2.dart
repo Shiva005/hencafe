@@ -108,6 +108,9 @@ class _HomeFragment2State extends State<HomeFragment2>
               titleStyle: TextStyle(fontSize: 16, color: Colors.white),
               onPress: () {
                 _animationController.reverse();
+                NavigationHelper.pushNamed(
+                  AppRoutes.sellChickScreen,
+                );
               },
             ),
             //Floating action menu item

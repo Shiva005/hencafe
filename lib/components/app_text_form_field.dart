@@ -92,7 +92,6 @@ class AppTextFormField extends StatelessWidget {
         ),
         onTapOutside: (event) => FocusScope.of(context).unfocus(),
         style: const TextStyle(
-          fontWeight: FontWeight.w500,
           color: Colors.black,
         ),
       ),
