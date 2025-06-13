@@ -24,7 +24,6 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
       RoundedLoadingButtonController();
   late Future<List<ApiResponse>> _dataFuture;
   List<String> _selectedStateID = [];
-  List<String> _previousSelectedStateID = [];
   var prefs;
   TextEditingController _searchController = TextEditingController();
   List<ApiResponse> _allStates = [];
@@ -74,7 +73,6 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
         for (var favState
             in getProfileRes.apiResponse![0].userFavouriteStateInfo!) {
           String stateId = favState.stateInfo![0].stateId!;
-          _previousSelectedStateID.add(stateId);
           _selectedStateID.add(stateId);
         }
       });

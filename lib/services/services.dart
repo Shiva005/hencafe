@@ -15,6 +15,7 @@ import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/success_model.dart';
+import 'package:hencafe/models/supplies_model.dart';
 import 'package:hencafe/models/user_address_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
@@ -216,6 +217,21 @@ class AuthServices {
 
     logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
     return UserAddressModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuppliesModel> getSupplies(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(ServiceNames.GET_SUPPLIES),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+      },
+    );
+
+    logger.d('TAG Supplies: ${jsonDecode(response.body)}');
+    return SuppliesModel.fromJson(jsonDecode(response.body));
   }
 
   Future<SuccessModel> updateFavState(

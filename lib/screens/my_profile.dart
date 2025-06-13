@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/navigation_helper.dart';
+import '../models/supplies_model.dart';
 import '../services/services.dart';
 import '../values/app_colors.dart';
+import '../values/app_routes.dart';
 import '../values/app_theme.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -15,7 +19,7 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  var getProfileRes, getAddressRes;
+  var getProfileRes, getAddressRes, getSuppliesRes;
   var prefs;
   var name = "",
       email = "",
@@ -28,20 +32,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       memberShipValidTo = Utils.formatDate(DateTime.now()),
       workType = "";
 
-  var addressType = "",
-      city = "",
-      state = "",
-      country = "",
-      zipcode = "",
-      address = "";
-
+  var selectedIds = '';
   var favStateList = [];
   var suppliesList = [];
+  List<ApiResponse> _allSupplies = [];
+  List<ApiResponse> _filteredSupplies = [];
+  List<String> _selectedSupplyIDs = [];
 
   @override
   void initState() {
     loadProfile();
+    _fetchSupplies();
     super.initState();
+  }
+
+  Future<List<ApiResponse>> _fetchSupplies() async {
+    final res = await AuthServices()
+        .getSupplies(context); // Replace with your actual call
+    if (res.errorCount == 0 && res.apiResponse != null) {
+      setState(() {
+        _allSupplies = res.apiResponse!;
+        _filteredSupplies = _allSupplies;
+      });
+      return _allSupplies;
+    }
+    return [];
   }
 
   Future<void> loadProfile() async {
@@ -49,6 +64,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     LoadingDialogHelper.showLoadingDialog(context);
     getProfileRes = await AuthServices().getProfile(context);
     getAddressRes = await AuthServices().getAddress(context);
+    getSuppliesRes = await AuthServices().getSupplies(context);
     if (getProfileRes.errorCount == 0) {
       LoadingDialogHelper.dismissLoadingDialog(context);
       setState(() {
@@ -218,7 +234,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
                   child: Column(
                     children: [
-                      _sectionHeader("Favorite states", onEdit: () {}),
+                      _sectionHeader("Favorite states", onEdit: () {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.stateSelection,
+                        );
+                      }),
                       SizedBox(
                         height: 25,
                         child: ListView.builder(
@@ -244,7 +264,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionHeader("Membership Details", onEdit: () {}),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10.0, top: 5.0, bottom: 10.0),
+                      child: Text(
+                        "Membership Details",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Row(
@@ -306,7 +336,98 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
                     child: Column(
                       children: [
-                        _sectionHeader("Supplies", onEdit: () {}),
+                        _sectionHeader("Supplies", onEdit: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                            ),
+                            builder: (context) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom,
+                                  top: 20,
+                                  left: 16,
+                                  right: 16,
+                                ),
+                                child: StatefulBuilder(
+                                  builder: (BuildContext context,
+                                      StateSetter setModalState) {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          "Select Supply Types",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        ListView.builder(
+                                          shrinkWrap: true,
+                                          // Important for wrapping
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: _filteredSupplies.length,
+                                          itemBuilder: (context, index) {
+                                            final supply =
+                                                _filteredSupplies[index];
+                                            final supplyId =
+                                                supply.supplytypeId.toString();
+                                            return CheckboxListTile(
+                                              title: Text(
+                                                  supply.supplytypeName ?? ''),
+                                              value: _selectedSupplyIDs
+                                                  .contains(supplyId),
+                                              activeColor:
+                                                  AppColors.primaryColor,
+                                              onChanged: (checked) {
+                                                setModalState(() {
+                                                  setState(() {
+                                                    if (checked == true) {
+                                                      _selectedSupplyIDs
+                                                          .add(supplyId);
+                                                    } else {
+                                                      _selectedSupplyIDs
+                                                          .remove(supplyId);
+                                                    }
+                                                    SnackbarHelper.showSnackBar(
+                                                        _selectedSupplyIDs
+                                                            .toString());
+                                                  });
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 10),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); // or submit logic
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                AppColors.primaryColor,
+                                          ),
+                                          child: const Text(
+                                            "Save",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        }),
                         SizedBox(
                           height: 25,
                           child: ListView.builder(

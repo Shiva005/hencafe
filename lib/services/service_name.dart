@@ -19,5 +19,6 @@ class ServiceNames {
   static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
   static String GET_ADDRESS = '${BASE_URL}v1/address?reference_from=USER&reference_uuid=';
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
+  static String GET_SUPPLIES = '${BASE_URL}v1/supplies/';
 
 }
