@@ -256,6 +256,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    qtyController.text = '1';
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
@@ -336,7 +337,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               maxLength: 3,
-                              enabled: true,
+                              enabled: false,
                               prefixIcon:
                                   Icon(Icons.production_quantity_limits),
                               validator: (value) {
@@ -366,6 +367,37 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      AppTextFormField(
+                        controller: ageController,
+                        labelText: "Age in Days",
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 3,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.cake_outlined),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Chick age';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(width: 10),
+                      AppTextFormField(
+                        controller: weightController,
+                        labelText: "Weight in Grams",
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        maxLength: 6,
+                        enabled: true,
+                        prefixIcon: Icon(Icons.monitor_weight_outlined),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Chick weight';
+                          }
+                          return null;
+                        },
                       ),
                       Row(
                         children: [
@@ -408,8 +440,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                         lastDate: DateTime(2040));
                                     if (pickedDate != null) {
                                       String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
+                                      DateFormat('yyyy-MM-dd')
+                                          .format(pickedDate);
                                       setState(() => startDateController.text =
                                           formattedDate);
                                     }
@@ -458,8 +490,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                         lastDate: DateTime(2040));
                                     if (pickedDate != null) {
                                       String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
+                                      DateFormat('yyyy-MM-dd')
+                                          .format(pickedDate);
                                       setState(() => endDateController.text =
                                           formattedDate);
                                     }
@@ -469,37 +501,6 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             ),
                           ),
                         ],
-                      ),
-                      AppTextFormField(
-                        controller: ageController,
-                        labelText: "Age in Days",
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 3,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.cake_outlined),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter Chick age';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(width: 10),
-                      AppTextFormField(
-                        controller: weightController,
-                        labelText: "Weight in Grams",
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 6,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.monitor_weight_outlined),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter Chick weight';
-                          }
-                          return null;
-                        },
                       ),
                       GestureDetector(
                         child: SizedBox(

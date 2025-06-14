@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/models/chick_price_model.dart';
+import 'package:hencafe/utils/my_logger.dart';
+import 'package:hencafe/values/app_strings.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
+import '../services/services.dart';
+import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
+import '../values/app_routes.dart';
 import '../values/app_theme.dart';
 
 class ChickPriceScreen extends StatefulWidget {
@@ -14,174 +22,114 @@ class ChickPriceScreen extends StatefulWidget {
 
 class _ChickPriceScreenState extends State<ChickPriceScreen> {
   bool cardVisibility = false;
+  late SharedPreferences prefs;
+  late Future<ChickPriceModel> chickPriceData;
+  Map<String, String> selectedFilters = {};
+  List<String> birdBreedList = [];
+  List<String> favouriteStateList = [];
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
+    getBirdBreedData();
+    getFavouriteStateData();
+    chickPriceData = _fetchData(Utils.formatDate(selectedDate));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: AppColors.primaryColor,
-          elevation: 1.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              NavigationHelper.pop();
-            },
-          ),
-          title: Text(
-            'Chick Price',
-            style: AppTheme.primaryHeadingDrawer,
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  cardVisibility = !cardVisibility;
-                });
-              },
-              icon: Icon(
-                Icons.filter_list_alt,
-                color: Colors.white,
-              ),
-            ),
-            IconButton(
-              onPressed: () {
-                setState(() {});
-              },
-              icon: Icon(
-                Icons.refresh,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          // Filter Buttons Section
-          Visibility(
-            visible: cardVisibility,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Card(
-                color: Colors.white,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      spacing: 5.0,
-                      runSpacing: 5.0,
-                      children: [
-                        FilterChipWidget(
-                          label: "Sale Type",
-                          onPressed: () =>
-                              _showBottomSheet(context, "Special Sale"),
-                        ),
-                        FilterChipWidget(
-                          label: "Status",
-                          onPressed: () => _showBottomSheet(context, "Status"),
-                        ),
-                        FilterChipWidget(
-                          label: "State",
-                          onPressed: () => _showBottomSheet(context, "State"),
-                        ),
-                        FilterChipWidget(
-                          label: "Birds",
-                          onPressed: () => _showBottomSheet(context, "Birds"),
-                        ),
-                        FilterChipWidget(
-                          label: "Hatching Eggs",
-                          onPressed: () =>
-                              _showBottomSheet(context, "Hatching Eggs"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Egg Price List
-          Expanded(
-            child: ListView.builder(
-              itemCount: 8, // Adjust the count as per your requirement
-              itemBuilder: (context, index) {
-                return const EggPriceCard();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+  Future<ChickPriceModel> _fetchData(String selectedDate) async {
+    prefs = await SharedPreferences.getInstance();
+    return await AuthServices()
+        .getChickPriceList(context, '', selectedDate, selectedDate, '');
   }
 
-  // Function to show a bottom sheet
+  Future<void> getBirdBreedData() async {
+    final res = await AuthServices().getBirdList(context);
+    if (res.errorCount == 0 && res.apiResponse != null) {
+      setState(() {
+        birdBreedList = res.apiResponse!
+            .map((e) => e.birdbreedNameLanguage ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
+      });
+    }
+  }
+
+  Future<void> getFavouriteStateData() async {
+    final res = await AuthServices().getFavouriteStateList(context);
+    if (res.errorCount == 0 && res.apiResponse != null) {
+      setState(() {
+        favouriteStateList = res.apiResponse!
+            .map((e) => e.stateInfo?.first.stateNameLanguage ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList();
+      });
+    }
+  }
+
+  List<String> _getFilterItems(String filter) {
+    final filterMap = {
+      "Special Sale": ["All", "Yes", "No"],
+      "State": favouriteStateList,
+      "Chicks": birdBreedList,
+      "My Data Only": ["All", "My Data Only"],
+    };
+    return filterMap[filter] ?? [];
+  }
+
   void _showBottomSheet(BuildContext context, String filter) {
+    final items = _getFilterItems(filter);
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allows the height to expand dynamically
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (context) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8, // 90% of screen height
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Bottom Sheet for $filter",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "You can add additional actions or content for $filter here.",
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      // Add dynamic content here
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 20, // Example content
-                        itemBuilder: (context, index) => ListTile(
-                          title: Text("Item $index"),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Filter for $filter",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(height: 10),
+                  if (items.isEmpty)
+                    const Text("No items available for this filter.",
+                        textAlign: TextAlign.center)
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(items[index]),
+                        trailing: Radio<String>(
+                          value: items[index],
+                          groupValue: selectedFilters[filter],
+                          onChanged: (value) {
+                            setModalState(() {});
+                            setState(() {
+                              selectedFilters[filter] = value!;
+                            });
+                            Navigator.pop(context);
+                          },
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Close"),
-                      ),
-                    ],
+                      separatorBuilder: (context, index) => Divider(
+                          thickness: 1,
+                          height: 2.0,
+                          color: Colors.grey.shade300),
+                    ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
                   ),
-                ),
+                ],
               ),
             );
           },
@@ -189,61 +137,264 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
       },
     );
   }
-}
 
-class FilterChipWidget extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
+  List<Map<String, dynamic>> applyLocalFilters(
+    List<Map<String, dynamic>> allItems,
+    Map<String, String> selectedFilters,
+  ) {
+    final filterMapping = {
+      "Special Sale": {
+        "key": "is_special_sale",
+        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+      },
+      "Chicks": {
+        "key": "bird_breed_info.0.birdbreed_name_language",
+        "transform": (String value) => value.toLowerCase()
+      },
+      "State": {
+        "key": "address_details.0.state_name_language",
+        "transform": (String value) => value.toLowerCase()
+      },
+      "My Data Only": {
+        "key": "user_basic_info.0.user_id",
+        "transform": (String value) {
+          final trimmed = value.trim().toLowerCase();
+          if (trimmed == "my data only") {
+            final uid = prefs.getString(AppStrings.prefUserID);
+            return uid ?? "n";
+          }
+          return "n";
+        }
+      },
+    };
 
-  const FilterChipWidget({
-    required this.label,
-    required this.onPressed,
-    super.key,
-  });
+    return allItems.where((item) {
+      for (final filterLabel in selectedFilters.keys) {
+        final filterValue = selectedFilters[filterLabel]?.toLowerCase() ?? '';
+        if (filterValue.isEmpty || filterValue == 'all') continue;
+
+        final mapping = filterMapping[filterLabel];
+        if (mapping == null) continue;
+
+        final key = mapping['key'] as String;
+        final transform = mapping['transform'] as String Function(String);
+
+        final itemValueRaw =
+            getNestedValue(item, key); // 'key' from the filter map
+        final itemValue = itemValueRaw?.toString().toLowerCase() ?? '';
+        final transformedValue = transform(filterValue.toLowerCase());
+        if (itemValue != transformedValue) return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  dynamic getNestedValue(dynamic data, String keyPath) {
+    final keys = keyPath.split('.');
+    dynamic value = data;
+    for (final key in keys) {
+      if (value is Map<String, dynamic>) {
+        value = value[key];
+      } else if (value is List) {
+        final index = int.tryParse(key);
+        if (index != null && index >= 0 && index < value.length) {
+          value = value[index];
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Chip(
-        label: Text(
-          label,
-          style: TextStyle(color: Colors.black54, fontSize: 11),
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: AppColors.primaryColor,
+          elevation: 1.0,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: NavigationHelper.pop,
+          ),
+          title: Text('Chick Price', style: AppTheme.primaryHeadingDrawer),
+          actions: [
+            GestureDetector(
+              onTap: () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2040),
+                );
+                if (pickedDate != null) {
+                  final formattedDate =
+                      DateFormat('yyyy-MM-dd').format(pickedDate);
+                  setState(() {
+                    selectedDate = pickedDate;
+                    chickPriceData = _fetchData(formattedDate);
+                  });
+                }
+              },
+              child: Chip(
+                label: Row(
+                  children: [
+                    const Icon(Icons.calendar_month,
+                        color: AppColors.primaryColor, size: 16),
+                    const SizedBox(width: 5),
+                    Text(
+                      Utils.threeLetterDateFormatted(selectedDate.toString()),
+                      style: const TextStyle(
+                          color: AppColors.primaryColor, fontSize: 11),
+                    ),
+                  ],
+                ),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: () => setState(() => cardVisibility = !cardVisibility),
+              icon: const Icon(Icons.filter_list_alt, color: Colors.white),
+            ),
+            IconButton(
+              onPressed: () => NavigationHelper.pushReplacementNamed(
+                  AppRoutes.chickPriceScreen),
+              icon: const Icon(Icons.refresh, color: Colors.white),
+            ),
+          ],
         ),
-        backgroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.0), // Adjust radius for curve
-        ),
+      ),
+      body: Column(
+        children: [
+          if (cardVisibility)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: Card(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4),
+                    child: Wrap(
+                      spacing: 7.0,
+                      children: [
+                        for (final filter in [
+                          "Special Sale",
+                          "State",
+                          "Chicks",
+                          "My Data Only"
+                        ])
+                          FilterChipWidget(
+                            label: filter,
+                            onPressed: () => _showBottomSheet(context, filter),
+                            isSelected: selectedFilters.containsKey(filter),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          Expanded(
+            child: FutureBuilder<ChickPriceModel>(
+              future: chickPriceData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
+                  return const Center(child: Text("No data available"));
+                }
+
+                final filteredItems = applyLocalFilters(
+                  snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
+                  selectedFilters,
+                );
+
+                logger.d(selectedFilters);
+                logger.d(filteredItems);
+
+                return filteredItems.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: filteredItems.length,
+                        itemBuilder: (context, index) {
+                          final filteredIndex = snapshot.data!.apiResponse!
+                              .indexWhere((e) =>
+                                  e.toJson().toString() ==
+                                  filteredItems[index].toString());
+                          return EggPriceCard(
+                            chickPriceModel: snapshot.data!,
+                            index: filteredIndex,
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text("No matching data for selected filters"));
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class EggPriceCard extends StatelessWidget {
-  const EggPriceCard({super.key});
+  final ChickPriceModel chickPriceModel;
+  final int index;
+
+  const EggPriceCard(
+      {required this.chickPriceModel, super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 0.0,
       color: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: AppColors.primaryColor, width: 1),
+        // Change color here
+        borderRadius:
+            BorderRadius.circular(8.0), // Optional: Adjust border radius
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Price Section
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: Card(
                     color: Colors.white,
+                    elevation: 0.0,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.black38, width: 1),
+                      // Change color here
+                      borderRadius: BorderRadius.circular(
+                          8.0), // Optional: Adjust border radius
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 15.0),
+                          horizontal: 10, vertical: 6.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -251,24 +402,20 @@ class EggPriceCard extends StatelessWidget {
                             'Rs/Chick',
                             style: TextStyle(fontSize: 10, color: Colors.grey),
                           ),
-                          Column(
-                            children: [
-                              Text(
-                                '6.60',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange.shade700,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            chickPriceModel.apiResponse![index].chicksaleCost ??
+                                '',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                // Details Section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,8 +427,9 @@ class EggPriceCard extends StatelessWidget {
                             color: Colors.grey,
                             size: 18,
                           ),
-                          const SizedBox(width: 7),
-                          const Text('Nellore'),
+                          const SizedBox(width: 3),
+                          Text(
+                              "${chickPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${chickPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
                         ],
                       ),
                       Row(
@@ -290,13 +438,26 @@ class EggPriceCard extends StatelessWidget {
                             height: 20.0,
                             width: 20.0,
                             child: Image.asset(
-                              AppIconsData.chick,
-                              color: Colors.grey.shade700,
+                              AppIconsData.hen,
                               fit: BoxFit.contain,
                             ),
                           ),
-                          const SizedBox(width: 7),
-                          const Text('Layer'),
+                          const SizedBox(width: 3),
+                          Text(chickPriceModel.apiResponse![index]
+                                  .birdBreedInfo![0].birdbreedNameLanguage ??
+                              ''),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.business,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(chickPriceModel.apiResponse![index]
+                              .companyBasicInfo![0].companyNameLanguage!),
                         ],
                       ),
                       Row(
@@ -309,8 +470,9 @@ class EggPriceCard extends StatelessWidget {
                                   color: Colors.grey,
                                   size: 18,
                                 ),
-                                const SizedBox(width: 7),
-                                const Text('30 days'),
+                                const SizedBox(width: 3),
+                                Text(
+                                    '${chickPriceModel.apiResponse![index].birdAgeInDays!} Days'),
                               ],
                             ),
                           ),
@@ -322,42 +484,80 @@ class EggPriceCard extends StatelessWidget {
                                   AppIconsData.weighingMachine,
                                   color: Colors.grey.shade700,
                                 ),
-                                const SizedBox(width: 7),
-                                const Text('400 gm'),
+                                const SizedBox(width: 3),
+                                Text(
+                                    '${chickPriceModel.apiResponse![index].birdWeightInGrams!} Grams'),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.business,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 7),
-                          const Text('Sri Venkateswara Hatcheries'),
-                        ],
-                      ),
                     ],
                   ),
                 ),
-                // Icons Section
+                Column(
+                  children: [
+                    Visibility(
+                      visible:
+                          chickPriceModel.apiResponse![index].isSpecialSale ==
+                              "Y",
+                      child: Icon(Icons.card_giftcard,
+                          color: AppColors.primaryColor, size: 20.0),
+                    ),
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Suresh Ch',
+                Text(
+                    'Start: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chicksaleEffectFrom.toString())}',
+                    style:
+                        TextStyle(fontSize: 12, color: Colors.green.shade700)),
+                Text(
+                    'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                Text(
+                    '${chickPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${chickPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
                     style:
                         TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                const Text('10-Dec-2024 Monday',
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class FilterChipWidget extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+  final bool isSelected;
+
+  const FilterChipWidget(
+      {required this.label,
+      required this.onPressed,
+      required this.isSelected,
+      super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Chip(
+        label: Text(label,
+            style: TextStyle(
+                color: isSelected ? AppColors.primaryColor : Colors.black54,
+                fontSize: 11)),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
+              width: 1.5),
+          borderRadius: BorderRadius.circular(20.0),
         ),
       ),
     );

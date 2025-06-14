@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
+import 'package:hencafe/models/chick_price_model.dart';
 import 'package:hencafe/models/city_list_model.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
@@ -424,6 +425,27 @@ class AuthServices {
     logger.d(
         'TAG Get Egg Price List: ${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate');
     return EggPriceModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<ChickPriceModel> getChickPriceList(BuildContext context, String eggID,
+      String fromDate, String toDate, String saleType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          '${ServiceNames.CHICK_PRICE_LIST}$fromDate&sale_to_date=$toDate'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+    );
+
+    logger.d(
+        'TAG Get Chick Price List: ${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate');
+    return ChickPriceModel.fromJson(jsonDecode(response.body));
   }
 
   Future<ForgetPinModel> forgetPin(
