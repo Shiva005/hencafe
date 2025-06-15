@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
 import 'package:hencafe/models/chick_price_model.dart';
+import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/models/city_list_model.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
@@ -360,6 +361,57 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> sellChicken(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String comment,
+      String effectFromDate,
+      String effectTillDate,
+      String saleType,
+      String stateID,
+      String cityID,
+      String uuid) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'qty': qty,
+      'farm_live_bird_cost': cost,
+      "retail_live_bird_cost": "0",
+      "with_skin_cost": "0",
+      "skin_less_cost": "0",
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'is_special_sale': saleType,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'company_id': companyID,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'chickensale_uuid': uuid,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.SELL_CHICKEN),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<UserFavouriteStateModel> getFavouriteStateList(
       BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
@@ -422,8 +474,7 @@ class AuthServices {
       },
     );
 
-    logger.d(
-        'TAG Get Egg Price List: ${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate');
+    logger.d('TAG Get Egg Price List: ${jsonDecode(response.body)}');
     return EggPriceModel.fromJson(jsonDecode(response.body));
   }
 
@@ -443,9 +494,28 @@ class AuthServices {
       },
     );
 
-    logger.d(
-        'TAG Get Chick Price List: ${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate');
+    logger.d('TAG Get Chick Price List: ${jsonDecode(response.body)}');
     return ChickPriceModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<ChickenPriceModel> getChickenPriceList(BuildContext context,
+      String eggID, String fromDate, String toDate, String saleType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          '${ServiceNames.CHICKEN_PRICE_LIST}$fromDate&sale_to_date=$toDate&chickensale_id='),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+    );
+
+    logger.d('TAG Get Chicken Price List: ${jsonDecode(response.body)}');
+    return ChickenPriceModel.fromJson(jsonDecode(response.body));
   }
 
   Future<ForgetPinModel> forgetPin(

@@ -20,21 +20,22 @@ import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 
-class ChickSellCreateScreen extends StatefulWidget {
-  const ChickSellCreateScreen({super.key});
+class ChickenSellCreateScreen extends StatefulWidget {
+  const ChickenSellCreateScreen({super.key});
 
   @override
-  State<ChickSellCreateScreen> createState() => _ChickSellCreateScreenState();
+  State<ChickenSellCreateScreen> createState() =>
+      _ChickenSellCreateScreenState();
 }
 
-class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
+class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final ValueNotifier<bool> passwordNotifier = ValueNotifier(true);
   final ValueNotifier<bool> fieldValidNotifier = ValueNotifier(false);
 
-  late final TextEditingController chickTypeController;
-  late final TextEditingController chickPriceController;
+  late final TextEditingController birdTypeController;
+  late final TextEditingController farmerPriceController;
   late final TextEditingController commentController;
   late final TextEditingController qtyController;
   late final TextEditingController startDateController;
@@ -42,8 +43,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
   late final TextEditingController stateController;
   late final TextEditingController cityController;
   late final TextEditingController companyController;
-  late final TextEditingController ageController;
-  late final TextEditingController weightController;
+
   var uuid = Uuid();
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
@@ -57,7 +57,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
   var saleType = "N";
 
   void initializeControllers() {
-    chickPriceController = TextEditingController()
+    farmerPriceController = TextEditingController()
       ..addListener(controllerListener);
     commentController = TextEditingController()
       ..addListener(controllerListener);
@@ -66,32 +66,28 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
       ..addListener(controllerListener);
     endDateController = TextEditingController()
       ..addListener(controllerListener);
-    chickTypeController = TextEditingController()
+    birdTypeController = TextEditingController()
       ..addListener(controllerListener);
     stateController = TextEditingController()..addListener(controllerListener);
     cityController = TextEditingController()..addListener(controllerListener);
-    ageController = TextEditingController()..addListener(controllerListener);
-    weightController = TextEditingController()..addListener(controllerListener);
     companyController = TextEditingController()
       ..addListener(controllerListener);
   }
 
   void disposeControllers() {
-    chickPriceController.dispose();
+    farmerPriceController.dispose();
     commentController.dispose();
     qtyController.dispose();
     startDateController.dispose();
     endDateController.dispose();
-    chickTypeController.dispose();
+    birdTypeController.dispose();
     stateController.dispose();
     cityController.dispose();
     companyController.dispose();
-    ageController.dispose();
-    weightController.dispose();
   }
 
   void controllerListener() {
-    final eggPrice = chickPriceController.text;
+    final eggPrice = farmerPriceController.text;
     if (eggPrice.isEmpty) return;
   }
 
@@ -262,7 +258,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(title: AppStrings.sellChick)),
+          child: MyAppBar(title: AppStrings.sellChicken)),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -286,14 +282,14 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                           height: 70.0,
                           child: TextFormField(
                             style: TextStyle(color: Colors.black),
-                            controller: chickTypeController,
+                            controller: birdTypeController,
                             decoration: InputDecoration(
                               labelStyle: TextStyle(color: Colors.grey),
                               iconColor: Colors.white,
                               prefixIcon: Icon(LucideIcons.bird),
                               filled: true,
                               fillColor: Colors.white,
-                              labelText: "Chick Type",
+                              labelText: "Bird Type",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
                               border: OutlineInputBorder(
                                 borderSide:
@@ -315,15 +311,15 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||
-                                  value == 'Select Chick Type') {
-                                return 'Please select Chick type';
+                                  value == 'Select Bird Type') {
+                                return 'Please select Bird type';
                               }
                               return null;
                             },
                             onTap: () async => _showSelectionBottomSheet(
-                              title: "Chick Type",
+                              title: "Bird Type",
                               fetchData: () async => birdBreedList,
-                              controller: chickTypeController,
+                              controller: birdTypeController,
                             ),
                           ),
                         ),
@@ -332,9 +328,10 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Expanded(
+                            flex: 4,
                             child: AppTextFormField(
                               controller: qtyController,
-                              labelText: "Quantity",
+                              labelText: "Kg",
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               maxLength: 3,
@@ -351,9 +348,10 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                           ),
                           SizedBox(width: 10),
                           Expanded(
+                            flex: 7,
                             child: AppTextFormField(
-                              controller: chickPriceController,
-                              labelText: "Price",
+                              controller: farmerPriceController,
+                              labelText: "Farmer Price",
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               maxLength: 6,
@@ -368,37 +366,6 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             ),
                           ),
                         ],
-                      ),
-                      AppTextFormField(
-                        controller: ageController,
-                        labelText: "Age in Days",
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 3,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.cake_outlined),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter Chick age';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(width: 10),
-                      AppTextFormField(
-                        controller: weightController,
-                        labelText: "Weight in Grams",
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 6,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.monitor_weight_outlined),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter Chick weight';
-                          }
-                          return null;
-                        },
                       ),
                       Row(
                         children: [
@@ -729,23 +696,24 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             controller: _btnController,
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                var sellEggRes = await AuthServices().sellChick(
-                                    context,
-                                    companyList[companyController.text]
-                                        .toString(),
-                                    birdBreedList[chickTypeController.text]
-                                        .toString(),
-                                    qtyController.text,
-                                    chickPriceController.text,
-                                    commentController.text,
-                                    startDateController.text,
-                                    endDateController.text,
-                                    saleType,
-                                    statelist[stateController.text].toString(),
-                                    cityList[cityController.text].toString(),
-                                    uuid.v1(),
-                                    ageController.text,
-                                    weightController.text);
+                                var sellEggRes = await AuthServices()
+                                    .sellChicken(
+                                        context,
+                                        companyList[companyController.text]
+                                            .toString(),
+                                        birdBreedList[birdTypeController.text]
+                                            .toString(),
+                                        qtyController.text,
+                                        farmerPriceController.text,
+                                        commentController.text,
+                                        startDateController.text,
+                                        endDateController.text,
+                                        saleType,
+                                        statelist[stateController.text]
+                                            .toString(),
+                                        cityList[cityController.text]
+                                            .toString(),
+                                        uuid.v1());
                                 if (sellEggRes.apiResponse![0].responseStatus ==
                                     true) {
                                   NavigationHelper.pushNamed(

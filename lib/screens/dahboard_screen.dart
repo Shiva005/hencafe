@@ -58,8 +58,10 @@ class _DashboardScreenState extends State<DashboardScreen>
           AppStrings.prefFavStateMaxCount,
           getProfileRes
               .apiResponse![0].userMembershipInfo[0].userFavStateMaxCount);
-      prefs.setString(AppStrings.prefUserImage,
-          getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath);
+      if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
+        prefs.setString(AppStrings.prefUserImage,
+            getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath);
+      }
       prefs.setString(
           AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
     }
@@ -90,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           title: Text(
             prefs != null
                 ? '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}'
-                : '',
+                : "",
             style: AppTheme.primaryHeadingDrawer,
           ),
           centerTitle: false,
@@ -130,8 +132,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         children: [
                           CircleAvatar(
                             radius: 30,
-                            backgroundImage: NetworkImage(prefs.getString(AppStrings.prefUserImage) ?? ''
-                            ),
+                            backgroundImage: NetworkImage(
+                                prefs.getString(AppStrings.prefUserImage) ??
+                                    ''),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 15.0),
@@ -169,7 +172,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Home'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.home_sharp,color: AppColors.primaryColor,)),
+                          width: 23,
+                          height: 23,
+                          child: Icon(
+                            Icons.home_sharp,
+                            color: AppColors.primaryColor,
+                          )),
                     ),
                     ListTile(
                       onTap: () {
@@ -182,7 +190,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('My Profile'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.person,color: AppColors.primaryColor)),
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.person,
+                              color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -192,7 +203,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Change Language'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.language,color: AppColors.primaryColor)),
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.language,
+                              color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -207,7 +221,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.location_pin,color: AppColors.primaryColor)),
+                          child: Icon(Icons.location_pin,
+                              color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -217,7 +232,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           const VisualDensity(horizontal: 0, vertical: -3),
                       title: const Text('Share App'),
                       leading: SizedBox(
-                          width: 23, height: 23, child: Icon(Icons.share,color: AppColors.primaryColor)),
+                          width: 23,
+                          height: 23,
+                          child:
+                              Icon(Icons.share, color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {
@@ -229,7 +247,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.star_purple500,color: AppColors.primaryColor)),
+                          child: Icon(Icons.star_purple500,
+                              color: AppColors.primaryColor)),
                     ),
                   ],
                 ),

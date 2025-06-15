@@ -72,7 +72,7 @@ class _HomeFragment2State extends State<HomeFragment2>
                 SizedBox(width: 20),
                 Expanded(
                     child: _buildDashboardCard(
-                        AppIconsData.colorContact, "Contact")),
+                        AppIconsData.colorContact, "Contact Us")),
               ],
             ),
           ],
@@ -122,6 +122,9 @@ class _HomeFragment2State extends State<HomeFragment2>
               titleStyle: TextStyle(fontSize: 16, color: Colors.white),
               onPress: () {
                 _animationController.reverse();
+                NavigationHelper.pushNamed(
+                  AppRoutes.sellChickenScreen,
+                );
               },
             ),
           ],

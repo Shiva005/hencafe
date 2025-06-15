@@ -31,6 +31,7 @@ class AppStrings {
   static const String createPinNumber = 'Create Pin Number';
   static const String sellEgg = 'Sell Egg';
   static const String sellChick = 'Sell Chick';
+  static const String sellChicken = 'Sell Chicken';
 
   ///SharedPreference Strings
   static const String prefFirstName = 'first_name';

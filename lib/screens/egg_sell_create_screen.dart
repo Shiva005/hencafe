@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/company_list_model.dart';
@@ -403,10 +404,13 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                         lastDate: DateTime(2040));
                                     if (pickedDate != null) {
                                       String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
-                                      setState(() => startDateController.text =
-                                          formattedDate);
+                                      DateFormat('yyyy-MM-dd')
+                                          .format(pickedDate);
+                                      setState(() {
+                                        startDateController.text =
+                                            formattedDate;
+                                        endDateController.text = "";
+                                      });
                                     }
                                   },
                                 ),
@@ -447,14 +451,45 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                   readOnly: true,
                                   onTap: () async {
                                     DateTime? pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2040));
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2040),
+                                    );
+
                                     if (pickedDate != null) {
+                                      if (startDateController.text.isNotEmpty) {
+                                        DateTime? startDate = DateTime.tryParse(
+                                            startDateController.text);
+                                        if (startDate != null) {
+                                          int diff = pickedDate
+                                              .difference(startDate)
+                                              .inDays;
+                                          if (diff > 7) {
+                                            AwesomeDialog(
+                                              context: context,
+                                              animType: AnimType.bottomSlide,
+                                              dialogType: DialogType.warning,
+                                              dialogBackgroundColor:
+                                              Colors.white,
+                                              titleTextStyle:
+                                              AppTheme.appBarText,
+                                              title:
+                                              'You can only select up to 7 days from the start date.',
+                                              btnOkOnPress: () {},
+                                              btnOkText: 'OK',
+                                              btnOkColor:
+                                              Colors.yellow.shade700,
+                                            ).show();
+                                            endDateController.text = "";
+                                            return;
+                                          }
+                                        }
+                                      }
+
                                       String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
+                                      DateFormat('yyyy-MM-dd')
+                                          .format(pickedDate);
                                       setState(() => endDateController.text =
                                           formattedDate);
                                     }

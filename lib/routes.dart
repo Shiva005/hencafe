@@ -3,6 +3,7 @@ import 'package:hencafe/responsive_scaffold.dart';
 import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
+import 'package:hencafe/screens/chicken_sell_create_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
@@ -129,6 +130,14 @@ class Routes {
             mobile:  ChickSellCreateScreen(),
             tablet: ChickSellCreateScreen(),
             desktop: ChickSellCreateScreen(),
+          ),
+        );
+      case AppRoutes.sellChickenScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile:  ChickenSellCreateScreen(),
+            tablet: ChickenSellCreateScreen(),
+            desktop: ChickenSellCreateScreen(),
           ),
         );
       case AppRoutes.myProfileScreen:
