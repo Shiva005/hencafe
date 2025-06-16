@@ -24,5 +24,6 @@ class ServiceNames {
   static String GET_ADDRESS = '${BASE_URL}v1/address?reference_from=USER&reference_uuid=';
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
   static String GET_SUPPLIES = '${BASE_URL}v1/supplies/';
+  static String ATTACHMENT_UPLOAD = '${BASE_URL}v1/attachment/upload';
 
 }

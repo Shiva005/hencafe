@@ -11,6 +11,7 @@ class AppIconsData {
   static const String colorChicken = 'assets/icons/color_chicken.png';
   static const String colorVideo = 'assets/icons/color_video.png';
   static const String colorContact = 'assets/icons/color_contact.png';
+  static const String colorLiftingSale = 'assets/icons/lifting_sale.png';
   static const String weighingMachine = 'assets/icons/weighing_scale.png';
   static const String hen = 'assets/icons/hen.png';
 

@@ -14,6 +14,7 @@ import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
+import 'package:hencafe/screens/upload_file_screen.dart';
 import 'package:hencafe/screens/welcome_screen.dart';
 import 'invalid_route.dart';
 import 'values/app_routes.dart';
@@ -146,6 +147,14 @@ class Routes {
             mobile:  MyProfileScreen(),
             tablet: MyProfileScreen(),
             desktop: MyProfileScreen(),
+          ),
+        );
+      case AppRoutes.uploadFileScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile:  UploadFileScreen(),
+            tablet: UploadFileScreen(),
+            desktop: UploadFileScreen(),
           ),
         );
       default:

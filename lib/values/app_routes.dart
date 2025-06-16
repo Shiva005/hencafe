@@ -18,4 +18,5 @@ class AppRoutes {
   static const String sellChickScreen = 'sell_chick_screen';
   static const String sellChickenScreen = 'sell_chicken_screen';
   static const String myProfileScreen = 'my_profile_screen';
+  static const String uploadFileScreen = 'upload_file_screen';
 }

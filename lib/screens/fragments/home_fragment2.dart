@@ -60,7 +60,7 @@ class _HomeFragment2State extends State<HomeFragment2>
                 SizedBox(width: 20),
                 Expanded(
                     child: _buildDashboardCard(
-                        AppIconsData.colorFeed, "Feed Price")),
+                        AppIconsData.colorLiftingSale, "Lifting Sale")),
               ],
             ),
             SizedBox(height: 20),

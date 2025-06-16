@@ -32,6 +32,7 @@ class AppStrings {
   static const String sellEgg = 'Sell Egg';
   static const String sellChick = 'Sell Chick';
   static const String sellChicken = 'Sell Chicken';
+  static const String uploadFile = 'Upload File';
 
   ///SharedPreference Strings
   static const String prefFirstName = 'first_name';

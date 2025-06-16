@@ -729,6 +729,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             controller: _btnController,
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
+                                String uuids = uuid.v1();
                                 var sellEggRes = await AuthServices().sellChick(
                                     context,
                                     companyList[companyController.text]
@@ -743,20 +744,41 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     saleType,
                                     statelist[stateController.text].toString(),
                                     cityList[cityController.text].toString(),
-                                    uuid.v1(),
+                                    uuids,
                                     ageController.text,
                                     weightController.text);
                                 if (sellEggRes.apiResponse![0].responseStatus ==
                                     true) {
-                                  NavigationHelper.pushNamed(
-                                    AppRoutes.dashboardScreen,
-                                    arguments: {
-                                      'uuid': uuid,
-                                      'pageType': AppRoutes.sellEggScreen,
+                                  AwesomeDialog(
+                                    context: context,
+                                    animType: AnimType.bottomSlide,
+                                    dialogType: DialogType.success,
+                                    dialogBackgroundColor: Colors.white,
+                                    title: sellEggRes
+                                        .apiResponse![0].responseDetails,
+                                    titleTextStyle: AppTheme.appBarText,
+                                    descTextStyle: AppTheme.appBarText,
+                                    btnOkOnPress: () {
+                                      NavigationHelper.pushReplacementNamed(
+                                        AppRoutes.uploadFileScreen,
+                                        arguments: {
+                                          'reference_from': 'CHICK_SALE',
+                                          'reference_uuid': uuids,
+                                          'pageType':
+                                              AppRoutes.uploadFileScreen,
+                                        },
+                                      );
                                     },
-                                  );
-                                  SnackbarHelper.showSnackBar(sellEggRes
-                                      .apiResponse![0].responseDetails);
+                                    btnCancelOnPress: () {
+                                      NavigationHelper
+                                          .pushReplacementNamedUntil(
+                                        AppRoutes.dashboardScreen,
+                                      );
+                                    },
+                                    btnOkText: 'Yes',
+                                    btnCancelText: 'No',
+                                    btnOkColor: Colors.greenAccent.shade700,
+                                  ).show();
                                 } else {
                                   SnackbarHelper.showSnackBar(sellEggRes
                                       .apiResponse![0].responseDetails);

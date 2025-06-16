@@ -404,8 +404,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                         lastDate: DateTime(2040));
                                     if (pickedDate != null) {
                                       String formattedDate =
-                                      DateFormat('yyyy-MM-dd')
-                                          .format(pickedDate);
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(pickedDate);
                                       setState(() {
                                         startDateController.text =
                                             formattedDate;
@@ -471,15 +471,15 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                               animType: AnimType.bottomSlide,
                                               dialogType: DialogType.warning,
                                               dialogBackgroundColor:
-                                              Colors.white,
+                                                  Colors.white,
                                               titleTextStyle:
-                                              AppTheme.appBarText,
+                                                  AppTheme.appBarText,
                                               title:
-                                              'You can only select up to 7 days from the start date.',
+                                                  'You can only select up to 7 days from the start date.',
                                               btnOkOnPress: () {},
                                               btnOkText: 'OK',
                                               btnOkColor:
-                                              Colors.yellow.shade700,
+                                                  Colors.yellow.shade700,
                                             ).show();
                                             endDateController.text = "";
                                             return;
@@ -488,8 +488,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                       }
 
                                       String formattedDate =
-                                      DateFormat('yyyy-MM-dd')
-                                          .format(pickedDate);
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(pickedDate);
                                       setState(() => endDateController.text =
                                           formattedDate);
                                     }
@@ -727,6 +727,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             height: 45.0,
                             controller: _btnController,
                             onPressed: () async {
+                              String uuids = uuid.v1();
                               if (_formKey.currentState?.validate() ?? false) {
                                 var sellEggRes = await AuthServices().sellEgg(
                                     context,
@@ -743,18 +744,39 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                     hatchingType,
                                     statelist[stateController.text].toString(),
                                     cityList[cityController.text].toString(),
-                                    uuid.v1());
+                                    uuids);
                                 if (sellEggRes.apiResponse![0].responseStatus ==
                                     true) {
-                                  NavigationHelper.pushNamed(
-                                    AppRoutes.dashboardScreen,
-                                    arguments: {
-                                      'uuid': uuid,
-                                      'pageType': AppRoutes.sellEggScreen,
+                                  AwesomeDialog(
+                                    context: context,
+                                    animType: AnimType.bottomSlide,
+                                    dialogType: DialogType.success,
+                                    dialogBackgroundColor: Colors.white,
+                                    title: sellEggRes
+                                        .apiResponse![0].responseDetails,
+                                    titleTextStyle: AppTheme.appBarText,
+                                    descTextStyle: AppTheme.appBarText,
+                                    btnOkOnPress: () {
+                                      NavigationHelper.pushReplacementNamed(
+                                        AppRoutes.uploadFileScreen,
+                                        arguments: {
+                                          'reference_from': 'EGG_SALE',
+                                          'reference_uuid': uuids,
+                                          'pageType':
+                                              AppRoutes.uploadFileScreen,
+                                        },
+                                      );
                                     },
-                                  );
-                                  SnackbarHelper.showSnackBar(sellEggRes
-                                      .apiResponse![0].responseDetails);
+                                    btnCancelOnPress: () {
+                                      NavigationHelper
+                                          .pushReplacementNamedUntil(
+                                        AppRoutes.dashboardScreen,
+                                      );
+                                    },
+                                    btnOkText: 'Yes',
+                                    btnCancelText: 'No',
+                                    btnOkColor: Colors.greenAccent.shade700,
+                                  ).show();
                                 } else {
                                   SnackbarHelper.showSnackBar(sellEggRes
                                       .apiResponse![0].responseDetails);

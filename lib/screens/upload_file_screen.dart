@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/services/service_name.dart';
 import 'package:hencafe/utils/appbar_widget.dart';
 import 'package:hencafe/utils/my_logger.dart';
@@ -14,13 +13,6 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: UploadFileScreen(),
-  ));
-}
 
 class UploadFileScreen extends StatefulWidget {
   @override
@@ -46,7 +38,8 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
     }
   }
 
-  Future<void> uploadFile(_UploadFile fileData) async {
+  Future<void> uploadFile(
+      _UploadFile fileData, String referenceFrom, String referenceUUID) async {
     final dio = Dio();
     final file = fileData.file;
     final fileName = basename(file.path);
@@ -74,8 +67,8 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
           filename: fileName,
           contentType: contentType,
         ),
-        "reference_from": "CHICKEN_SALE",
-        "reference_uuid": uuid.v1(),
+        "reference_from": referenceFrom,
+        "reference_uuid": referenceUUID,
         "attachment_type": _getAttachmentType(file.path),
       });
 
@@ -103,7 +96,6 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
       fileData.status = UploadStatus.success;
     } catch (e) {
       if (e is DioException) {
-        SnackbarHelper.showSnackBar(e.response?.statusMessage);
         logger.e('TAG Upload File Dio Error: ${e.response?.statusMessage}');
         logger.e('TAG Upload File Headers: ${e.response?.headers}');
         logger.e('TAG Upload File Status Code: ${e.response?.statusCode}');
@@ -140,7 +132,6 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
 
   String _getAttachmentType(String path) {
     final extension = path.split('.').last.toLowerCase();
-    SnackbarHelper.showSnackBar(extension);
 
     if (['jpg', 'jpeg', 'png'].contains(extension)) return 'image';
     if (['pdf'].contains(extension)) return 'pdf';
@@ -152,6 +143,12 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final String referenceUUID = args?['reference_uuid'] ?? '';
+    final String referenceFrom = args?['reference_from'] ?? '';
+
+    logger.e('$referenceFrom $referenceUUID');
     return Scaffold(
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
@@ -169,16 +166,17 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                   final file = files[index];
                   return GestureDetector(
                     onTap: file.status == UploadStatus.initial
-                        ? () => uploadFile(file)
+                        ? () => uploadFile(file, referenceFrom, referenceUUID)
                         : null,
                     child: Card(
                       elevation: 0.0,
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                        side: BorderSide(color: AppColors.primaryColor, width: 1),
+                        side:
+                            BorderSide(color: AppColors.primaryColor, width: 1),
                         // Change color here
-                        borderRadius:
-                        BorderRadius.circular(8.0), // Optional: Adjust border radius
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Optional: Adjust border radius
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -232,14 +230,17 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                   color: AppColors.primaryColor,
                                   size: 30,
                                 ),
-                                onPressed: () => uploadFile(file),
+                                onPressed: () => uploadFile(
+                                    file, referenceFrom, referenceUUID),
                               )
                             else if (file.status == UploadStatus.failed)
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.refresh, color: Colors.orange),
-                                    onPressed: () => uploadFile(file),
+                                    icon: Icon(Icons.refresh,
+                                        color: Colors.orange),
+                                    onPressed: () => uploadFile(
+                                        file, referenceFrom, referenceUUID),
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete_forever,
@@ -249,7 +250,6 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                   ),
                                 ],
                               ),
-
 
                             if (file.status == UploadStatus.initial)
                               IconButton(
