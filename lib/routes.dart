@@ -13,6 +13,7 @@ import 'package:hencafe/screens/login_screen_pin.dart';
 import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
+import 'package:hencafe/screens/sale_details_screen.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
 import 'package:hencafe/screens/upload_file_screen.dart';
 import 'package:hencafe/screens/welcome_screen.dart';
@@ -155,6 +156,14 @@ class Routes {
             mobile:  UploadFileScreen(),
             tablet: UploadFileScreen(),
             desktop: UploadFileScreen(),
+          ),
+        );
+      case AppRoutes.saleDetailsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile:  SaleDetailsScreen(),
+            tablet: SaleDetailsScreen(),
+            desktop: SaleDetailsScreen(),
           ),
         );
       default:

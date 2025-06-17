@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
   static String formatDate(DateTime date) {
@@ -20,6 +21,14 @@ class Utils {
       return formatter.format(parsedDate);
     } catch (_) {
       return formatDate(DateTime.now());
+    }
+  }
+  static openDialPad(String phoneNumber) async {
+    final Uri telUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(telUri)) {
+      await launchUrl(telUri);
+    } else {
+      throw 'Could not open dial pad';
     }
   }
 }

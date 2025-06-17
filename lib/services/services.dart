@@ -463,7 +463,7 @@ class AuthServices {
       String fromDate, String toDate, String saleType) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
-      Uri.parse('${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate'),
+      Uri.parse('${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate&eggsale_id=$eggID'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

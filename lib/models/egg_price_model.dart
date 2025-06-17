@@ -1,10 +1,9 @@
 class EggPriceModel {
   EggPriceModel({
-    this.apiCode,
-    this.errorCount,
-    this.errorMessage,
-    this.apiResponse,
-  });
+      this.apiCode, 
+      this.errorCount, 
+      this.errorMessage, 
+      this.apiResponse,});
 
   EggPriceModel.fromJson(dynamic json) {
     apiCode = json['api_code'];
@@ -22,7 +21,6 @@ class EggPriceModel {
       });
     }
   }
-
   int? apiCode;
   int? errorCount;
   List<dynamic>? errorMessage;
@@ -40,28 +38,28 @@ class EggPriceModel {
     }
     return map;
   }
+
 }
 
 class ApiResponse {
   ApiResponse({
-    this.eggsaleId,
-    this.eggsaleUuid,
-    this.eggsaleQty,
-    this.eggsaleCost,
-    this.eggsaleEffectFrom,
-    this.eggsaleEffectTo,
-    this.isSpecialSale,
-    this.isHatchingEgg,
-    this.eggsaleComment,
-    this.eggsaleStatus,
-    this.eggsaleCreatedon,
-    this.eggsaleUpdatedon,
-    this.birdBreedInfo,
-    this.userBasicInfo,
-    this.companyBasicInfo,
-    this.attachmentInfo,
-    this.addressDetails,
-  });
+      this.eggsaleId, 
+      this.eggsaleUuid, 
+      this.eggsaleQty, 
+      this.eggsaleCost, 
+      this.eggsaleEffectFrom, 
+      this.eggsaleEffectTo, 
+      this.isSpecialSale, 
+      this.isHatchingEgg, 
+      this.eggsaleComment, 
+      this.eggsaleStatus, 
+      this.eggsaleCreatedon, 
+      this.eggsaleUpdatedon, 
+      this.birdBreedInfo, 
+      this.userBasicInfo, 
+      this.companyBasicInfo, 
+      this.attachmentInfo, 
+      this.addressDetails,});
 
   ApiResponse.fromJson(dynamic json) {
     eggsaleId = json['eggsale_id'];
@@ -107,7 +105,6 @@ class ApiResponse {
       });
     }
   }
-
   String? eggsaleId;
   String? eggsaleUuid;
   int? eggsaleQty;
@@ -147,8 +144,7 @@ class ApiResponse {
       map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
     }
     if (companyBasicInfo != null) {
-      map['company_basic_info'] =
-          companyBasicInfo?.map((v) => v.toJson()).toList();
+      map['company_basic_info'] = companyBasicInfo?.map((v) => v.toJson()).toList();
     }
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
@@ -158,20 +154,20 @@ class ApiResponse {
     }
     return map;
   }
+
 }
 
 class AddressDetails {
   AddressDetails({
-    this.countryId,
-    this.countryName,
-    this.countryNameLanguage,
-    this.stateId,
-    this.stateName,
-    this.stateNameLanguage,
-    this.cityId,
-    this.cityName,
-    this.cityNameLanguage,
-  });
+      this.countryId, 
+      this.countryName, 
+      this.countryNameLanguage, 
+      this.stateId, 
+      this.stateName, 
+      this.stateNameLanguage, 
+      this.cityId, 
+      this.cityName, 
+      this.cityNameLanguage,});
 
   AddressDetails.fromJson(dynamic json) {
     countryId = json['country_id'];
@@ -184,7 +180,6 @@ class AddressDetails {
     cityName = json['city_name'];
     cityNameLanguage = json['city_name_language'];
   }
-
   String? countryId;
   String? countryName;
   String? countryNameLanguage;
@@ -208,31 +203,36 @@ class AddressDetails {
     map['city_name_language'] = cityNameLanguage;
     return map;
   }
+
 }
 
 class AttachmentInfo {
   AttachmentInfo({
-    this.attachmentId,
-    this.attachmentReferenceCode,
-    this.attachmentReferenceUuid,
-    this.attachmentPath,
-    this.attachmentStatus,
-    this.attachmentCreatedon,
-  });
+      this.attachmentId, 
+      this.attachmentReferenceCode, 
+      this.attachmentReferenceUuid, 
+      this.attachmentPath, 
+      this.attachmentType, 
+      this.attachmentName, 
+      this.attachmentStatus, 
+      this.attachmentCreatedon,});
 
   AttachmentInfo.fromJson(dynamic json) {
     attachmentId = json['attachment_id'];
     attachmentReferenceCode = json['attachment_reference_code'];
     attachmentReferenceUuid = json['attachment_reference_uuid'];
     attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
     attachmentStatus = json['attachment_status'];
     attachmentCreatedon = json['attachment_createdon'];
   }
-
   String? attachmentId;
   String? attachmentReferenceCode;
   String? attachmentReferenceUuid;
   String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
   String? attachmentStatus;
   String? attachmentCreatedon;
 
@@ -242,19 +242,21 @@ class AttachmentInfo {
     map['attachment_reference_code'] = attachmentReferenceCode;
     map['attachment_reference_uuid'] = attachmentReferenceUuid;
     map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
     map['attachment_status'] = attachmentStatus;
     map['attachment_createdon'] = attachmentCreatedon;
     return map;
   }
+
 }
 
 class CompanyBasicInfo {
   CompanyBasicInfo({
-    this.companyId,
-    this.companyUuid,
-    this.companyName,
-    this.companyNameLanguage,
-  });
+      this.companyId, 
+      this.companyUuid, 
+      this.companyName, 
+      this.companyNameLanguage,});
 
   CompanyBasicInfo.fromJson(dynamic json) {
     companyId = json['company_id'];
@@ -262,7 +264,6 @@ class CompanyBasicInfo {
     companyName = json['company_name'];
     companyNameLanguage = json['company_name_language'];
   }
-
   String? companyId;
   String? companyUuid;
   String? companyName;
@@ -276,20 +277,20 @@ class CompanyBasicInfo {
     map['company_name_language'] = companyNameLanguage;
     return map;
   }
+
 }
 
 class UserBasicInfo {
   UserBasicInfo({
-    this.userId,
-    this.userUuid,
-    this.userFirstName,
-    this.userLastName,
-    this.userMobile,
-    this.userEmail,
-    this.userRoleType,
-    this.userWorkType,
-    this.userIsVerfied,
-  });
+      this.userId, 
+      this.userUuid, 
+      this.userFirstName, 
+      this.userLastName, 
+      this.userMobile, 
+      this.userEmail, 
+      this.userRoleType, 
+      this.userWorkType, 
+      this.userIsVerfied,});
 
   UserBasicInfo.fromJson(dynamic json) {
     userId = json['user_id'];
@@ -302,7 +303,6 @@ class UserBasicInfo {
     userWorkType = json['user_work_type'];
     userIsVerfied = json['user_is_verfied'];
   }
-
   String? userId;
   String? userUuid;
   String? userFirstName;
@@ -326,15 +326,15 @@ class UserBasicInfo {
     map['user_is_verfied'] = userIsVerfied;
     return map;
   }
+
 }
 
 class BirdBreedInfo {
   BirdBreedInfo({
-    this.birdbreedId,
-    this.birdbreedName,
-    this.birdbreedSno,
-    this.birdbreedNameLanguage,
-  });
+      this.birdbreedId, 
+      this.birdbreedName, 
+      this.birdbreedSno, 
+      this.birdbreedNameLanguage,});
 
   BirdBreedInfo.fromJson(dynamic json) {
     birdbreedId = json['birdbreed_id'];
@@ -342,7 +342,6 @@ class BirdBreedInfo {
     birdbreedSno = json['birdbreed_sno'];
     birdbreedNameLanguage = json['birdbreed_name_language'];
   }
-
   String? birdbreedId;
   String? birdbreedName;
   String? birdbreedSno;
@@ -356,4 +355,5 @@ class BirdBreedInfo {
     map['birdbreed_name_language'] = birdbreedNameLanguage;
     return map;
   }
+
 }

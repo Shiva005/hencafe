@@ -38,8 +38,8 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
     }
   }
 
-  Future<void> uploadFile(
-      _UploadFile fileData, String referenceFrom, String referenceUUID) async {
+  Future<void> uploadFile(_UploadFile fileData, String referenceFrom,
+      String referenceUUID, String fileName) async {
     final dio = Dio();
     final file = fileData.file;
     final fileName = basename(file.path);
@@ -70,6 +70,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
         "reference_from": referenceFrom,
         "reference_uuid": referenceUUID,
         "attachment_type": _getAttachmentType(file.path),
+        "attachment_name": fileName,
       });
 
       final response = await dio.post(
@@ -166,7 +167,8 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                   final file = files[index];
                   return GestureDetector(
                     onTap: file.status == UploadStatus.initial
-                        ? () => uploadFile(file, referenceFrom, referenceUUID)
+                        ? () => uploadFile(
+                            file, referenceFrom, referenceUUID, file.name)
                         : null,
                     child: Card(
                       elevation: 0.0,
@@ -230,8 +232,8 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                   color: AppColors.primaryColor,
                                   size: 30,
                                 ),
-                                onPressed: () => uploadFile(
-                                    file, referenceFrom, referenceUUID),
+                                onPressed: () => uploadFile(file, referenceFrom,
+                                    referenceUUID, file.name),
                               )
                             else if (file.status == UploadStatus.failed)
                               Row(
@@ -240,7 +242,10 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                     icon: Icon(Icons.refresh,
                                         color: Colors.orange),
                                     onPressed: () => uploadFile(
-                                        file, referenceFrom, referenceUUID),
+                                        file,
+                                        referenceFrom,
+                                        referenceUUID,
+                                        file.name),
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete_forever,

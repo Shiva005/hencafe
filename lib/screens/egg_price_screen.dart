@@ -370,154 +370,175 @@ class EggPriceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: AppColors.primaryColor, width: 1),
-        // Change color here
-        borderRadius:
-            BorderRadius.circular(8.0), // Optional: Adjust border radius
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black38, width: 1),
-                      // Change color here
-                      borderRadius: BorderRadius.circular(
-                          8.0), // Optional: Adjust border radius
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Rs/egg',
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
-                          Text(
-                            eggPriceModel.apiResponse![index].eggsaleCost ?? '',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor,
+    return GestureDetector(
+      onTap: () {
+        NavigationHelper.pushNamed(
+          AppRoutes.saleDetailsScreen,
+          arguments: {
+            'eggPriceModel': eggPriceModel.apiResponse![index],
+            'pageType': AppRoutes.eggPriceScreen,
+          },
+        );
+      },
+      child: Card(
+        elevation: 0.0,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.primaryColor, width: 1),
+          // Change color here
+          borderRadius:
+              BorderRadius.circular(8.0), // Optional: Adjust border radius
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0.0,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.black38, width: 1),
+                        // Change color here
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Optional: Adjust border radius
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Rs/egg',
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.grey),
                             ),
-                          ),
-                        ],
+                            Text(
+                              eggPriceModel.apiResponse![index].eggsaleCost ??
+                                  '',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                              "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: 20.0,
-                            width: 20.0,
-                            child: Image.asset(
-                              AppIconsData.hen,
-                              fit: BoxFit.contain,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.grey,
+                              size: 18,
                             ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index]
-                                  .birdBreedInfo![0].birdbreedNameLanguage ??
-                              ''),
-                        ],
+                            const SizedBox(width: 3),
+                            Text(
+                                "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 20.0,
+                              width: 20.0,
+                              child: Image.asset(
+                                AppIconsData.hen,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(eggPriceModel.apiResponse![index]
+                                    .birdBreedInfo![0].birdbreedNameLanguage ??
+                                ''),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.business,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(eggPriceModel.apiResponse![index]
+                                .companyBasicInfo![0].companyNameLanguage!),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Visibility(
+                        visible:
+                            eggPriceModel.apiResponse![index].isHatchingEgg ==
+                                "Y",
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 24.0,
+                              width: 24.0,
+                              child: Image.asset(
+                                AppIconsData.chick,
+                                color: AppColors.primaryColor,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.business,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(eggPriceModel.apiResponse![index]
-                              .companyBasicInfo![0].companyNameLanguage!),
-                        ],
+                      Visibility(
+                        visible:
+                            eggPriceModel.apiResponse![index].isSpecialSale ==
+                                "Y",
+                        child: Icon(Icons.card_giftcard,
+                            color: AppColors.primaryColor, size: 20.0),
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    Visibility(
-                      visible:
-                          eggPriceModel.apiResponse![index].isHatchingEgg ==
-                              "Y",
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 24.0,
-                            width: 24.0,
-                            child: Image.asset(
-                              AppIconsData.chick,
-                              color: AppColors.primaryColor,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                        ],
-                      ),
-                    ),
-                    Visibility(
-                      visible:
-                          eggPriceModel.apiResponse![index].isSpecialSale ==
-                              "Y",
-                      child: Icon(Icons.card_giftcard,
-                          color: AppColors.primaryColor, size: 20.0),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                    'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.green.shade700)),
-                Text(
-                    'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
-                    style: TextStyle(fontSize: 12, color: Colors.red.shade700)),
-                Text(
-                    '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.green.shade700)),
+                  Text(
+                      'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                  Row(
+                    children: [
+                      Text(
+                          '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade700)),
+                      SizedBox(width: 10.0),
+                      Icon(Icons.arrow_right_alt_outlined,
+                          color: AppColors.primaryColor),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -33,6 +33,9 @@ class AppStrings {
   static const String sellChick = 'Sell Chick';
   static const String sellChicken = 'Sell Chicken';
   static const String uploadFile = 'Upload File';
+  static const String saleDetails = 'Sale Details';
+  static const String imagePreview = 'Image Preview';
+  static const String videoPreview = 'Video Preview';
 
   ///SharedPreference Strings
   static const String prefFirstName = 'first_name';

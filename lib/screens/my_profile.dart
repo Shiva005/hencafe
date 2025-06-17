@@ -89,9 +89,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 .apiResponse![0].userMembershipInfo![0].userMembershipValidTo ??
             "";
         workType = getProfileRes.apiResponse![0].userWorkType.value ?? "";
-        userImage =
-            getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath ??
-                "";
+        if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
+          userImage =
+              getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath ??
+                  "";
+        }
         for (int i = 0;
             i < getProfileRes.apiResponse![0].userFavouriteStateInfo!.length;
             i++) {

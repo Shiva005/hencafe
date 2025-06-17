@@ -94,6 +94,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
   @override
   void initState() {
     initializeControllers();
+    startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _fetchStates();
     getBirdBreedData();
     getCompanyData();
