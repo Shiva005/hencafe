@@ -734,7 +734,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                                           'reference_from': 'CHICKEN_SALE',
                                           'reference_uuid': uuids,
                                           'pageType':
-                                              AppRoutes.uploadFileScreen,
+                                              AppRoutes.sellChickenScreen,
                                         },
                                       );
                                     },

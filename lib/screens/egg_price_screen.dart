@@ -375,7 +375,7 @@ class EggPriceCard extends StatelessWidget {
         NavigationHelper.pushNamed(
           AppRoutes.saleDetailsScreen,
           arguments: {
-            'eggPriceModel': eggPriceModel.apiResponse![index],
+            'eggSaleID': eggPriceModel.apiResponse![index].eggsaleId,
             'pageType': AppRoutes.eggPriceScreen,
           },
         );

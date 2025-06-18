@@ -148,6 +148,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final String referenceUUID = args?['reference_uuid'] ?? '';
     final String referenceFrom = args?['reference_from'] ?? '';
+    final String pageType = args?['pageType'] ?? '';
 
     logger.e('$referenceFrom $referenceUUID');
     return Scaffold(

@@ -764,7 +764,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                           'reference_from': 'EGG_SALE',
                                           'reference_uuid': uuids,
                                           'pageType':
-                                              AppRoutes.uploadFileScreen,
+                                              AppRoutes.sellEggScreen,
                                         },
                                       );
                                     },
