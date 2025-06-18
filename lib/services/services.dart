@@ -463,7 +463,8 @@ class AuthServices {
       String fromDate, String toDate, String saleType) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
-      Uri.parse('${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate&eggsale_id=$eggID'),
+      Uri.parse(
+          '${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate&eggsale_id=$eggID'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -540,8 +541,43 @@ class AuthServices {
     return ForgetPinModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> attachmentDelete(
+      BuildContext context, String attachmentID, String fileUrl) async {
+    var prefs = await SharedPreferences.getInstance();
 
+    var request = http.MultipartRequest(
+      'DELETE',
+      Uri.parse(ServiceNames.ATTACHMENT_DELETE),
+    );
 
+    // Add form fields
+    request.fields['attachment_id'] = attachmentID;
+    request.fields['file_path'] = fileUrl;
+
+    // Add headers
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+      'language': prefs.getString(AppStrings.prefLanguage) ?? 'en',
+      'user-id': prefs.getString(AppStrings.prefUserID) ?? '',
+      'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
+      'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
+      'session-id': '', // if needed
+    });
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      logger.d('Request Data: ${request.fields}');
+      logger.d('Response: ${response.statusCode}');
+      logger.d('Response Body: ${response.body}');
+      return SuccessModel.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      logger.e('Exception during attachment delete: $e');
+      rethrow;
+    }
+  }
 }
 
 class StatusCodeHandler {

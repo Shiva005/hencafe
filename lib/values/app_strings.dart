@@ -20,6 +20,7 @@ class AppStrings {
   static const String mobileNumber1 = '+919885279787';
   static const String finish = 'Finish';
   static const String submit = 'Submit';
+  static const String update = 'Update';
   static const String otp = 'OTP';
   static const String verify = 'Verify';
   static const String forgetPin = 'Forget Pin?';

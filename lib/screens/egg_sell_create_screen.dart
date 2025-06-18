@@ -13,6 +13,7 @@ import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../models/bird_breed_model.dart';
 import '../models/city_list_model.dart';
+import '../models/egg_price_model.dart' as eggPrice;
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
@@ -49,10 +50,12 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   Map<String, String> companyList = {};
   Map<String, String> statelist = {};
   Map<String, String> cityList = {};
+  String selectedCityID = '';
   bool isHatchingEggs = false;
   bool isSpecialSale = false;
   var hatchingType = "N";
   var saleType = "N";
+  bool _isInitialized = false;
 
   void initializeControllers() {
     eggPriceController = TextEditingController()
@@ -147,8 +150,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     return getCompanyRes;
   }
 
-  Future<CityListModel> getCityData(String state) async {
-    var getCityRes = await AuthServices().getCityList(context, state);
+  Future<CityListModel> getCityData(String stateID) async {
+    var getCityRes = await AuthServices().getCityList(context, stateID);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
         LoadingDialogHelper.dismissLoadingDialog(context);
@@ -225,6 +228,10 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                           getCityData(
                                               statelist[key].toString());
                                         }
+                                        if (title == "City") {
+                                          selectedCityID =
+                                              cityList[key].toString();
+                                        }
                                       },
                                     ),
                                     Divider(
@@ -253,6 +260,32 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   @override
   Widget build(BuildContext context) {
     qtyController.text = "1";
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String pageType = arguments['pageType'];
+    if (!_isInitialized && pageType == 'eggSaleDetails') {
+      final eggPrice.ApiResponse eggPriceModel = arguments['eggPriceModel'];
+      selectedCityID = eggPriceModel.addressDetails![0].cityId!;
+      eggPriceController.text = eggPriceModel.eggsaleCost!;
+      startDateController.text = eggPriceModel.eggsaleEffectFrom!;
+      endDateController.text = eggPriceModel.eggsaleEffectTo!;
+      commentController.text = eggPriceModel.eggsaleComment!;
+      birdTypeController.text =
+          eggPriceModel.birdBreedInfo![0].birdbreedNameLanguage!;
+      stateController.text =
+          eggPriceModel.addressDetails![0].stateNameLanguage!;
+      cityController.text = eggPriceModel.addressDetails![0].cityNameLanguage!;
+      companyController.text =
+          eggPriceModel.companyBasicInfo![0].companyNameLanguage!;
+
+      isHatchingEggs = eggPriceModel.isHatchingEgg == 'Y';
+      hatchingType = isHatchingEggs ? 'Y' : 'N';
+
+      isSpecialSale = eggPriceModel.isSpecialSale == 'Y';
+      saleType = isSpecialSale ? 'Y' : 'N';
+      _isInitialized = true;
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
@@ -744,7 +777,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                     saleType,
                                     hatchingType,
                                     statelist[stateController.text].toString(),
-                                    cityList[cityController.text].toString(),
+                                    selectedCityID,
                                     uuids);
                                 if (sellEggRes.apiResponse![0].responseStatus ==
                                     true) {
@@ -763,8 +796,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                         arguments: {
                                           'reference_from': 'EGG_SALE',
                                           'reference_uuid': uuids,
-                                          'pageType':
-                                              AppRoutes.sellEggScreen,
+                                          'pageType': AppRoutes.sellEggScreen,
                                         },
                                       );
                                     },
@@ -789,7 +821,9 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             child: Row(
                               children: [
                                 Text(
-                                  AppStrings.continueNext,
+                                  pageType == 'eggSaleDetails'
+                                      ? AppStrings.continueNext
+                                      : AppStrings.update,
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 SizedBox(width: 5.0),

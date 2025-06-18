@@ -25,5 +25,6 @@ class ServiceNames {
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
   static String GET_SUPPLIES = '${BASE_URL}v1/supplies/';
   static String ATTACHMENT_UPLOAD = '${BASE_URL}v1/attachment/upload';
+  static String ATTACHMENT_DELETE = '${BASE_URL}v1/attachment/delete';
 
 }
