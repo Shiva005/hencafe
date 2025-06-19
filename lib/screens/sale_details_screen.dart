@@ -1,5 +1,5 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/screens/image_preview_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +14,7 @@ import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
+import '../values/app_theme.dart';
 import 'video_player_screen.dart';
 
 class SaleDetailsScreen extends StatefulWidget {
@@ -451,17 +452,51 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     ),
                                     child: GestureDetector(
                                       onTap: () {
-                                        NavigationHelper.pushNamed(
-                                          AppRoutes.uploadFileScreen,
-                                          arguments: {
-                                            'reference_from': 'EGG_SALE',
-                                            'reference_uuid': priceModel
-                                                .apiResponse![0].eggsaleUuid,
-                                            'pageType': AppRoutes.sellEggScreen,
-                                          },
-                                        )?.then((value) {
-                                          loadData();
-                                        });
+                                        if (pageType ==
+                                            AppRoutes.eggPriceScreen) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.uploadFileScreen,
+                                            arguments: {
+                                              'reference_from': 'EGG_SALE',
+                                              'reference_uuid': priceModel
+                                                  .apiResponse![0].eggsaleUuid,
+                                              'pageType':
+                                                  AppRoutes.sellEggScreen,
+                                            },
+                                          )?.then((value) {
+                                            loadData();
+                                          });
+                                        } else if (pageType ==
+                                            AppRoutes.chickPriceScreen) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.uploadFileScreen,
+                                            arguments: {
+                                              'reference_from': 'CHICK_SALE',
+                                              'reference_uuid': priceModel
+                                                  .apiResponse![0]
+                                                  .chicksaleUuid,
+                                              'pageType':
+                                                  AppRoutes.sellChickScreen,
+                                            },
+                                          )?.then((value) {
+                                            loadData();
+                                          });
+                                        } else if (pageType ==
+                                            AppRoutes.chickenPriceScreen) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.uploadFileScreen,
+                                            arguments: {
+                                              'reference_from': 'CHICKEN_SALE',
+                                              'reference_uuid': priceModel
+                                                  .apiResponse![0]
+                                                  .chickensaleUuid,
+                                              'pageType':
+                                                  AppRoutes.sellChickenScreen,
+                                            },
+                                          )?.then((value) {
+                                            loadData();
+                                          });
+                                        }
                                       },
                                       child: Row(
                                         children: [
@@ -575,27 +610,43 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                       Icons.delete_forever),
                                                   color: Colors.red,
                                                   onPressed: () async {
-                                                    var attachmentDeleteRes =
-                                                        await AuthServices()
-                                                            .attachmentDelete(
-                                                                context,
-                                                                attachment
-                                                                    .attachmentId!,
-                                                                attachment
-                                                                    .attachmentPath!);
-                                                    if (attachmentDeleteRes
-                                                            .apiResponse![0]
-                                                            .responseStatus ==
-                                                        true) {
-                                                      setState(() {
-                                                        attachments.removeAt(
-                                                            index); // Remove the item directly
-                                                      });
-                                                    }
-                                                    SnackbarHelper.showSnackBar(
-                                                        attachmentDeleteRes
-                                                            .apiResponse![0]
-                                                            .responseDetails);
+                                                    AwesomeDialog(
+                                                      context: context,
+                                                      animType:
+                                                          AnimType.bottomSlide,
+                                                      dialogType:
+                                                          DialogType.warning,
+                                                      dialogBackgroundColor:
+                                                          Colors.white,
+                                                      titleTextStyle:
+                                                          AppTheme.appBarText,
+                                                      title:
+                                                          'Are you sure you want to delete this file?',
+                                                      btnCancelOnPress: () {},
+                                                      btnCancelText: 'Cancel',
+                                                      btnOkOnPress: () async {
+                                                        var attachmentDeleteRes =
+                                                            await AuthServices()
+                                                                .attachmentDelete(
+                                                                    context,
+                                                                    attachment
+                                                                        .attachmentId!,
+                                                                    attachment
+                                                                        .attachmentPath!);
+                                                        if (attachmentDeleteRes
+                                                                .apiResponse![0]
+                                                                .responseStatus ==
+                                                            true) {
+                                                          setState(() {
+                                                            attachments.removeAt(
+                                                                index); // Remove the item directly
+                                                          });
+                                                        }
+                                                      },
+                                                      btnOkText: 'Yes',
+                                                      btnOkColor: Colors
+                                                          .yellow.shade700,
+                                                    ).show();
                                                   },
                                                 ),
                                               ],

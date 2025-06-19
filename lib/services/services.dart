@@ -413,6 +413,60 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> updateSellChick(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String comment,
+      String effectFromDate,
+      String effectTillDate,
+      String saleType,
+      String stateID,
+      String cityID,
+      String age,
+      String weight,
+      String uuid,
+      String chickID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'qty': qty,
+      'cost': cost,
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'is_special_sale': saleType,
+      'age_in_days': age,
+      'weight_in_grams': weight,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'company_id': companyID,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'chicksale_uuid': uuid,
+      'chicksale_id': chickID,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_SELL_CHICK),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuccessModel> sellChicken(
       BuildContext context,
       String companyID,
@@ -448,6 +502,59 @@ class AuthServices {
 
     final response = await http.post(
       Uri.parse(ServiceNames.SELL_CHICKEN),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> updateSellChicken(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String comment,
+      String effectFromDate,
+      String effectTillDate,
+      String saleType,
+      String stateID,
+      String cityID,
+      String uuid,
+      String chickenID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'qty': qty,
+      'farm_live_bird_cost': cost,
+      "retail_live_bird_cost": "0",
+      "with_skin_cost": "0",
+      "skin_less_cost": "0",
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'is_special_sale': saleType,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'company_id': companyID,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'chickensale_uuid': uuid,
+      'chickensale_id': chickenID,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_SELL_CHICKEN),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

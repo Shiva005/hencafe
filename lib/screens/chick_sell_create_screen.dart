@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../models/bird_breed_model.dart';
+import '../models/chick_price_model.dart' as chickPrice;
 import '../models/city_list_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
@@ -51,10 +52,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
   Map<String, String> companyList = {};
   Map<String, String> statelist = {};
   Map<String, String> cityList = {};
-  bool isHatchingEggs = false;
+  String selectedCityID = '';
   bool isSpecialSale = false;
-  var hatchingType = "N";
   var saleType = "N";
+  bool _isInitialized = false;
+  late final chickPrice.ApiResponse chickPriceModel;
 
   void initializeControllers() {
     chickPriceController = TextEditingController()
@@ -157,7 +159,6 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
     var getCityRes = await AuthServices().getCityList(context, state);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
-        LoadingDialogHelper.dismissLoadingDialog(context);
         for (int i = 0; i < getCityRes.apiResponse!.length; i++) {
           cityList[getCityRes.apiResponse![i].cityNameLanguage!] =
               getCityRes.apiResponse![i].cityId!;
@@ -169,96 +170,168 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
 
   void _showSelectionBottomSheet({
     required String title,
-    required Future<Map<String, String>> Function() fetchData, // Fetch function
+    required Future<Map<String, String>> Function() fetchData,
     required TextEditingController controller,
   }) {
+    final TextEditingController searchController = TextEditingController();
+    Map<String, String> allData = {};
+    Map<String, String> filteredData = {};
+
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        // Allows the height to expand dynamically
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-        ),
-        builder: (context) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return FutureBuilder<Map<String, String>>(
-                future: fetchData(), // Fetch data dynamically
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final data = snapshot.data!;
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight:
-                          constraints.maxHeight * 0.9, // 90% of screen height
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Select $title",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                            const SizedBox(height: 20),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: data.length, // Example content
-                              itemBuilder: (context, index) {
-                                final key = data.keys.elementAt(index);
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        key,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      onTap: () {
-                                        controller.text = key;
-                                        Navigator.pop(context);
-                                        if (title == "State") {
-                                          cityList.clear();
-                                          cityController.text = "";
-                                          LoadingDialogHelper.showLoadingDialog(
-                                              context);
-                                          getCityData(
-                                              statelist[key].toString());
-                                        }
-                                      },
-                                    ),
-                                    Divider(
-                                        color: Colors.grey.shade200, height: 2),
-                                  ],
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("Close"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return FutureBuilder<Map<String, String>>(
+              future: fetchData(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError || !snapshot.hasData) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(child: Text("Failed to load data.")),
                   );
-                },
-              );
-            },
-          );
-        });
+                }
+
+                if (allData.isEmpty) {
+                  allData = snapshot.data!;
+                  filteredData = Map.from(allData);
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Select $title",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search $title',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onChanged: (query) {
+                                  setModalState(() {
+                                    filteredData = Map.fromEntries(
+                                      allData.entries.where((entry) =>
+                                      entry.key.toLowerCase().contains(query.toLowerCase()) ||
+                                          entry.value.toLowerCase().contains(query.toLowerCase())),
+                                    );
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: filteredData.isNotEmpty
+                              ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const ClampingScrollPhysics(),
+                            itemCount: filteredData.length,
+                            itemBuilder: (context, index) {
+                              final key = filteredData.keys.elementAt(index);
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    title: Text(
+                                      key,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    onTap: () {
+                                      controller.text = key;
+                                      Navigator.pop(context);
+                                      if (title == "State") {
+                                        cityList.clear();
+                                        cityController.text = "";
+                                        getCityData(statelist[key].toString());
+                                      } else if (title == "City") {
+                                        selectedCityID = cityList[key].toString();
+                                      }
+                                    },
+                                  ),
+                                  Divider(
+                                    color: Colors.grey.shade200,
+                                    height: 2,
+                                  ),
+                                ],
+                              );
+                            },
+                          )
+                              : const Center(child: Text("No results found.")),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("Close"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     qtyController.text = '1';
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String pageType = arguments['pageType'];
+    if (!_isInitialized && pageType == 'chickSaleDetails') {
+      chickPriceModel = arguments['chickPriceModel'];
+      selectedCityID = chickPriceModel.addressDetails![0].cityId!;
+      chickPriceController.text = chickPriceModel.chicksaleCost!;
+      startDateController.text = chickPriceModel.chicksaleEffectFrom!;
+      endDateController.text = chickPriceModel.chickaleEffectTo!;
+      commentController.text = chickPriceModel.chicksaleComment!;
+      chickTypeController.text =
+          chickPriceModel.birdBreedInfo![0].birdbreedNameLanguage!;
+      stateController.text =
+          chickPriceModel.addressDetails![0].stateNameLanguage!;
+      cityController.text =
+          chickPriceModel.addressDetails![0].cityNameLanguage!;
+      companyController.text =
+          chickPriceModel.companyBasicInfo![0].companyNameLanguage!;
+      ageController.text = chickPriceModel.birdAgeInDays!.toString();
+      weightController.text = chickPriceModel.birdWeightInGrams!.toString();
+      getCityData(chickPriceModel.addressDetails![0].stateId!);
+      isSpecialSale = chickPriceModel.isSpecialSale == 'Y';
+      saleType = isSpecialSale ? 'Y' : 'N';
+      _isInitialized = true;
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
@@ -616,6 +689,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               ),
                             ),
                             readOnly: true,
+                            enabled:
+                                stateController.text.isEmpty ? false : true,
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||
@@ -729,69 +804,115 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                             height: 45.0,
                             controller: _btnController,
                             onPressed: () async {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                String uuids = uuid.v1();
-                                var sellEggRes = await AuthServices().sellChick(
-                                    context,
-                                    companyList[companyController.text]
-                                        .toString(),
-                                    birdBreedList[chickTypeController.text]
-                                        .toString(),
-                                    qtyController.text,
-                                    chickPriceController.text,
-                                    commentController.text,
-                                    startDateController.text,
-                                    endDateController.text,
-                                    saleType,
-                                    statelist[stateController.text].toString(),
-                                    cityList[cityController.text].toString(),
-                                    uuids,
-                                    ageController.text,
-                                    weightController.text);
-                                if (sellEggRes.apiResponse![0].responseStatus ==
-                                    true) {
-                                  AwesomeDialog(
-                                    context: context,
-                                    animType: AnimType.bottomSlide,
-                                    dialogType: DialogType.success,
-                                    dialogBackgroundColor: Colors.white,
-                                    title: sellEggRes
-                                        .apiResponse![0].responseDetails,
-                                    titleTextStyle: AppTheme.appBarText,
-                                    descTextStyle: AppTheme.appBarText,
-                                    btnOkOnPress: () {
-                                      NavigationHelper.pushReplacementNamed(
-                                        AppRoutes.uploadFileScreen,
-                                        arguments: {
-                                          'reference_from': 'CHICK_SALE',
-                                          'reference_uuid': uuids,
-                                          'pageType':
-                                              AppRoutes.sellChickScreen,
-                                        },
-                                      );
-                                    },
-                                    btnCancelOnPress: () {
-                                      NavigationHelper
-                                          .pushReplacementNamedUntil(
-                                        AppRoutes.dashboardScreen,
-                                      );
-                                    },
-                                    btnOkText: 'Yes',
-                                    btnCancelText: 'No',
-                                    btnOkColor: Colors.greenAccent.shade700,
-                                  ).show();
-                                } else {
-                                  SnackbarHelper.showSnackBar(sellEggRes
-                                      .apiResponse![0].responseDetails);
+                              if (pageType == 'chickSaleDetails') {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  var updateSellChickRes = await AuthServices()
+                                      .updateSellChick(
+                                          context,
+                                          companyList[companyController.text]
+                                              .toString(),
+                                          birdBreedList[
+                                                  chickTypeController.text]
+                                              .toString(),
+                                          qtyController.text,
+                                          chickPriceController.text,
+                                          commentController.text,
+                                          startDateController.text,
+                                          endDateController.text,
+                                          saleType,
+                                          statelist[stateController.text]
+                                              .toString(),
+                                          selectedCityID,
+                                          ageController.text,
+                                          weightController.text,
+                                          chickPriceModel.chicksaleUuid
+                                              .toString(),
+                                          chickPriceModel.chicksaleId
+                                              .toString());
+                                  if (updateSellChickRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    SnackbarHelper.showSnackBar(
+                                        updateSellChickRes
+                                            .apiResponse![0].responseDetails);
+                                  }
                                 }
+                              } else {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  String uuids = uuid.v1();
+                                  var sellEggRes = await AuthServices()
+                                      .sellChick(
+                                          context,
+                                          companyList[companyController.text]
+                                              .toString(),
+                                          birdBreedList[
+                                                  chickTypeController.text]
+                                              .toString(),
+                                          qtyController.text,
+                                          chickPriceController.text,
+                                          commentController.text,
+                                          startDateController.text,
+                                          endDateController.text,
+                                          saleType,
+                                          statelist[stateController.text]
+                                              .toString(),
+                                          cityList[cityController.text]
+                                              .toString(),
+                                          uuids,
+                                          ageController.text,
+                                          weightController.text);
+                                  if (sellEggRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    AwesomeDialog(
+                                      context: context,
+                                      animType: AnimType.bottomSlide,
+                                      dialogType: DialogType.success,
+                                      dialogBackgroundColor: Colors.white,
+                                      title: sellEggRes
+                                          .apiResponse![0].responseDetails,
+                                      titleTextStyle: AppTheme.appBarText,
+                                      descTextStyle: AppTheme.appBarText,
+                                      btnOkOnPress: () {
+                                        NavigationHelper.pushReplacementNamed(
+                                          AppRoutes.uploadFileScreen,
+                                          arguments: {
+                                            'reference_from': 'CHICK_SALE',
+                                            'reference_uuid': uuids,
+                                            'pageType':
+                                                AppRoutes.sellChickScreen,
+                                          },
+                                        );
+                                      },
+                                      btnCancelOnPress: () {
+                                        NavigationHelper
+                                            .pushReplacementNamedUntil(
+                                          AppRoutes.dashboardScreen,
+                                        );
+                                      },
+                                      btnOkText: 'Yes',
+                                      btnCancelText: 'No',
+                                      btnOkColor: Colors.greenAccent.shade700,
+                                    ).show();
+                                  } else {
+                                    SnackbarHelper.showSnackBar(sellEggRes
+                                        .apiResponse![0].responseDetails);
+                                  }
+                                }
+                                _btnController.reset();
                               }
-                              _btnController.reset();
                             },
                             color: AppColors.primaryColor,
                             child: Row(
                               children: [
                                 Text(
-                                  AppStrings.continueNext,
+                                  pageType == 'chickSaleDetails'
+                                      ? AppStrings.update
+                                      : AppStrings.continueNext,
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 SizedBox(width: 5.0),

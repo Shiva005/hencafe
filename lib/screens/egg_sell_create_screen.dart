@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
-import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
@@ -155,7 +154,6 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
     var getCityRes = await AuthServices().getCityList(context, stateID);
     if (getCityRes.errorCount == 0 && getCityRes.apiResponse != null) {
       setState(() {
-        LoadingDialogHelper.dismissLoadingDialog(context);
         for (int i = 0; i < getCityRes.apiResponse!.length; i++) {
           cityList[getCityRes.apiResponse![i].cityNameLanguage!] =
               getCityRes.apiResponse![i].cityId!;
@@ -167,95 +165,144 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   void _showSelectionBottomSheet({
     required String title,
-    required Future<Map<String, String>> Function() fetchData, // Fetch function
+    required Future<Map<String, String>> Function() fetchData,
     required TextEditingController controller,
   }) {
+    final TextEditingController searchController = TextEditingController();
+    Map<String, String> allData = {};
+    Map<String, String> filteredData = {};
+
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        // Allows the height to expand dynamically
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-        ),
-        builder: (context) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return FutureBuilder<Map<String, String>>(
-                future: fetchData(), // Fetch data dynamically
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final data = snapshot.data!;
-                  return ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight:
-                          constraints.maxHeight * 0.9, // 90% of screen height
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Select $title",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                            const SizedBox(height: 20),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: data.length, // Example content
-                              itemBuilder: (context, index) {
-                                final key = data.keys.elementAt(index);
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        key,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      onTap: () {
-                                        controller.text = key;
-                                        Navigator.pop(context);
-                                        if (title == "State") {
-                                          cityList.clear();
-                                          cityController.text = "";
-                                          LoadingDialogHelper.showLoadingDialog(
-                                              context);
-                                          getCityData(
-                                              statelist[key].toString());
-                                        }
-                                        if (title == "City") {
-                                          selectedCityID =
-                                              cityList[key].toString();
-                                        }
-                                      },
-                                    ),
-                                    Divider(
-                                        color: Colors.grey.shade200, height: 2),
-                                  ],
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("Close"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return FutureBuilder<Map<String, String>>(
+              future: fetchData(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError || !snapshot.hasData) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(child: Text("Failed to load data.")),
                   );
-                },
-              );
-            },
-          );
-        });
+                }
+
+                if (allData.isEmpty) {
+                  allData = snapshot.data!;
+                  filteredData = Map.from(allData);
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Select $title",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search $title',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onChanged: (query) {
+                                  setModalState(() {
+                                    filteredData = Map.fromEntries(
+                                      allData.entries.where((entry) =>
+                                          entry.key
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase()) ||
+                                          entry.value
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase())),
+                                    );
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: filteredData.isNotEmpty
+                              ? ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const ClampingScrollPhysics(),
+                                  itemCount: filteredData.length,
+                                  itemBuilder: (context, index) {
+                                    final key =
+                                        filteredData.keys.elementAt(index);
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          title: Text(
+                                            key,
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                          onTap: () {
+                                            controller.text = key;
+                                            Navigator.pop(context);
+                                            if (title == "State") {
+                                              cityList.clear();
+                                              cityController.text = "";
+                                              getCityData(
+                                                  statelist[key].toString());
+                                            } else if (title == "City") {
+                                              selectedCityID =
+                                                  cityList[key].toString();
+                                            }
+                                          },
+                                        ),
+                                        Divider(
+                                          color: Colors.grey.shade200,
+                                          height: 2,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              : const Center(child: Text("No results found.")),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("Close"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -281,7 +328,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
       isHatchingEggs = eggPriceModel.isHatchingEgg == 'Y';
       hatchingType = isHatchingEggs ? 'Y' : 'N';
-
+      getCityData(eggPriceModel.addressDetails![0].stateId!);
       isSpecialSale = eggPriceModel.isSpecialSale == 'Y';
       saleType = isSpecialSale ? 'Y' : 'N';
       _isInitialized = true;
@@ -649,6 +696,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               ),
                             ),
                             readOnly: true,
+                            enabled:
+                                stateController.text.isEmpty ? false : true,
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||
