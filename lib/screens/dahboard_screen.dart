@@ -361,9 +361,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                           var mb = prefs.getString(AppStrings.prefMobileNumber);
                           var language =
                               prefs.getString(AppStrings.prefLanguage);
+                          var countryCode =
+                              prefs.getString(AppStrings.prefCountryCode);
                           prefs.clear();
-                          prefs.setString(AppStrings.prefLanguage, language!);
-                          prefs.setString(AppStrings.prefMobileNumber, mb!);
+                          prefs.setString(AppStrings.prefLanguage, language);
+                          prefs.setString(AppStrings.prefMobileNumber, mb);
+                          prefs.setString(AppStrings.prefCountryCode, countryCode);
                           NavigationHelper.pushReplacementNamedUntil(
                               AppRoutes.loginMobile);
                         },

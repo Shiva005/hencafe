@@ -121,6 +121,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     // Fetch states before showing the bottom sheet
     await _fetchStates();
 
+    final TextEditingController searchController = TextEditingController();
+    List<state.ApiResponse> filteredStates = List.from(_states);
+
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
@@ -129,88 +132,110 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (context) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Select State",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      _states.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _states.length,
-                              itemBuilder: (context, index) {
-                                final state = _states[index];
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      trailing: Radio<String>(
-                                        value: state.stateNameLanguage ?? '',
-                                        groupValue: _selectedStateID,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            stateController.text = value!;
-                                            _selectedStateID = state.stateId;
-                                            cityController.clear();
-                                          });
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      title: Text(
-                                        '${state.stateNameLanguage}',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0, right: 15),
-                                      child: Divider(
-                                        color: Colors.grey.shade200,
-                                        height: 2,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Close"),
-                      ),
-                    ],
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight * 0.9,
                   ),
-                ),
-              ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 16.0,
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Select State",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search State',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onChanged: (query) {
+                            setModalState(() {
+                              filteredStates = (_states ?? [])
+                                  .where((item) => (item.stateNameLanguage ?? '')
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()))
+                                  .toList();
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        (_states.isEmpty)
+                            ? const Center(child: CircularProgressIndicator())
+                            : Expanded(
+                          child: filteredStates.isNotEmpty
+                              ? ListView.separated(
+                            itemCount: filteredStates.length,
+                            separatorBuilder: (_, __) => Divider(
+                              color: Colors.grey.shade200,
+                              height: 2,
+                            ),
+                            itemBuilder: (context, index) {
+                              final state = filteredStates[index];
+                              return ListTile(
+                                title: Text(
+                                  state.stateNameLanguage ?? '',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    stateController.text = state.stateNameLanguage ?? '';
+                                    _selectedStateID = state.stateId;
+                                    cityController.clear();
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          )
+                              : const Center(child: Text("No results found.")),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Close"),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             );
           },
         );
       },
     );
   }
+
+
 
   // Function to show a bottom sheet
   void _showCityBottomSheet() async {
     await _fetchCity();
 
+    final TextEditingController searchController = TextEditingController();
+    List<city.ApiResponse> filteredCities = List.from(_city);
+
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
@@ -219,82 +244,102 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (context) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * 0.8,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Select City",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      _city.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _city.length,
-                              itemBuilder: (context, index) {
-                                final city = _city[index];
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      trailing: Radio<String>(
-                                        value: city.cityNameLanguage ?? '',
-                                        groupValue: _selectedCityID,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            cityController.text = value!;
-                                            _selectedCityID = city.cityId;
-                                          });
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                      title: Text(
-                                        '${city.cityNameLanguage}',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0, right: 15),
-                                      child: Divider(
-                                        color: Colors.grey.shade200,
-                                        height: 2,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Close"),
-                      ),
-                    ],
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight * 0.9,
                   ),
-                ),
-              ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      top: 16.0,
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Select City",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search City',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onChanged: (query) {
+                            setModalState(() {
+                              filteredCities = (_city ?? [])
+                                  .where((item) => (item.cityNameLanguage ?? '')
+                                  .toLowerCase()
+                                  .contains(query.toLowerCase()))
+                                  .toList();
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        (_city.isEmpty)
+                            ? const Center(child: CircularProgressIndicator())
+                            : Expanded(
+                          child: filteredCities.isNotEmpty
+                              ? ListView.separated(
+                            itemCount: filteredCities.length,
+                            separatorBuilder: (_, __) => Divider(
+                              color: Colors.grey.shade200,
+                              height: 2,
+                            ),
+                            itemBuilder: (context, index) {
+                              final city = filteredCities[index];
+                              return ListTile(
+                                title: Text(
+                                  city.cityNameLanguage ?? '',
+                                  style:
+                                  const TextStyle(fontSize: 16),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    cityController.text =
+                                        city.cityNameLanguage ?? '';
+                                    _selectedCityID = city.cityId;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          )
+                              : const Center(child: Text("No results found.")),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Close"),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             );
           },
         );
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
