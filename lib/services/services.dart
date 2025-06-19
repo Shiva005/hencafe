@@ -531,12 +531,12 @@ class AuthServices {
     return EggPriceModel.fromJson(jsonDecode(response.body));
   }
 
-  Future<ChickPriceModel> getChickPriceList(BuildContext context, String eggID,
-      String fromDate, String toDate, String saleType) async {
+  Future<ChickPriceModel> getChickPriceList(BuildContext context,
+      String chickID, String fromDate, String toDate, String saleType) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.CHICK_PRICE_LIST}$fromDate&sale_to_date=$toDate'),
+          '${ServiceNames.CHICK_PRICE_LIST}$fromDate&sale_to_date=$toDate&chicksale_id=$chickID'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -552,11 +552,11 @@ class AuthServices {
   }
 
   Future<ChickenPriceModel> getChickenPriceList(BuildContext context,
-      String eggID, String fromDate, String toDate, String saleType) async {
+      String chickenID, String fromDate, String toDate, String saleType) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.CHICKEN_PRICE_LIST}$fromDate&sale_to_date=$toDate&chickensale_id='),
+          '${ServiceNames.CHICKEN_PRICE_LIST}$fromDate&sale_to_date=$toDate&chickensale_id=$chickenID'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

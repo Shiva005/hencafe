@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/screens/image_preview_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../helpers/navigation_helper.dart';
+import '../models/chick_price_model.dart';
 import '../models/egg_price_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
@@ -24,8 +26,11 @@ class SaleDetailsScreen extends StatefulWidget {
 class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
   late SharedPreferences prefs;
   late Future<EggPriceModel> eggPriceData;
+  late Future<ChickPriceModel> chickPriceData;
+  late Future<ChickenPriceModel> chickenPriceData;
   DateTime selectedDate = DateTime.now();
   String saleID = '';
+  String pageType = '';
 
   @override
   void didChangeDependencies() {
@@ -34,26 +39,67 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       saleID = args['saleID'] ?? '';
-      eggPriceData = _fetchData(Utils.formatDate(selectedDate), saleID);
+      pageType = args['pageType'] ?? '';
+      if (pageType == AppRoutes.eggPriceScreen) {
+        eggPriceData = _fetchEggData(Utils.formatDate(selectedDate), saleID);
+      } else if (pageType == AppRoutes.chickPriceScreen) {
+        chickPriceData =
+            _fetchChickData(Utils.formatDate(selectedDate), saleID);
+      } else if (pageType == AppRoutes.chickenPriceScreen) {
+        chickenPriceData =
+            _fetchChickenData(Utils.formatDate(selectedDate), saleID);
+      }
     }
   }
 
-  Future<EggPriceModel> _fetchData(
+  Future<EggPriceModel> _fetchEggData(
       String selectedDate, String eggSaleID) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices()
         .getEggPriceList(context, eggSaleID, selectedDate, selectedDate, '');
   }
 
+  Future<ChickPriceModel> _fetchChickData(
+      String selectedDate, String eggSaleID) async {
+    prefs = await SharedPreferences.getInstance();
+    return await AuthServices()
+        .getChickPriceList(context, eggSaleID, selectedDate, selectedDate, '');
+  }
+
+  Future<ChickenPriceModel> _fetchChickenData(
+      String selectedDate, String eggSaleID) async {
+    prefs = await SharedPreferences.getInstance();
+    return await AuthServices().getChickenPriceList(
+        context, eggSaleID, selectedDate, selectedDate, '');
+  }
+
   Future<void> loadData() async {
     prefs = await SharedPreferences.getInstance();
-    eggPriceData = AuthServices().getEggPriceList(
-      context,
-      saleID,
-      Utils.formatDate(selectedDate),
-      Utils.formatDate(selectedDate),
-      '',
-    );
+    if (pageType == AppRoutes.eggPriceScreen) {
+      eggPriceData = AuthServices().getEggPriceList(
+        context,
+        saleID,
+        Utils.formatDate(selectedDate),
+        Utils.formatDate(selectedDate),
+        '',
+      );
+    } else if (pageType == AppRoutes.chickPriceScreen) {
+      chickPriceData = AuthServices().getChickPriceList(
+        context,
+        saleID,
+        Utils.formatDate(selectedDate),
+        Utils.formatDate(selectedDate),
+        '',
+      );
+    } else if (pageType == AppRoutes.chickenPriceScreen) {
+      chickenPriceData = AuthServices().getChickenPriceList(
+        context,
+        saleID,
+        Utils.formatDate(selectedDate),
+        Utils.formatDate(selectedDate),
+        '',
+      );
+    }
     setState(() {}); // Refresh UI after loading data
   }
 
@@ -63,10 +109,19 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
       backgroundColor: Colors.grey.shade100,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60.0),
-        child: MyAppBar(title: AppStrings.saleDetails),
+        child: MyAppBar(
+            title: pageType == AppRoutes.eggPriceScreen
+                ? 'Egg Sale Details'
+                : pageType == AppRoutes.chickPriceScreen
+                    ? 'Chick Sale Details'
+                    : 'Chicken Sale Details'),
       ),
-      body: FutureBuilder<EggPriceModel>(
-          future: eggPriceData,
+      body: FutureBuilder<dynamic>(
+          future: pageType == AppRoutes.eggPriceScreen
+              ? eggPriceData
+              : pageType == AppRoutes.chickPriceScreen
+                  ? chickPriceData
+                  : chickenPriceData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -76,9 +131,8 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
               return Center(child: Text('No data found.'));
             }
 
-            final eggPriceModel = snapshot.data!;
-            final attachments =
-                eggPriceModel.apiResponse![0].attachmentInfo ?? [];
+            final priceModel = snapshot.data!;
+            final attachments = priceModel.apiResponse![0].attachmentInfo ?? [];
             return Column(
               children: [
                 SizedBox(height: 5),
@@ -112,7 +166,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     size: 20, color: Colors.black54),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${eggPriceModel.apiResponse![0].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![0].userBasicInfo![0].userFirstName}',
+                                  '${priceModel.apiResponse![0].userBasicInfo![0].userLastName} ${priceModel.apiResponse![0].userBasicInfo![0].userFirstName}',
                                   style: TextStyle(
                                       fontSize: 17, color: Colors.black),
                                 ),
@@ -125,7 +179,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     size: 20, color: Colors.black54),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${eggPriceModel.apiResponse![0].userBasicInfo![0].userMobile}',
+                                  '${priceModel.apiResponse![0].userBasicInfo![0].userMobile}',
                                   style: const TextStyle(
                                       fontSize: 15, color: Colors.black),
                                 ),
@@ -138,7 +192,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     size: 20, color: Colors.black54),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${eggPriceModel.apiResponse![0].userBasicInfo![0].userEmail}',
+                                  '${priceModel.apiResponse![0].userBasicInfo![0].userEmail}',
                                   style: const TextStyle(
                                       fontSize: 15, color: Colors.black),
                                 ),
@@ -150,7 +204,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                         FloatingActionButton(
                           onPressed: () {
                             Utils.openDialPad(
-                                '${eggPriceModel.apiResponse![0].userBasicInfo![0].userMobile}');
+                                '${priceModel.apiResponse![0].userBasicInfo![0].userMobile}');
                           },
                           backgroundColor: Colors.white,
                           child: const Icon(Icons.call,
@@ -182,7 +236,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                   TextStyle(fontSize: 18, color: Colors.black),
                             ),
                             Visibility(
-                              visible: eggPriceModel.apiResponse![0]
+                              visible: priceModel.apiResponse![0]
                                       .userBasicInfo![0].userId ==
                                   prefs.getString(AppStrings.prefUserID),
                               child: Container(
@@ -196,15 +250,42 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                 ),
                                 child: GestureDetector(
                                   onTap: () {
-                                    NavigationHelper.pushNamed(
-                                      AppRoutes.sellEggScreen,
-                                      arguments: {
-                                        'eggPriceModel': eggPriceModel.apiResponse![0],
-                                        'pageType': "eggSaleDetails",
-                                      },
-                                    )?.then((value) {
-                                      loadData();
-                                    });
+                                    if (pageType == AppRoutes.eggPriceScreen) {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.sellEggScreen,
+                                        arguments: {
+                                          'eggPriceModel':
+                                              priceModel.apiResponse![0],
+                                          'pageType': "eggSaleDetails",
+                                        },
+                                      )?.then((value) {
+                                        loadData();
+                                      });
+                                    } else if (pageType ==
+                                        AppRoutes.chickPriceScreen) {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.sellChickScreen,
+                                        arguments: {
+                                          'chickPriceModel':
+                                              priceModel.apiResponse![0],
+                                          'pageType': "chickSaleDetails",
+                                        },
+                                      )?.then((value) {
+                                        loadData();
+                                      });
+                                    } else if (pageType ==
+                                        AppRoutes.chickenPriceScreen) {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.sellChickenScreen,
+                                        arguments: {
+                                          'chickenPriceModel':
+                                              priceModel.apiResponse![0],
+                                          'pageType': "chickenSaleDetails",
+                                        },
+                                      )?.then((value) {
+                                        loadData();
+                                      });
+                                    }
                                   },
                                   child: Row(
                                     children: [
@@ -227,44 +308,104 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                           ],
                         ),
                         const SizedBox(height: 6),
-                        buildRow('Price',
-                            '${eggPriceModel.apiResponse![0].eggsaleCost ?? ''} rs/egg',
-                            isHighlight: true),
+                        if (pageType == AppRoutes.eggPriceScreen)
+                          buildRow('Price',
+                              '${priceModel.apiResponse![0].eggsaleCost ?? ''} rs/egg',
+                              isHighlight: true),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow('Price',
+                              '${priceModel.apiResponse![0].chicksaleCost ?? ''} rs/chick',
+                              isHighlight: true),
+                        if (pageType == AppRoutes.chickenPriceScreen)
+                          buildRow('Price',
+                              '${priceModel.apiResponse![0].farmLiveBirdCost ?? ''} Rs/kg',
+                              isHighlight: true),
                         buildRow(
                             'Bird Breed',
-                            eggPriceModel.apiResponse![0].birdBreedInfo?.first
+                            priceModel.apiResponse![0].birdBreedInfo?.first
                                     .birdbreedNameLanguage ??
                                 ''),
                         buildRow(
                             'Company Name',
-                            eggPriceModel.apiResponse![0].companyBasicInfo
-                                    ?.first.companyNameLanguage ??
+                            priceModel.apiResponse![0].companyBasicInfo?.first
+                                    .companyNameLanguage ??
                                 ''),
-                        buildRow(
-                            'Is Hatching Eggs?',
-                            eggPriceModel.apiResponse![0].isHatchingEgg == 'Y'
-                                ? 'Yes'
-                                : 'No'),
+                        if (pageType == AppRoutes.eggPriceScreen)
+                          buildRow(
+                              'Is Hatching Eggs?',
+                              priceModel.apiResponse![0].isHatchingEgg == 'Y'
+                                  ? 'Yes'
+                                  : 'No'),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow('Chick age',
+                              '${priceModel.apiResponse![0].birdAgeInDays ?? ''} Days'),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow('Chick weight',
+                              '${priceModel.apiResponse![0].birdWeightInGrams ?? ''} Grams'),
                         buildRow(
                             'Is Special Sell?',
-                            eggPriceModel.apiResponse![0].isSpecialSale == 'Y'
+                            priceModel.apiResponse![0].isSpecialSale == 'Y'
                                 ? 'Yes'
                                 : 'No'),
-                        buildRow(
-                            'Sale Start:',
-                            Utils.threeLetterDateFormatted(eggPriceModel
-                                    .apiResponse![0].eggsaleEffectFrom ??
-                                '')),
-                        buildRow(
-                            'Sale End:',
-                            Utils.threeLetterDateFormatted(
-                                eggPriceModel.apiResponse![0].eggsaleEffectTo ??
-                                    '')),
+                        if (pageType == AppRoutes.eggPriceScreen)
+                          buildRow(
+                              'Sale Start:',
+                              Utils.threeLetterDateFormatted(priceModel
+                                      .apiResponse![0].eggsaleEffectFrom ??
+                                  '')),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow(
+                              'Sale Start:',
+                              Utils.threeLetterDateFormatted(priceModel
+                                      .apiResponse![0].chicksaleEffectFrom ??
+                                  '')),
+                        if (pageType == AppRoutes.chickenPriceScreen)
+                          buildRow(
+                              'Sale Start:',
+                              Utils.threeLetterDateFormatted(priceModel
+                                      .apiResponse![0].chickensaleEffectFrom ??
+                                  '')),
+                        if (pageType == AppRoutes.eggPriceScreen)
+                          buildRow(
+                              'Sale End:',
+                              Utils.threeLetterDateFormatted(
+                                  priceModel.apiResponse![0].eggsaleEffectTo ??
+                                      '')),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow(
+                              'Sale End:',
+                              Utils.threeLetterDateFormatted(
+                                  priceModel.apiResponse![0].chickaleEffectTo ??
+                                      '')),
+                        if (pageType == AppRoutes.chickenPriceScreen)
+                          buildRow(
+                              'Sale End:',
+                              Utils.threeLetterDateFormatted(priceModel
+                                      .apiResponse![0].chickensaleEffectTo ??
+                                  '')),
                         buildRow(
                           'Address',
-                          '${eggPriceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${eggPriceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
+                          '${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
                           isMultiline: true,
                         ),
+                        if (pageType == AppRoutes.eggPriceScreen)
+                          buildRow(
+                            'Comment',
+                            '${priceModel.apiResponse![0].eggsaleComment ?? ''}',
+                            isMultiline: true,
+                          ),
+                        if (pageType == AppRoutes.chickPriceScreen)
+                          buildRow(
+                            'Comment',
+                            '${priceModel.apiResponse![0].chicksaleComment ?? ''}',
+                            isMultiline: true,
+                          ),
+                        if (pageType == AppRoutes.chickenPriceScreen)
+                          buildRow(
+                            'Comment',
+                            '${priceModel.apiResponse![0].chickensaleComment ?? ''}',
+                            isMultiline: true,
+                          ),
                       ],
                     ),
                   ),
@@ -296,7 +437,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                       fontSize: 18, color: Colors.black),
                                 ),
                                 Visibility(
-                                  visible: eggPriceModel.apiResponse![0]
+                                  visible: priceModel.apiResponse![0]
                                           .userBasicInfo![0].userId ==
                                       prefs.getString(AppStrings.prefUserID),
                                   child: Container(
@@ -314,7 +455,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                           AppRoutes.uploadFileScreen,
                                           arguments: {
                                             'reference_from': 'EGG_SALE',
-                                            'reference_uuid': eggPriceModel
+                                            'reference_uuid': priceModel
                                                 .apiResponse![0].eggsaleUuid,
                                             'pageType': AppRoutes.sellEggScreen,
                                           },
@@ -421,10 +562,8 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                         child: ListTile(
                                           leading: leadingWidget,
                                           trailing: Visibility(
-                                            visible: eggPriceModel
-                                                    .apiResponse![0]
-                                                    .userBasicInfo![0]
-                                                    .userId ==
+                                            visible: priceModel.apiResponse![0]
+                                                    .userBasicInfo![0].userId ==
                                                 prefs.getString(
                                                     AppStrings.prefUserID),
                                             child: Column(
