@@ -309,6 +309,58 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> updateSellEgg(
+      BuildContext context,
+      String companyID,
+      String breedID,
+      String qty,
+      String cost,
+      String comment,
+      String effectFromDate,
+      String effectTillDate,
+      String saleType,
+      String isHatchingEgg,
+      String stateID,
+      String cityID,
+      String uuid,
+      String eggSaleID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'qty': qty,
+      'cost': cost,
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'is_special_sale': saleType,
+      'is_hatching_egg': isHatchingEgg,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'company_id': companyID,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'eggsale_uuid': uuid,
+      'eggsale_id': eggSaleID,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_SELL_EGG),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuccessModel> sellChick(
       BuildContext context,
       String companyID,

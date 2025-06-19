@@ -364,168 +364,189 @@ class EggPriceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: AppColors.primaryColor, width: 1),
-        // Change color here
-        borderRadius:
-            BorderRadius.circular(8.0), // Optional: Adjust border radius
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black38, width: 1),
-                      // Change color here
-                      borderRadius: BorderRadius.circular(
-                          8.0), // Optional: Adjust border radius
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Rs/Chick',
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
-                          Text(
-                            chickPriceModel.apiResponse![index].chicksaleCost ??
-                                '',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor,
+    return GestureDetector(
+      onTap: () {
+        NavigationHelper.pushNamed(
+          AppRoutes.saleDetailsScreen,
+          arguments: {
+            'saleID': chickPriceModel.apiResponse![index].chicksaleId,
+            'pageType': AppRoutes.chickPriceScreen,
+          },
+        );
+      },
+      child: Card(
+        elevation: 0.0,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.primaryColor, width: 1),
+          // Change color here
+          borderRadius:
+              BorderRadius.circular(8.0), // Optional: Adjust border radius
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0.0,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.black38, width: 1),
+                        // Change color here
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Optional: Adjust border radius
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Rs/Chick',
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.grey),
                             ),
-                          ),
-                        ],
+                            Text(
+                              chickPriceModel
+                                      .apiResponse![index].chicksaleCost ??
+                                  '',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                                "${chickPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${chickPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 20.0,
+                              width: 20.0,
+                              child: Image.asset(
+                                AppIconsData.hen,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(chickPriceModel.apiResponse![index]
+                                    .birdBreedInfo![0].birdbreedNameLanguage ??
+                                ''),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.business,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(chickPriceModel.apiResponse![index]
+                                .companyBasicInfo![0].companyNameLanguage!),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_month,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                      '${chickPriceModel.apiResponse![index].birdAgeInDays!} Days'),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    height: 15,
+                                    AppIconsData.weighingMachine,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                      '${chickPriceModel.apiResponse![index].birdWeightInGrams!} Grams'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
                     children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                              "${chickPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${chickPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: 20.0,
-                            width: 20.0,
-                            child: Image.asset(
-                              AppIconsData.hen,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(chickPriceModel.apiResponse![index]
-                                  .birdBreedInfo![0].birdbreedNameLanguage ??
-                              ''),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.business,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(chickPriceModel.apiResponse![index]
-                              .companyBasicInfo![0].companyNameLanguage!),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.calendar_month,
-                                  color: Colors.grey,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                    '${chickPriceModel.apiResponse![index].birdAgeInDays!} Days'),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  height: 15,
-                                  AppIconsData.weighingMachine,
-                                  color: Colors.grey.shade700,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                    '${chickPriceModel.apiResponse![index].birdWeightInGrams!} Grams'),
-                              ],
-                            ),
-                          ),
-                        ],
+                      Visibility(
+                        visible:
+                            chickPriceModel.apiResponse![index].isSpecialSale ==
+                                "Y",
+                        child: Icon(Icons.card_giftcard,
+                            color: AppColors.primaryColor, size: 20.0),
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    Visibility(
-                      visible:
-                          chickPriceModel.apiResponse![index].isSpecialSale ==
-                              "Y",
-                      child: Icon(Icons.card_giftcard,
-                          color: AppColors.primaryColor, size: 20.0),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                    'Start: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chicksaleEffectFrom.toString())}',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.green.shade700)),
-                Text(
-                    'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
-                    style: TextStyle(fontSize: 12, color: Colors.red.shade700)),
-                Text(
-                    '${chickPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${chickPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      'Start: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chicksaleEffectFrom.toString())}',
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.green.shade700)),
+                  Text(
+                      'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                  Row(
+                    children: [
+                      Text(
+                          '${chickPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${chickPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade700)),
+                      SizedBox(width: 10.0),
+                      Icon(Icons.arrow_right_alt_outlined,
+                          color: AppColors.primaryColor),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

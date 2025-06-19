@@ -25,16 +25,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
   late SharedPreferences prefs;
   late Future<EggPriceModel> eggPriceData;
   DateTime selectedDate = DateTime.now();
-  String eggSaleID = '';
+  String saleID = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (eggSaleID.isEmpty) {
+    if (saleID.isEmpty) {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      eggSaleID = args['eggSaleID'] ?? '';
-      eggPriceData = _fetchData(Utils.formatDate(selectedDate), eggSaleID);
+      saleID = args['saleID'] ?? '';
+      eggPriceData = _fetchData(Utils.formatDate(selectedDate), saleID);
     }
   }
 
@@ -49,7 +49,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
     prefs = await SharedPreferences.getInstance();
     eggPriceData = AuthServices().getEggPriceList(
       context,
-      eggSaleID,
+      saleID,
       Utils.formatDate(selectedDate),
       Utils.formatDate(selectedDate),
       '',
@@ -215,9 +215,9 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                       ),
                                       SizedBox(width: 5),
                                       Icon(
-                                        Icons.add_circle_outline,
+                                        Icons.edit,
                                         color: Colors.white,
-                                        size: 18,
+                                        size: 15,
                                       ),
                                     ],
                                   ),

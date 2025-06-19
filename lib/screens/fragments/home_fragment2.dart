@@ -96,6 +96,9 @@ class _HomeFragment2State extends State<HomeFragment2>
                 _animationController.reverse();
                 NavigationHelper.pushNamed(
                   AppRoutes.sellEggScreen,
+                  arguments: {
+                    'pageType': AppRoutes.sellEggScreen,
+                  },
                 );
               },
             ),
@@ -110,6 +113,9 @@ class _HomeFragment2State extends State<HomeFragment2>
                 _animationController.reverse();
                 NavigationHelper.pushNamed(
                   AppRoutes.sellChickScreen,
+                  arguments: {
+                    'pageType': AppRoutes.sellChickScreen,
+                  },
                 );
               },
             ),
@@ -124,6 +130,9 @@ class _HomeFragment2State extends State<HomeFragment2>
                 _animationController.reverse();
                 NavigationHelper.pushNamed(
                   AppRoutes.sellChickenScreen,
+                  arguments: {
+                    'pageType': AppRoutes.sellChickenScreen,
+                  },
                 );
               },
             ),

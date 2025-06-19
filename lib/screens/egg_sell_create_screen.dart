@@ -56,6 +56,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   var hatchingType = "N";
   var saleType = "N";
   bool _isInitialized = false;
+  late final eggPrice.ApiResponse eggPriceModel;
 
   void initializeControllers() {
     eggPriceController = TextEditingController()
@@ -264,7 +265,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final String pageType = arguments['pageType'];
     if (!_isInitialized && pageType == 'eggSaleDetails') {
-      final eggPrice.ApiResponse eggPriceModel = arguments['eggPriceModel'];
+      eggPriceModel = arguments['eggPriceModel'];
       selectedCityID = eggPriceModel.addressDetails![0].cityId!;
       eggPriceController.text = eggPriceModel.eggsaleCost!;
       startDateController.text = eggPriceModel.eggsaleEffectFrom!;
@@ -761,58 +762,94 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                             height: 45.0,
                             controller: _btnController,
                             onPressed: () async {
-                              String uuids = uuid.v1();
-                              if (_formKey.currentState?.validate() ?? false) {
-                                var sellEggRes = await AuthServices().sellEgg(
-                                    context,
-                                    companyList[companyController.text]
-                                        .toString(),
-                                    birdBreedList[birdTypeController.text]
-                                        .toString(),
-                                    qtyController.text,
-                                    eggPriceController.text,
-                                    commentController.text,
-                                    startDateController.text,
-                                    endDateController.text,
-                                    saleType,
-                                    hatchingType,
-                                    statelist[stateController.text].toString(),
-                                    selectedCityID,
-                                    uuids);
-                                if (sellEggRes.apiResponse![0].responseStatus ==
-                                    true) {
-                                  AwesomeDialog(
-                                    context: context,
-                                    animType: AnimType.bottomSlide,
-                                    dialogType: DialogType.success,
-                                    dialogBackgroundColor: Colors.white,
-                                    title: sellEggRes
-                                        .apiResponse![0].responseDetails,
-                                    titleTextStyle: AppTheme.appBarText,
-                                    descTextStyle: AppTheme.appBarText,
-                                    btnOkOnPress: () {
-                                      NavigationHelper.pushReplacementNamed(
-                                        AppRoutes.uploadFileScreen,
-                                        arguments: {
-                                          'reference_from': 'EGG_SALE',
-                                          'reference_uuid': uuids,
-                                          'pageType': AppRoutes.sellEggScreen,
-                                        },
-                                      );
-                                    },
-                                    btnCancelOnPress: () {
-                                      NavigationHelper
-                                          .pushReplacementNamedUntil(
-                                        AppRoutes.dashboardScreen,
-                                      );
-                                    },
-                                    btnOkText: 'Yes',
-                                    btnCancelText: 'No',
-                                    btnOkColor: Colors.greenAccent.shade700,
-                                  ).show();
-                                } else {
-                                  SnackbarHelper.showSnackBar(sellEggRes
-                                      .apiResponse![0].responseDetails);
+                              if (pageType == 'eggSaleDetails') {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  var updateSellEggRes = await AuthServices()
+                                      .updateSellEgg(
+                                          context,
+                                          companyList[companyController.text]
+                                              .toString(),
+                                          birdBreedList[birdTypeController.text]
+                                              .toString(),
+                                          qtyController.text,
+                                          eggPriceController.text,
+                                          commentController.text,
+                                          startDateController.text,
+                                          endDateController.text,
+                                          saleType,
+                                          hatchingType,
+                                          statelist[stateController.text]
+                                              .toString(),
+                                          selectedCityID,
+                                          eggPriceModel.eggsaleUuid!,
+                                          eggPriceModel.eggsaleId!);
+                                  if (updateSellEggRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    SnackbarHelper.showSnackBar(updateSellEggRes
+                                        .apiResponse![0].responseDetails);
+                                  }
+                                }
+                              } else {
+                                String uuids = uuid.v1();
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  var sellEggRes = await AuthServices().sellEgg(
+                                      context,
+                                      companyList[companyController.text]
+                                          .toString(),
+                                      birdBreedList[birdTypeController.text]
+                                          .toString(),
+                                      qtyController.text,
+                                      eggPriceController.text,
+                                      commentController.text,
+                                      startDateController.text,
+                                      endDateController.text,
+                                      saleType,
+                                      hatchingType,
+                                      statelist[stateController.text]
+                                          .toString(),
+                                      selectedCityID,
+                                      uuids);
+                                  if (sellEggRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    AwesomeDialog(
+                                      context: context,
+                                      animType: AnimType.bottomSlide,
+                                      dialogType: DialogType.success,
+                                      dialogBackgroundColor: Colors.white,
+                                      title: sellEggRes
+                                          .apiResponse![0].responseDetails,
+                                      titleTextStyle: AppTheme.appBarText,
+                                      descTextStyle: AppTheme.appBarText,
+                                      btnOkOnPress: () {
+                                        NavigationHelper.pushReplacementNamed(
+                                          AppRoutes.uploadFileScreen,
+                                          arguments: {
+                                            'reference_from': 'EGG_SALE',
+                                            'reference_uuid': uuids,
+                                            'pageType': AppRoutes.sellEggScreen,
+                                          },
+                                        );
+                                      },
+                                      btnCancelOnPress: () {
+                                        NavigationHelper
+                                            .pushReplacementNamedUntil(
+                                          AppRoutes.dashboardScreen,
+                                        );
+                                      },
+                                      btnOkText: 'Yes',
+                                      btnCancelText: 'No',
+                                      btnOkColor: Colors.greenAccent.shade700,
+                                    ).show();
+                                  } else {
+                                    SnackbarHelper.showSnackBar(sellEggRes
+                                        .apiResponse![0].responseDetails);
+                                  }
                                 }
                               }
                               _btnController.reset();
@@ -822,8 +859,8 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                               children: [
                                 Text(
                                   pageType == 'eggSaleDetails'
-                                      ? AppStrings.continueNext
-                                      : AppStrings.update,
+                                      ? AppStrings.update
+                                      : AppStrings.continueNext,
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 SizedBox(width: 5.0),
