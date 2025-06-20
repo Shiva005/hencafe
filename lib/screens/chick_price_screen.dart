@@ -524,14 +524,19 @@ class EggPriceCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                      'Start: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chicksaleEffectFrom.toString())}',
-                      style: TextStyle(
-                          fontSize: 12, color: Colors.green.shade700)),
-                  Text(
-                      'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
-                      style:
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Start: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chicksaleEffectFrom.toString())}',
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.green.shade700)),
+                      Text(
+                          'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
+                          style:
                           TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                    ],
+                  ),
                   Row(
                     children: [
                       Text(

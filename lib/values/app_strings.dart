@@ -33,6 +33,7 @@ class AppStrings {
   static const String sellEgg = 'Sell Egg';
   static const String sellChick = 'Sell Chick';
   static const String sellChicken = 'Sell Chicken';
+  static const String sellBird = 'Lifting Sale';
   static const String uploadFile = 'Upload File';
   static const String saleDetails = 'Sale Details';
   static const String imagePreview = 'Image Preview';
@@ -52,4 +53,5 @@ class AppStrings {
   static const String prefRole = 'role';
   static const String prefFavStateMaxCount = 'fav_state_max_count';
   static const String prefIsUserVerified = 'is_user_verified';
+  static const String prefSessionID = 'session_id';
 }

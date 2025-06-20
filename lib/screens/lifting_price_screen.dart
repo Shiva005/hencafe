@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/models/lifting_price_model.dart';
 import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
-import '../models/egg_price_model.dart';
 import '../services/services.dart';
 import '../utils/utils.dart';
 import '../values/app_colors.dart';
@@ -13,17 +13,17 @@ import '../values/app_icons.dart';
 import '../values/app_routes.dart';
 import '../values/app_theme.dart';
 
-class EggPriceScreen extends StatefulWidget {
-  const EggPriceScreen({super.key});
+class LiftingPriceScreen extends StatefulWidget {
+  const LiftingPriceScreen({super.key});
 
   @override
-  State<EggPriceScreen> createState() => _EggPriceScreenState();
+  State<LiftingPriceScreen> createState() => _LiftingPriceScreenState();
 }
 
-class _EggPriceScreenState extends State<EggPriceScreen> {
+class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
   bool cardVisibility = false;
   late SharedPreferences prefs;
-  late Future<EggPriceModel> eggPriceData;
+  late Future<LiftingPriceModel> liftingPriceData;
   Map<String, String> selectedFilters = {};
   List<String> birdBreedList = [];
   List<String> favouriteStateList = [];
@@ -34,13 +34,13 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
     super.initState();
     getBirdBreedData();
     getFavouriteStateData();
-    eggPriceData = _fetchData(Utils.formatDate(selectedDate));
+    liftingPriceData = _fetchData(Utils.formatDate(selectedDate));
   }
 
-  Future<EggPriceModel> _fetchData(String selectedDate) async {
+  Future<LiftingPriceModel> _fetchData(String selectedDate) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices()
-        .getEggPriceList(context, '', selectedDate, selectedDate, '');
+        .getLiftingPriceList(context, '', selectedDate, selectedDate, '');
   }
 
   Future<void> getBirdBreedData() async {
@@ -69,10 +69,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
 
   List<String> _getFilterItems(String filter) {
     final filterMap = {
-      "Special Sale": ["All", "Yes", "No"],
       "State": favouriteStateList,
-      "Birds": birdBreedList,
-      "Hatching Eggs": ["All", "Yes", "No"],
+      "Bird Type": birdBreedList,
       "My Data Only": ["All", "My Data Only"],
     };
     return filterMap[filter] ?? [];
@@ -94,7 +92,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Filter for $filter",
+                  Text(filter,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 10),
@@ -144,15 +142,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
     Map<String, String> selectedFilters,
   ) {
     final filterMapping = {
-      "Special Sale": {
-        "key": "is_special_sale",
-        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
-      },
-      "Hatching Eggs": {
-        "key": "is_hatching_egg",
-        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
-      },
-      "Birds": {
+      "Bird Type": {
         "key": "bird_breed_info.0.birdbreed_name_language",
         "transform": (String value) => value.toLowerCase()
       },
@@ -231,7 +221,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: NavigationHelper.pop,
           ),
-          title: Text('Egg Price', style: AppTheme.primaryHeadingDrawer),
+          title: Text('Lifting Sale', style: AppTheme.primaryHeadingDrawer),
           actions: [
             GestureDetector(
               onTap: () async {
@@ -246,7 +236,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       DateFormat('yyyy-MM-dd').format(pickedDate);
                   setState(() {
                     selectedDate = pickedDate;
-                    eggPriceData = _fetchData(formattedDate);
+                    liftingPriceData = _fetchData(formattedDate);
                   });
                 }
               },
@@ -275,7 +265,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
             ),
             IconButton(
               onPressed: () => NavigationHelper.pushReplacementNamed(
-                  AppRoutes.eggPriceScreen),
+                  AppRoutes.liftingPriceScreen),
               icon: const Icon(Icons.refresh, color: Colors.white),
             ),
           ],
@@ -297,10 +287,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       spacing: 7.0,
                       children: [
                         for (final filter in [
-                          "Special Sale",
                           "State",
-                          "Birds",
-                          "Hatching Eggs",
+                          "Bird Type",
                           "My Data Only"
                         ])
                           FilterChipWidget(
@@ -315,8 +303,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
               ),
             ),
           Expanded(
-            child: FutureBuilder<EggPriceModel>(
-              future: eggPriceData,
+            child: FutureBuilder<LiftingPriceModel>(
+              future: liftingPriceData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -345,7 +333,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                                   e.toJson().toString() ==
                                   filteredItems[index].toString());
                           return EggPriceCard(
-                            eggPriceModel: snapshot.data!,
+                            liftingPriceModel: snapshot.data!,
                             index: filteredIndex,
                           );
                         },
@@ -362,11 +350,11 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
 }
 
 class EggPriceCard extends StatelessWidget {
-  final EggPriceModel eggPriceModel;
+  final LiftingPriceModel liftingPriceModel;
   final int index;
 
   const EggPriceCard(
-      {required this.eggPriceModel, super.key, required this.index});
+      {required this.liftingPriceModel, super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -375,8 +363,8 @@ class EggPriceCard extends StatelessWidget {
         NavigationHelper.pushNamed(
           AppRoutes.saleDetailsScreen,
           arguments: {
-            'saleID': eggPriceModel.apiResponse![index].eggsaleId,
-            'pageType': AppRoutes.eggPriceScreen,
+            'saleID': liftingPriceModel.apiResponse![index].liftingsaleId,
+            'pageType': AppRoutes.liftingPriceScreen,
           },
         );
       },
@@ -415,12 +403,13 @@ class EggPriceCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
-                              'Rs/egg',
+                              'Rs/Kg',
                               style:
                                   TextStyle(fontSize: 10, color: Colors.grey),
                             ),
                             Text(
-                              eggPriceModel.apiResponse![index].eggsaleCost ??
+                              liftingPriceModel.apiResponse![index]
+                                      .liftingsaleCostPerKg ??
                                   '',
                               style: TextStyle(
                                 fontSize: 20,
@@ -446,7 +435,7 @@ class EggPriceCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                                "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
+                                "${liftingPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${liftingPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
                           ],
                         ),
                         Row(
@@ -460,55 +449,61 @@ class EggPriceCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 3),
-                            Text(eggPriceModel.apiResponse![index]
+                            Text(liftingPriceModel.apiResponse![index]
                                     .birdBreedInfo![0].birdbreedNameLanguage ??
                                 ''),
                           ],
                         ),
                         Row(
                           children: [
-                            const Icon(
-                              Icons.business,
-                              color: Colors.grey,
-                              size: 18,
+                            SizedBox(
+                              height: 20.0,
+                              width: 20.0,
+                              child: Image.asset(
+                                AppIconsData.hen,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(width: 3),
-                            Text(eggPriceModel.apiResponse![index]
-                                .companyBasicInfo![0].companyNameLanguage!),
+                            Text(
+                                '${liftingPriceModel.apiResponse![index].liftingsaleTotalBirds} Bird for sale' ??
+                                    ''),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_month,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                      '${liftingPriceModel.apiResponse![index].birdAgeInDays!} Days'),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    height: 15,
+                                    AppIconsData.weighingMachine,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                      '${liftingPriceModel.apiResponse![index].birdWeightInKg!} Kg/Bird'),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                  ),
-                  Column(
-                    children: [
-                      Visibility(
-                        visible:
-                            eggPriceModel.apiResponse![index].isHatchingEgg ==
-                                "Y",
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 24.0,
-                              width: 24.0,
-                              child: Image.asset(
-                                AppIconsData.chick,
-                                color: AppColors.primaryColor,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            eggPriceModel.apiResponse![index].isSpecialSale ==
-                                "Y",
-                        child: Icon(Icons.card_giftcard,
-                            color: AppColors.primaryColor, size: 20.0),
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -520,11 +515,11 @@ class EggPriceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
+                          'Start Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectFrom.toString())}',
                           style: TextStyle(
                               fontSize: 12, color: Colors.green.shade700)),
                       Text(
-                          'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
+                          'End Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectTo.toString())}',
                           style: TextStyle(
                               fontSize: 12, color: Colors.red.shade700)),
                     ],
@@ -532,7 +527,7 @@ class EggPriceCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                          '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
+                          '${liftingPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${liftingPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
                           style: TextStyle(
                               fontSize: 12, color: Colors.grey.shade700)),
                       SizedBox(width: 10.0),

@@ -24,6 +24,7 @@ import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/lifting_price_model.dart';
 import '../models/login_pin_check_model.dart';
 import '../utils/my_logger.dart';
 import '../values/app_strings.dart';
@@ -40,6 +41,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -60,6 +62,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -83,6 +86,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -107,6 +111,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -125,6 +130,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -142,6 +148,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -180,6 +187,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -198,6 +206,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -214,6 +223,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -229,6 +239,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -250,6 +261,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -300,6 +312,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -352,6 +365,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -404,6 +418,111 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> createLiftingSell(
+      BuildContext context,
+      String breedID,
+      String totalBirds,
+      String cost,
+      String comment,
+      String address,
+      String effectFromDate,
+      String effectTillDate,
+      String stateID,
+      String cityID,
+      String uuid,
+      String age,
+      String weight) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'total_birds': totalBirds,
+      'cost_per_kg': cost,
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'age_in_days': age,
+      'weight_in_kg': weight,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'address': address,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'uuid': uuid,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.CREATE_LIFTING_SALE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Sell Egg: $payload');
+    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> updateLiftingSell(
+      BuildContext context,
+      String breedID,
+      String totalBirds,
+      String cost,
+      String comment,
+      String address,
+      String effectFromDate,
+      String effectTillDate,
+      String stateID,
+      String cityID,
+      String saleID,
+      String uuid,
+      String age,
+      String weight) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'total_birds': totalBirds,
+      'cost_per_kg': cost,
+      'effect_from': effectFromDate,
+      'effect_to': effectTillDate,
+      'age_in_days': age,
+      'weight_in_kg': weight,
+      'comment': comment,
+      'birdbreed_id': breedID,
+      'address': address,
+      'state_id': stateID,
+      'city_id': cityID,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'uuid': uuid,
+      'liftingsale_id': saleID,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_LIFTING_SALE),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -458,6 +577,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -509,6 +629,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -562,6 +683,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -581,6 +703,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -596,6 +719,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -611,6 +735,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -631,6 +756,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -651,6 +777,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
@@ -671,11 +798,33 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
     logger.d('TAG Get Chicken Price List: ${jsonDecode(response.body)}');
     return ChickenPriceModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<LiftingPriceModel> getLiftingPriceList(BuildContext context,
+      String liftingID, String fromDate, String toDate, String saleType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          '${ServiceNames.LIFTING_PRICE_LIST}$fromDate&sale_to_date=$toDate&liftingsale_id=$liftingID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
+    return LiftingPriceModel.fromJson(jsonDecode(response.body));
   }
 
   Future<ForgetPinModel> forgetPin(
@@ -691,6 +840,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -721,7 +871,7 @@ class AuthServices {
       'user-id': prefs.getString(AppStrings.prefUserID) ?? '',
       'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
       'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
-      'session-id': '', // if needed
+      'session-id': prefs.getString(AppStrings.prefSessionID)!,
     });
 
     try {

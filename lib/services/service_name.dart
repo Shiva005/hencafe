@@ -24,6 +24,9 @@ class ServiceNames {
   static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
   static String CHICK_PRICE_LIST = '${BASE_URL}v1/chick-sale?sale_from_date=';
   static String CHICKEN_PRICE_LIST = '${BASE_URL}v1/chicken-sale?sale_from_date=';
+  static String LIFTING_PRICE_LIST = '${BASE_URL}v1/lifting-sale?sale_from_date=';
+  static String CREATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/create';
+  static String UPDATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/update';
   static String GET_ADDRESS = '${BASE_URL}v1/address?reference_from=USER&reference_uuid=';
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
   static String GET_SUPPLIES = '${BASE_URL}v1/supplies/';

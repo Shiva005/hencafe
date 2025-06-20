@@ -119,7 +119,6 @@ class _HomeFragment2State extends State<HomeFragment2>
                 );
               },
             ),
-            //Floating action menu item
             Bubble(
               title: "Sell Chicken",
               iconColor: Colors.white,
@@ -132,6 +131,22 @@ class _HomeFragment2State extends State<HomeFragment2>
                   AppRoutes.sellChickenScreen,
                   arguments: {
                     'pageType': AppRoutes.sellChickenScreen,
+                  },
+                );
+              },
+            ),
+            Bubble(
+              title: "Lifting Sale",
+              iconColor: Colors.white,
+              bubbleColor: AppColors.primaryColor,
+              icon: Icons.currency_rupee_outlined,
+              titleStyle: TextStyle(fontSize: 16, color: Colors.white),
+              onPress: () {
+                _animationController.reverse();
+                NavigationHelper.pushNamed(
+                  AppRoutes.sellLiftingScreen,
+                  arguments: {
+                    'pageType': AppRoutes.sellLiftingScreen,
                   },
                 );
               },
@@ -175,6 +190,10 @@ class _HomeFragment2State extends State<HomeFragment2>
             } else if (label == 'Chicken Price') {
               NavigationHelper.pushNamed(
                 AppRoutes.chickenPriceScreen,
+              );
+            } else if (label == 'Lifting Sale') {
+              NavigationHelper.pushNamed(
+                AppRoutes.liftingPriceScreen,
               );
             }
           },

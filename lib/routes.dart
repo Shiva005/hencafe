@@ -7,6 +7,8 @@ import 'package:hencafe/screens/chicken_sell_create_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
+import 'package:hencafe/screens/lifting_price_screen.dart';
+import 'package:hencafe/screens/lifting_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
@@ -17,6 +19,7 @@ import 'package:hencafe/screens/sale_details_screen.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
 import 'package:hencafe/screens/upload_file_screen.dart';
 import 'package:hencafe/screens/welcome_screen.dart';
+
 import 'invalid_route.dart';
 import 'values/app_routes.dart';
 
@@ -94,14 +97,6 @@ class Routes {
             desktop: EggPriceScreen(),
           ),
         );
-      case AppRoutes.chickenPriceScreen:
-        return getRoute(
-          widget: ResponsiveScaffold(
-            mobile: const ChickenPriceScreen(),
-            tablet: ChickenPriceScreen(),
-            desktop: ChickenPriceScreen(),
-          ),
-        );
       case AppRoutes.chickPriceScreen:
         return getRoute(
           widget: ResponsiveScaffold(
@@ -110,10 +105,26 @@ class Routes {
             desktop: ChickPriceScreen(),
           ),
         );
+      case AppRoutes.chickenPriceScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const ChickenPriceScreen(),
+            tablet: ChickenPriceScreen(),
+            desktop: ChickenPriceScreen(),
+          ),
+        );
+      case AppRoutes.liftingPriceScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const LiftingPriceScreen(),
+            tablet: LiftingPriceScreen(),
+            desktop: LiftingPriceScreen(),
+          ),
+        );
       case AppRoutes.dashboardScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  DashboardScreen(),
+            mobile: DashboardScreen(),
             tablet: DashboardScreen(),
             desktop: DashboardScreen(),
           ),
@@ -121,7 +132,7 @@ class Routes {
       case AppRoutes.sellEggScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  EggSellCreateScreen(),
+            mobile: EggSellCreateScreen(),
             tablet: EggSellCreateScreen(),
             desktop: EggSellCreateScreen(),
           ),
@@ -129,7 +140,7 @@ class Routes {
       case AppRoutes.sellChickScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  ChickSellCreateScreen(),
+            mobile: ChickSellCreateScreen(),
             tablet: ChickSellCreateScreen(),
             desktop: ChickSellCreateScreen(),
           ),
@@ -137,15 +148,23 @@ class Routes {
       case AppRoutes.sellChickenScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  ChickenSellCreateScreen(),
+            mobile: ChickenSellCreateScreen(),
             tablet: ChickenSellCreateScreen(),
             desktop: ChickenSellCreateScreen(),
+          ),
+        );
+      case AppRoutes.sellLiftingScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: LiftingSellCreateScreen(),
+            tablet: LiftingSellCreateScreen(),
+            desktop: LiftingSellCreateScreen(),
           ),
         );
       case AppRoutes.myProfileScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  MyProfileScreen(),
+            mobile: MyProfileScreen(),
             tablet: MyProfileScreen(),
             desktop: MyProfileScreen(),
           ),
@@ -153,7 +172,7 @@ class Routes {
       case AppRoutes.uploadFileScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  UploadFileScreen(),
+            mobile: UploadFileScreen(),
             tablet: UploadFileScreen(),
             desktop: UploadFileScreen(),
           ),
@@ -161,7 +180,7 @@ class Routes {
       case AppRoutes.saleDetailsScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile:  SaleDetailsScreen(),
+            mobile: SaleDetailsScreen(),
             tablet: SaleDetailsScreen(),
             desktop: SaleDetailsScreen(),
           ),

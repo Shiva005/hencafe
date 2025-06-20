@@ -9,14 +9,16 @@ class AppRoutes {
   static const String registerCreatePin = 'register_create_pin';
   static const String stateSelection = 'state_selection';
   static const String eggPriceScreen = 'egg_price_screen';
-  static const String chickenPriceScreen = 'chicken_price_screen';
   static const String chickPriceScreen = 'chick_price_screen';
+  static const String chickenPriceScreen = 'chicken_price_screen';
+  static const String liftingPriceScreen = 'lifting_price_screen';
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';
   static const String dashboardScreen = 'dashboard_screen';
   static const String sellEggScreen = 'sell_egg_screen';
   static const String sellChickScreen = 'sell_chick_screen';
   static const String sellChickenScreen = 'sell_chicken_screen';
+  static const String sellLiftingScreen = 'sell_Lifting_screen';
   static const String myProfileScreen = 'my_profile_screen';
   static const String uploadFileScreen = 'upload_file_screen';
   static const String saleDetailsScreen = 'sale_details_screen';

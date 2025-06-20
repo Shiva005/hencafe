@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
+import 'package:hencafe/models/lifting_price_model.dart';
 import 'package:hencafe/screens/image_preview_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,6 +30,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
   late Future<EggPriceModel> eggPriceData;
   late Future<ChickPriceModel> chickPriceData;
   late Future<ChickenPriceModel> chickenPriceData;
+  late Future<LiftingPriceModel> liftingSaleData;
   DateTime selectedDate = DateTime.now();
   String saleID = '';
   String pageType = '';
@@ -49,8 +51,18 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
       } else if (pageType == AppRoutes.chickenPriceScreen) {
         chickenPriceData =
             _fetchChickenData(Utils.formatDate(selectedDate), saleID);
+      } else if (pageType == AppRoutes.liftingPriceScreen) {
+        liftingSaleData =
+            _fetchLiftingSaleData(Utils.formatDate(selectedDate), saleID);
       }
     }
+  }
+
+  Future<LiftingPriceModel> _fetchLiftingSaleData(
+      String selectedDate, String eggSaleID) async {
+    prefs = await SharedPreferences.getInstance();
+    return await AuthServices().getLiftingPriceList(
+        context, eggSaleID, selectedDate, selectedDate, '');
   }
 
   Future<EggPriceModel> _fetchEggData(
@@ -100,6 +112,14 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
         Utils.formatDate(selectedDate),
         '',
       );
+    } else if (pageType == AppRoutes.liftingPriceScreen) {
+      liftingSaleData = AuthServices().getLiftingPriceList(
+        context,
+        saleID,
+        Utils.formatDate(selectedDate),
+        Utils.formatDate(selectedDate),
+        '',
+      );
     }
     setState(() {}); // Refresh UI after loading data
   }
@@ -115,14 +135,18 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                 ? 'Egg Sale Details'
                 : pageType == AppRoutes.chickPriceScreen
                     ? 'Chick Sale Details'
-                    : 'Chicken Sale Details'),
+                    : pageType == AppRoutes.liftingPriceScreen
+                        ? 'Lifting Sale Details'
+                        : 'Chicken Sale Details'),
       ),
       body: FutureBuilder<dynamic>(
           future: pageType == AppRoutes.eggPriceScreen
               ? eggPriceData
               : pageType == AppRoutes.chickPriceScreen
                   ? chickPriceData
-                  : chickenPriceData,
+                  : pageType == AppRoutes.liftingPriceScreen
+                      ? liftingSaleData
+                      : chickenPriceData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -286,6 +310,18 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                       )?.then((value) {
                                         loadData();
                                       });
+                                    } else if (pageType ==
+                                        AppRoutes.liftingPriceScreen) {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.sellLiftingScreen,
+                                        arguments: {
+                                          'liftingPriceModel':
+                                              priceModel.apiResponse![0],
+                                          'pageType': "liftingSaleDetails",
+                                        },
+                                      )?.then((value) {
+                                        loadData();
+                                      });
                                     }
                                   },
                                   child: Row(
@@ -321,33 +357,49 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                           buildRow('Price',
                               '${priceModel.apiResponse![0].farmLiveBirdCost ?? ''} Rs/kg',
                               isHighlight: true),
+                        if (pageType == AppRoutes.liftingPriceScreen)
+                          buildRow('Price',
+                              '${priceModel.apiResponse![0].liftingsaleCostPerKg ?? ''} Rs/kg',
+                              isHighlight: true),
+                        if (pageType == AppRoutes.liftingPriceScreen)
+                          buildRow('Total Birds',
+                              '${priceModel.apiResponse![0].liftingsaleTotalBirds ?? ''} Total Birds'),
                         buildRow(
                             'Bird Breed',
                             priceModel.apiResponse![0].birdBreedInfo?.first
                                     .birdbreedNameLanguage ??
                                 ''),
-                        buildRow(
-                            'Company Name',
-                            priceModel.apiResponse![0].companyBasicInfo?.first
-                                    .companyNameLanguage ??
-                                ''),
+                        if (pageType != AppRoutes.liftingPriceScreen)
+                          buildRow(
+                              'Company Name',
+                              priceModel.apiResponse![0].companyBasicInfo?.first
+                                      .companyNameLanguage ??
+                                  ''),
                         if (pageType == AppRoutes.eggPriceScreen)
                           buildRow(
                               'Is Hatching Eggs?',
                               priceModel.apiResponse![0].isHatchingEgg == 'Y'
                                   ? 'Yes'
                                   : 'No'),
-                        if (pageType == AppRoutes.chickPriceScreen)
-                          buildRow('Chick age',
+                        if (pageType == AppRoutes.chickPriceScreen ||
+                            pageType == AppRoutes.liftingPriceScreen)
+                          buildRow(
+                              pageType == AppRoutes.liftingPriceScreen
+                                  ? 'Bird Age'
+                                  : 'Chick age',
                               '${priceModel.apiResponse![0].birdAgeInDays ?? ''} Days'),
                         if (pageType == AppRoutes.chickPriceScreen)
                           buildRow('Chick weight',
                               '${priceModel.apiResponse![0].birdWeightInGrams ?? ''} Grams'),
-                        buildRow(
-                            'Is Special Sell?',
-                            priceModel.apiResponse![0].isSpecialSale == 'Y'
-                                ? 'Yes'
-                                : 'No'),
+                        if (pageType == AppRoutes.liftingPriceScreen)
+                          buildRow('Bird weight',
+                              '${priceModel.apiResponse![0].birdWeightInKg ?? ''} Kg'),
+                        if (pageType != AppRoutes.liftingPriceScreen)
+                          buildRow(
+                              'Is Special Sell?',
+                              priceModel.apiResponse![0].isSpecialSale == 'Y'
+                                  ? 'Yes'
+                                  : 'No'),
                         if (pageType == AppRoutes.eggPriceScreen)
                           buildRow(
                               'Sale Start:',
@@ -384,9 +436,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                               Utils.threeLetterDateFormatted(priceModel
                                       .apiResponse![0].chickensaleEffectTo ??
                                   '')),
+                        if (pageType != AppRoutes.liftingPriceScreen)
                         buildRow(
                           'Address',
                           '${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
+                          isMultiline: true,
+                        ),
+                        if (pageType == AppRoutes.liftingPriceScreen)
+                        buildRow(
+                          'Address',
+                          '${priceModel.apiResponse![0].liftingsaleAddress ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
                           isMultiline: true,
                         ),
                         if (pageType == AppRoutes.eggPriceScreen)
@@ -405,6 +464,12 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                           buildRow(
                             'Comment',
                             '${priceModel.apiResponse![0].chickensaleComment ?? ''}',
+                            isMultiline: true,
+                          ),
+                        if (pageType == AppRoutes.liftingPriceScreen)
+                          buildRow(
+                            'Comment',
+                            '${priceModel.apiResponse![0].liftingsaleComment ?? ''}',
                             isMultiline: true,
                           ),
                       ],
@@ -492,6 +557,21 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                   .chickensaleUuid,
                                               'pageType':
                                                   AppRoutes.sellChickenScreen,
+                                            },
+                                          )?.then((value) {
+                                            loadData();
+                                          });
+                                        } else if (pageType ==
+                                            AppRoutes.liftingPriceScreen) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.uploadFileScreen,
+                                            arguments: {
+                                              'reference_from': 'LIFTING_SALE',
+                                              'reference_uuid': priceModel
+                                                  .apiResponse![0]
+                                                  .liftingsaleUuid,
+                                              'pageType':
+                                                  AppRoutes.sellLiftingScreen,
                                             },
                                           )?.then((value) {
                                             loadData();
