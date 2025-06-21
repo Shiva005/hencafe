@@ -23,8 +23,10 @@ class ServiceNames {
   static String UPDATE_SELL_CHICKEN = '${BASE_URL}v1/chicken-sale/update';
   static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
   static String CHICK_PRICE_LIST = '${BASE_URL}v1/chick-sale?sale_from_date=';
-  static String CHICKEN_PRICE_LIST = '${BASE_URL}v1/chicken-sale?sale_from_date=';
-  static String LIFTING_PRICE_LIST = '${BASE_URL}v1/lifting-sale?sale_from_date=';
+  static String CHICKEN_PRICE_LIST =
+      '${BASE_URL}v1/chicken-sale?sale_from_date=';
+  static String LIFTING_PRICE_LIST =
+      '${BASE_URL}v1/lifting-sale?sale_from_date=';
   static String CREATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/create';
   static String UPDATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/update';
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
@@ -32,5 +34,7 @@ class ServiceNames {
   static String ATTACHMENT_UPLOAD = '${BASE_URL}v1/attachment/upload';
   static String ATTACHMENT_DELETE = '${BASE_URL}v1/attachment/delete';
   static String UPDATE_SUPPLY = '${BASE_URL}v1/supplies/supplies-mapping';
-
+  static String CREATE_ADDRESS = '${BASE_URL}v1/address/create';
+  static String UPDATE_ADDRESS = '${BASE_URL}v1/address/update';
+  static String DELETE_ADDRESS = '${BASE_URL}v1/address/delete?address_uuid=';
 }

@@ -306,7 +306,9 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                           AppRoutes.registerBasicDetails,
                                           arguments: {
                                             'mobileNumber':
-                                                mobileController.text
+                                                mobileController.text,
+                                            'pageType':
+                                                AppRoutes.registerBasicDetails
                                           },
                                         );
                                       },

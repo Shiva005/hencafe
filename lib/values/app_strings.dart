@@ -16,6 +16,7 @@ class AppStrings {
   static const String lastName = 'Last Name*';
   static const String email = 'Email';
   static const String referralCode = 'Referral Code';
+  static const String zipCode = 'ZIP Code';
   static const String address = 'Address*';
   static const String mobileNumber1 = '+919885279787';
   static const String finish = 'Finish';

@@ -1,43 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/navigation_helper.dart';
 import 'package:hencafe/models/city_list_model.dart' as city;
-import 'package:hencafe/models/profile_model.dart' as profile;
+import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/state_model.dart' as state;
 import 'package:hencafe/utils/loading_dialog_helper.dart';
-import 'package:hencafe/values/app_regex.dart';
-import 'package:intl/intl.dart';
+import 'package:hencafe/values/app_routes.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:uuid/uuid.dart';
 
 import '../components/app_text_form_field.dart';
-import '../helpers/navigation_helper.dart';
 import '../helpers/snackbar_helper.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
-import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 
-class RegisterBasicDetails extends StatefulWidget {
-  const RegisterBasicDetails({super.key});
+class CreateAddressScreen extends StatefulWidget {
+  const CreateAddressScreen({super.key});
 
   @override
-  State<RegisterBasicDetails> createState() => _RegisterBasicDetailsState();
+  State<CreateAddressScreen> createState() => _CreateAddressScreenState();
 }
 
-class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
+class _CreateAddressScreenState extends State<CreateAddressScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final ValueNotifier<bool> passwordNotifier = ValueNotifier(true);
-  final ValueNotifier<bool> fieldValidNotifier = ValueNotifier(false);
-
-  late final TextEditingController firstNameController;
-  late final TextEditingController lastNameController;
-  late final TextEditingController mobileController;
-  late final TextEditingController dateController;
-  late final TextEditingController emailController;
-  late final TextEditingController referralCodeController;
+  late final TextEditingController addressTypeController;
+  late final TextEditingController zipCodeController;
   late final TextEditingController addressController;
   late final TextEditingController stateController;
   late final TextEditingController cityController;
+  var uuid = Uuid();
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
@@ -46,38 +39,28 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
   String? _selectedStateID;
   String? _selectedCityID;
   bool _isInitialized = false;
-  late final profile.ApiResponse profileModel;
+  late final AddressDetails addressDetailsModel;
 
   void initializeControllers() {
-    firstNameController = TextEditingController()
+    addressTypeController = TextEditingController()
       ..addListener(controllerListener);
-    lastNameController = TextEditingController()
-      ..addListener(controllerListener);
-    mobileController = TextEditingController()..addListener(controllerListener);
-    dateController = TextEditingController()..addListener(controllerListener);
-    emailController = TextEditingController()..addListener(controllerListener);
     stateController = TextEditingController()..addListener(controllerListener);
     cityController = TextEditingController()..addListener(controllerListener);
     addressController = TextEditingController()
       ..addListener(controllerListener);
-    referralCodeController = TextEditingController()
+    zipCodeController = TextEditingController()
       ..addListener(controllerListener);
   }
 
   void disposeControllers() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    mobileController.dispose();
-    emailController.dispose();
-    dateController.dispose();
-    referralCodeController.dispose();
+    zipCodeController.dispose();
     addressController.dispose();
     stateController.dispose();
     cityController.dispose();
   }
 
   void controllerListener() {
-    final email = mobileController.text;
+    final email = zipCodeController.text;
     if (email.isEmpty) return;
   }
 
@@ -119,7 +102,6 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     return cityRes;
   }
 
-  // Function to show a bottom sheet
   void _showStateBottomSheet() async {
     // Fetch states before showing the bottom sheet
     await _fetchStates();
@@ -236,7 +218,6 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     );
   }
 
-  // Function to show a bottom sheet
   void _showCityBottomSheet() async {
     await _fetchCity();
 
@@ -348,37 +329,90 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     );
   }
 
+  void _showAddressTypeBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0, bottom: 20.0),
+                child: Text(
+                  'Address Type',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: ['Home', 'Office', 'Others'].map((type) {
+                  return ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      // Align content to the left
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          type,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Divider(
+                            height: 1,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      addressTypeController.text = type;
+                      Navigator.pop(context);
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final String mobileNumber = args['mobileNumber'] ?? '';
-    final String pageType = args['pageType'] ?? '';
-    mobileController.text = mobileNumber;
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final String pageType = args?['pageType'] ?? '';
 
-    if (!_isInitialized && pageType == AppRoutes.myProfileScreen) {
-      profileModel = args['profileModel'];
-      firstNameController.text = profileModel.userFirstName!;
-      lastNameController.text = profileModel.userLastName!;
-      addressController.text = profileModel.addressDetails![0].addressAddress!;
-      emailController.text = profileModel.userEmail!;
-      dateController.text = profileModel.userDob!;
+    if (!_isInitialized && pageType != AppRoutes.createAddressScreen) {
+      addressDetailsModel = args!['addressModel'];
+      addressController.text = addressDetailsModel.addressAddress!;
+      addressTypeController.text = addressDetailsModel.addressType!;
       stateController.text =
-          profileModel.addressDetails![0].locationInfo![0].stateNameLanguage!;
+          addressDetailsModel.locationInfo![0].stateNameLanguage!;
       cityController.text =
-          profileModel.addressDetails![0].locationInfo![0].cityNameLanguage!;
-
-      _selectedStateID =
-          profileModel.addressDetails![0].locationInfo![0].stateId!;
-      _selectedCityID =
-          profileModel.addressDetails![0].locationInfo![0].cityId!;
+          addressDetailsModel.locationInfo![0].cityNameLanguage!;
+      zipCodeController.text = addressDetailsModel.addressZipcode!;
+      _selectedCityID = addressDetailsModel.locationInfo![0].cityId!;
+      _selectedStateID = addressDetailsModel.locationInfo![0].stateId!;
       _isInitialized = true;
     }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(title: AppStrings.createAccount)),
+          child: MyAppBar(
+              title: pageType == AppRoutes.createAddressScreen
+                  ? AppStrings.createAccount
+                  : 'Update Address')),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -397,112 +431,46 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      AppTextFormField(
-                        controller: firstNameController,
-                        labelText: AppStrings.firstName,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.person),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                      ),
-                      AppTextFormField(
-                        controller: lastNameController,
-                        labelText: AppStrings.lastName,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.person),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                      ),
-                      AppTextFormField(
-                        controller: mobileController,
-                        labelText: AppStrings.mobile,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        maxLength: 15,
-                        enabled: false,
-                        prefixIcon: Icon(Icons.call),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your mobile number';
-                          }
-                          return null;
-                        },
-                      ),
-                      AppTextFormField(
-                        controller: emailController,
-                        labelText: AppStrings.email,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.alternate_email),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email address';
-                          } else if (!AppRegex.emailRegex.hasMatch(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      Visibility(
-                        visible: false,
+                      GestureDetector(
                         child: SizedBox(
                           height: 70.0,
-                          child: GestureDetector(
-                            child: TextFormField(
-                              style: TextStyle(color: Colors.black),
-                              controller: dateController,
-                              decoration: InputDecoration(
-                                labelStyle: TextStyle(color: Colors.grey),
-                                prefixIcon: Icon(Icons.calendar_month),
-                                iconColor: Colors.white,
-                                filled: true,
-                                fillColor: Colors.white,
-                                labelText: "Date Of Birth",
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey.shade400),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.grey.shade400),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.green.shade200),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                          child: TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: addressTypeController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(color: Colors.grey),
+                              prefixIcon: Icon(Icons.my_location),
+                              iconColor: Colors.white,
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: "Address Type",
+                              suffixIcon: Icon(Icons.keyboard_arrow_down),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              readOnly: true,
-                              onTap: () async {
-                                DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1900),
-                                    lastDate: DateTime(2040));
-                                if (pickedDate != null) {
-                                  String formattedDate =
-                                      DateFormat('dd-MM-yyyy')
-                                          .format(pickedDate);
-                                  setState(() =>
-                                      dateController.text = formattedDate);
-                                }
-                              },
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green.shade200),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value == 'Select Address Type') {
+                                return 'Please select address type';
+                              }
+                              return null;
+                            },
+                            onTap: _showAddressTypeBottomSheet,
                           ),
                         ),
                       ),
@@ -576,6 +544,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                               prefixIcon: Icon(Icons.location_city),
                               iconColor: Colors.white,
                               filled: true,
+                              enabled: stateController.text.isNotEmpty,
                               fillColor: Colors.white,
                               labelText: "City",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
@@ -609,12 +578,12 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                         ),
                       ),
                       AppTextFormField(
-                        controller: referralCodeController,
-                        labelText: AppStrings.referralCode,
-                        keyboardType: TextInputType.text,
+                        controller: zipCodeController,
+                        labelText: AppStrings.zipCode,
+                        keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.done,
                         enabled: true,
-                        prefixIcon: Icon(Icons.card_giftcard),
+                        prefixIcon: Icon(Icons.folder_zip_rounded),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -625,30 +594,40 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                             controller: _btnController,
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                var generateOtpRes = await AuthServices()
-                                    .otpGenerate(
-                                        context, mobileController.text);
-                                if (generateOtpRes
+                                var createAddressRes;
+                                if (pageType == AppRoutes.createAddressScreen) {
+                                  createAddressRes = await AuthServices()
+                                      .createAddress(
+                                          context,
+                                          uuid.v1(),
+                                          'USER',
+                                          addressTypeController.text,
+                                          addressController.text,
+                                          _selectedStateID!,
+                                          _selectedCityID!,
+                                          zipCodeController.text);
+                                } else {
+                                  createAddressRes = await AuthServices()
+                                      .updateAddress(
+                                          context,
+                                          addressDetailsModel.addressId!,
+                                          addressDetailsModel.addressUuid!,
+                                          'USER',
+                                          addressTypeController.text,
+                                          addressController.text,
+                                          _selectedStateID!,
+                                          _selectedCityID!,
+                                          zipCodeController.text);
+                                }
+
+                                if (createAddressRes
                                         .apiResponse![0].responseStatus ==
                                     true) {
-                                  NavigationHelper.pushNamed(
-                                    AppRoutes.loginOtp,
-                                    arguments: {
-                                      'pageType':
-                                          AppRoutes.registerBasicDetails,
-                                      'firstName': firstNameController.text,
-                                      'lastName': lastNameController.text,
-                                      'mobileNumber': mobileController.text,
-                                      'email': emailController.text,
-                                      'city_id': _selectedCityID,
-                                      'address': addressController.text,
-                                      'stateID': _selectedStateID,
-                                      'referralCode':
-                                          referralCodeController.text,
-                                    },
-                                  );
+                                  SnackbarHelper.showSnackBar(createAddressRes
+                                      .apiResponse![0].responseDetails!);
+                                  NavigationHelper.pop(context);
                                 } else {
-                                  SnackbarHelper.showSnackBar(generateOtpRes
+                                  SnackbarHelper.showSnackBar(createAddressRes
                                       .apiResponse![0].responseDetails!);
                                 }
                               }
@@ -658,7 +637,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                             child: Row(
                               children: [
                                 Text(
-                                  AppStrings.continueNext,
+                                  pageType == AppRoutes.createAddressScreen
+                                      ? 'Create Address'
+                                      : 'Update Address',
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 SizedBox(width: 5.0),

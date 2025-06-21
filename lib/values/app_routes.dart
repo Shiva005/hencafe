@@ -24,4 +24,5 @@ class AppRoutes {
   static const String saleDetailsScreen = 'sale_details_screen';
   static const String videoPlayerScreen = 'video_player_screen';
   static const String imagePreviewScreen = 'image_preview_screen';
+  static const String createAddressScreen = 'create_address_screen';
 }

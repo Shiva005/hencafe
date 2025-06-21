@@ -4,6 +4,7 @@ import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
 import 'package:hencafe/screens/chicken_sell_create_screen.dart';
+import 'package:hencafe/screens/create_address_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
@@ -183,6 +184,14 @@ class Routes {
             mobile: SaleDetailsScreen(),
             tablet: SaleDetailsScreen(),
             desktop: SaleDetailsScreen(),
+          ),
+        );
+      case AppRoutes.createAddressScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: CreateAddressScreen(),
+            tablet: CreateAddressScreen(),
+            desktop: CreateAddressScreen(),
           ),
         );
       default:

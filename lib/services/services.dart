@@ -281,6 +281,84 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> createAddress(
+      BuildContext context,
+      String addressUUID,
+      String referenceFrom,
+      String addressType,
+      String address,
+      String stateID,
+      String cityID,
+      String zipCode) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'address_type': addressType,
+      'address': address,
+      'zipcode': zipCode,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'state_id': stateID,
+      'city_id': cityID,
+      'address_uuid': addressUUID,
+      'reference_from': referenceFrom,
+      'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.CREATE_ADDRESS),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update Supplies: $payload');
+    logger.d('TAG Update Supplies: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> updateAddress(
+      BuildContext context,
+      String addressID,
+      String addressUUID,
+      String referenceFrom,
+      String addressType,
+      String address,
+      String stateID,
+      String cityID,
+      String zipCode) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'address_id': addressID,
+      'address_type': addressType,
+      'address': address,
+      'zipcode': zipCode,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
+      'state_id': stateID,
+      'city_id': cityID,
+      'address_uuid': addressUUID,
+      'reference_from': referenceFrom,
+      'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_ADDRESS),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update Address: $payload');
+    logger.d('TAG Update Address: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuccessModel> sellEgg(
       BuildContext context,
       String companyID,
@@ -835,6 +913,26 @@ class AuthServices {
 
     logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
     return LiftingPriceModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> deleteAddress(
+      BuildContext context, String addressUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_ADDRESS}$addressUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
   Future<ForgetPinModel> forgetPin(
