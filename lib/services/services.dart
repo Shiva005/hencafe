@@ -18,7 +18,6 @@ import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/success_model.dart';
 import 'package:hencafe/models/supplies_model.dart';
-import 'package:hencafe/models/user_address_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
@@ -197,38 +196,24 @@ class AuthServices {
     return RegistrationCreateModel.fromJson(jsonDecode(response.body));
   }
 
-  Future<ProfileModel> getProfile(BuildContext context) async {
+  Future<ProfileModel> getProfile(
+      BuildContext context, String thirdPartUserID) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile/"),
+          "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile?profile_id=$thirdPartUserID"),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
 
     logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
     return ProfileModel.fromJson(jsonDecode(response.body));
-  }
-
-  Future<UserAddressModel> getAddress(BuildContext context) async {
-    var prefs = await SharedPreferences.getInstance();
-    final response = await http.get(
-      Uri.parse(
-          "${ServiceNames.GET_ADDRESS}${prefs.getString(AppStrings.prefUserUUID)}"),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
-      },
-    );
-
-    logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
-    return UserAddressModel.fromJson(jsonDecode(response.body));
   }
 
   Future<SuppliesModel> getSupplies(BuildContext context) async {
@@ -268,6 +253,31 @@ class AuthServices {
 
     logger.d('TAG Update State: $payload');
     logger.d('TAG Update State: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> updateSupplies(
+      BuildContext context, String referenceFrom, String supplyIDs) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'reference_from': referenceFrom,
+      'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+      'supply_id_list': supplyIDs,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.UPDATE_SUPPLY),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update Supplies: $payload');
+    logger.d('TAG Update Supplies: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 

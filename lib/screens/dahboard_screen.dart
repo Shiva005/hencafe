@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
-    getProfileRes = await AuthServices().getProfile(context);
+    getProfileRes = await AuthServices().getProfile(context, '');
     if (getProfileRes.errorCount == 0) {
       prefs.setString(AppStrings.prefFirstName,
           getProfileRes.apiResponse![0].userFirstName);
@@ -363,10 +363,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                               prefs.getString(AppStrings.prefLanguage);
                           var countryCode =
                               prefs.getString(AppStrings.prefCountryCode);
+                          var sessionID =
+                              prefs.getString(AppStrings.prefSessionID);
                           prefs.clear();
                           prefs.setString(AppStrings.prefLanguage, language);
                           prefs.setString(AppStrings.prefMobileNumber, mb);
-                          prefs.setString(AppStrings.prefCountryCode, countryCode);
+                          prefs.setString(
+                              AppStrings.prefCountryCode, countryCode);
+                          prefs.setString(AppStrings.prefSessionID, sessionID);
                           NavigationHelper.pushReplacementNamedUntil(
                               AppRoutes.loginMobile);
                         },

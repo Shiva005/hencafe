@@ -8,7 +8,6 @@ import '../helpers/navigation_helper.dart';
 import '../models/state_model.dart';
 import '../services/services.dart';
 import '../values/app_colors.dart';
-import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 
@@ -67,7 +66,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   }
 
   Future<void> loadProfile() async {
-    var getProfileRes = await AuthServices().getProfile(context);
+    var getProfileRes = await AuthServices().getProfile(context, '');
     if (getProfileRes.errorCount == 0) {
       setState(() {
         for (var favState
@@ -214,9 +213,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                             titleTextStyle: AppTheme.appBarText,
                             descTextStyle: AppTheme.appBarText,
                             btnOkOnPress: () {
-                              NavigationHelper.pushReplacementNamedUntil(
-                                AppRoutes.dashboardScreen,
-                              );
+                              NavigationHelper.pop(context);
                             },
                             btnOkText: 'OK',
                             btnOkColor: Colors.greenAccent.shade700,

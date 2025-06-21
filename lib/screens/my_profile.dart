@@ -19,14 +19,14 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  var getProfileRes, getAddressRes, getSuppliesRes;
+  var getProfileRes, getSuppliesRes;
   var prefs;
   var name = "",
       email = "",
       phone = "",
       userImage = "",
       userVerified = "",
-      memberShipType = "",
+      role = "",
       maxFavState = "",
       memberShipValidFrom = Utils.formatDate(DateTime.now()),
       memberShipValidTo = Utils.formatDate(DateTime.now()),
@@ -62,22 +62,23 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
     LoadingDialogHelper.showLoadingDialog(context);
-    getProfileRes = await AuthServices().getProfile(context);
-    getAddressRes = await AuthServices().getAddress(context);
+    getProfileRes = await AuthServices().getProfile(context, '');
     getSuppliesRes = await AuthServices().getSupplies(context);
     if (getProfileRes.errorCount == 0) {
       LoadingDialogHelper.dismissLoadingDialog(context);
       setState(() {
-        name = getProfileRes.apiResponse![0].userFirstName +
-                " " +
-                getProfileRes.apiResponse![0].userLastName ??
-            "";
+        name =
+            '${getProfileRes.apiResponse![0].userFirstName} ${getProfileRes.apiResponse![0].userLastName}';
         email = getProfileRes.apiResponse![0].userEmail ?? "";
         phone = getProfileRes.apiResponse![0].userMobile ?? "";
         userVerified = getProfileRes.apiResponse![0].userIsVerfied ?? "";
-        memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
-                .userMembershipType.value ??
-            "";
+        if (getProfileRes.apiResponse![0].userRoleType == 'U') {
+          role = "User";
+        } else if (getProfileRes.apiResponse![0].userRoleType == 'A') {
+          role = "Admin";
+        } else if (getProfileRes.apiResponse![0].userRoleType == 'S') {
+          role = "Super Admin";
+        }
         memberShipValidFrom = getProfileRes.apiResponse![0]
                 .userMembershipInfo![0].userMembershipValidFrom ??
             "";
@@ -137,12 +138,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(10),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Profile header
               _card(
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Column(
                       children: [
@@ -184,48 +185,97 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.person_outlined, size: 18),
-                              SizedBox(width: 5),
-                              Text(name),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.person_outlined, size: 18),
+                                        SizedBox(width: 5),
+                                        Text(name),
+                                      ],
+                                    ),
+                                    SizedBox(height: 3),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.phone, size: 16),
+                                        SizedBox(width: 5),
+                                        Text(phone),
+                                      ],
+                                    ),
+                                    SizedBox(height: 3),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.email_outlined, size: 16),
+                                        SizedBox(width: 5),
+                                        Text(email),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  onPressed: () {}),
                             ],
                           ),
-                          SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Icon(Icons.phone, size: 16),
-                              SizedBox(width: 5),
-                              Text(phone),
-                            ],
-                          ),
-                          SizedBox(height: 3),
-                          Row(
-                            children: [
-                              Icon(Icons.email_outlined, size: 16),
-                              SizedBox(width: 5),
-                              Text(email),
-                            ],
-                          ),
-                          SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildChip(memberShipType),
-                              _buildChip(workType),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text('Role: '),
+                                    Text(
+                                      role,
+                                      style: TextStyle(
+                                          color: AppColors.primaryColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text('Work: '),
+                                    Text(
+                                      workType,
+                                      style: TextStyle(
+                                          color: AppColors.primaryColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    IconButton(
-                        icon: const Icon(
-                          Icons.edit,
-                          color: AppColors.primaryColor,
-                        ),
-                        onPressed: () {}),
                   ],
                 ),
               ),
@@ -239,7 +289,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       _sectionHeader("Favorite states", onEdit: () {
                         NavigationHelper.pushNamed(
                           AppRoutes.stateSelection,
-                        );
+                        )?.then((value) {
+                          favStateList.clear();
+                          suppliesList.clear();
+                          loadProfile();
+                        });
                       }),
                       SizedBox(
                         height: 25,
@@ -284,7 +338,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         children: [
                           Text("Membership Type : ",
                               style: TextStyle(color: Colors.grey.shade700)),
-                          Text(memberShipType),
+                          Text(getProfileRes.apiResponse![0]
+                              .userMembershipInfo![0].userMembershipType.value),
                         ],
                       ),
                     ),
@@ -339,6 +394,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: Column(
                       children: [
                         _sectionHeader("Supplies", onEdit: () {
+                          _selectedSupplyIDs = _filteredSupplies
+                              .where((supply) =>
+                                  suppliesList.contains(supply.supplytypeName))
+                              .map((supply) => supply.supplytypeId.toString())
+                              .toList();
+
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -370,7 +431,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         const SizedBox(height: 10),
                                         ListView.builder(
                                           shrinkWrap: true,
-                                          // Important for wrapping
                                           physics:
                                               const NeverScrollableScrollPhysics(),
                                           itemCount: _filteredSupplies.length,
@@ -379,6 +439,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                                 _filteredSupplies[index];
                                             final supplyId =
                                                 supply.supplytypeId.toString();
+
                                             return CheckboxListTile(
                                               title: Text(
                                                   supply.supplytypeName ?? ''),
@@ -388,18 +449,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                                   AppColors.primaryColor,
                                               onChanged: (checked) {
                                                 setModalState(() {
-                                                  setState(() {
-                                                    if (checked == true) {
-                                                      _selectedSupplyIDs
-                                                          .add(supplyId);
-                                                    } else {
-                                                      _selectedSupplyIDs
-                                                          .remove(supplyId);
-                                                    }
-                                                    SnackbarHelper.showSnackBar(
-                                                        _selectedSupplyIDs
-                                                            .toString());
-                                                  });
+                                                  if (checked == true) {
+                                                    _selectedSupplyIDs
+                                                        .add(supplyId);
+                                                  } else {
+                                                    _selectedSupplyIDs
+                                                        .remove(supplyId);
+                                                  }
                                                 });
                                               },
                                             );
@@ -407,9 +463,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         ),
                                         const SizedBox(height: 10),
                                         ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(
-                                                context); // or submit logic
+                                          onPressed: () async {
+                                            var updateSupplyRes =
+                                                await AuthServices()
+                                                    .updateSupplies(
+                                                        context,
+                                                        'USER',
+                                                        _selectedSupplyIDs
+                                                            .join(","));
+                                            Navigator.pop(context);
+                                            SnackbarHelper.showSnackBar(
+                                                updateSupplyRes.apiResponse![0]
+                                                    .responseDetails);
+                                            loadProfile();
+                                            suppliesList.clear();
+                                            favStateList.clear();
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
@@ -453,46 +521,86 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Saved Addresses",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Saved Addresses",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              border: Border.all(color: AppColors.primaryColor),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Add Address',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 13),
+                                ),
+                                SizedBox(width: 5),
+                                Icon(
+                                  Icons.add_circle_outline,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
-                    if (getAddressRes?.apiResponse != null &&
-                        getAddressRes!.apiResponse!.isNotEmpty)
+                    if (getProfileRes?.apiResponse != null &&
+                        getProfileRes!.apiResponse!.isNotEmpty)
                       SizedBox(
                         height: 115,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: getAddressRes!.apiResponse!.length,
+                          itemCount: getProfileRes!
+                              .apiResponse![0].addressDetails.length,
                           itemBuilder: (context, index) {
-                            final address = getAddressRes!.apiResponse![index];
+                            final address =
+                                getProfileRes!.apiResponse![0].addressDetails;
                             return Container(
                               margin: const EdgeInsets.only(right: 8),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade300),
+                                border:
+                                    Border.all(color: AppColors.primaryColor),
                               ),
                               width: 220,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Wrap(
-                                    spacing: 8,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      _buildChip(
-                                          address.addressType ?? "Other"),
-                                      _buildChip("View More"),
+                                      _buildChip(address[index].addressType ??
+                                          "Other"),
+                                      Icon(
+                                        Icons.arrow_right_alt_outlined,
+                                        color: AppColors.primaryColor,
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(address.addressAddress ?? "No Address"),
+                                  Text(address[index].addressAddress ??
+                                      "No Address"),
                                   Text(
-                                    "${address.locationInfo?[0].cityNameLanguage ?? "City"}, "
-                                    "${address.locationInfo?[0].stateNameLanguage ?? "State"}, "
-                                    "${address.locationInfo?[0].countryNameLanguage ?? "Country"} - "
-                                    "${address.addressZipcode ?? "Zipcode"}",
+                                    "${address[index].locationInfo?[0].cityNameLanguage ?? "City"}, "
+                                    "${address[index].locationInfo?[0].stateNameLanguage ?? "State"}, "
+                                    "${address[index].locationInfo?[0].countryNameLanguage ?? "Country"} - "
+                                    "${address[index].addressZipcode ?? "Zipcode"}",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w500),
                                   ),

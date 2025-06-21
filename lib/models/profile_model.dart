@@ -50,6 +50,7 @@ class ApiResponse {
     this.userLastName,
     this.userMobile,
     this.userEmail,
+    this.userDob,
     this.userRoleType,
     this.userWorkType,
     this.userLoginUid,
@@ -61,6 +62,7 @@ class ApiResponse {
     this.userMembershipInfo,
     this.attachmentInfo,
     this.supplyInfo,
+    this.addressDetails,
   });
 
   ApiResponse.fromJson(dynamic json) {
@@ -70,6 +72,7 @@ class ApiResponse {
     userLastName = json['user_last_name'];
     userMobile = json['user_mobile'];
     userEmail = json['user_email'];
+    userDob = json['user_dob'];
     userRoleType = json['user_role_type'];
     userWorkType = json['user_work_type'] != null
         ? UserWorkType.fromJson(json['user_work_type'])
@@ -103,6 +106,12 @@ class ApiResponse {
         supplyInfo?.add(SupplyInfo.fromJson(v));
       });
     }
+    if (json['address_details'] != null) {
+      addressDetails = [];
+      json['address_details'].forEach((v) {
+        addressDetails?.add(AddressDetails.fromJson(v));
+      });
+    }
   }
 
   String? userId;
@@ -111,6 +120,7 @@ class ApiResponse {
   String? userLastName;
   String? userMobile;
   String? userEmail;
+  String? userDob;
   String? userRoleType;
   UserWorkType? userWorkType;
   String? userLoginUid;
@@ -122,6 +132,7 @@ class ApiResponse {
   List<UserMembershipInfo>? userMembershipInfo;
   List<AttachmentInfo>? attachmentInfo;
   List<SupplyInfo>? supplyInfo;
+  List<AddressDetails>? addressDetails;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -131,6 +142,7 @@ class ApiResponse {
     map['user_last_name'] = userLastName;
     map['user_mobile'] = userMobile;
     map['user_email'] = userEmail;
+    map['user_dob'] = userDob;
     map['user_role_type'] = userRoleType;
     if (userWorkType != null) {
       map['user_work_type'] = userWorkType?.toJson();
@@ -154,6 +166,135 @@ class ApiResponse {
     if (supplyInfo != null) {
       map['supply_info'] = supplyInfo?.map((v) => v.toJson()).toList();
     }
+    if (addressDetails != null) {
+      map['address_details'] = addressDetails?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class AddressDetails {
+  AddressDetails({
+    this.addressId,
+    this.addressUuid,
+    this.addressReferenceFrom,
+    this.addressReferenceUuid,
+    this.addressType,
+    this.addressAddress,
+    this.addressZipcode,
+    this.addressGeoCode,
+    this.addressGeoAddress,
+    this.addressStatus,
+    this.locationInfo,
+    this.attachmentInfo,
+  });
+
+  AddressDetails.fromJson(dynamic json) {
+    addressId = json['address_id'];
+    addressUuid = json['address_uuid'];
+    addressReferenceFrom = json['address_reference_from'];
+    addressReferenceUuid = json['address_reference_uuid'];
+    addressType = json['address_type'];
+    addressAddress = json['address_address'];
+    addressZipcode = json['address_zipcode'];
+    addressGeoCode = json['address_geo_code'];
+    addressGeoAddress = json['address_geo_address'];
+    addressStatus = json['address_status'];
+    if (json['location_info'] != null) {
+      locationInfo = [];
+      json['location_info'].forEach((v) {
+        locationInfo?.add(LocationInfo.fromJson(v));
+      });
+    }
+    if (json['attachment_info'] != null) {
+      attachmentInfo = [];
+      json['attachment_info'].forEach((v) {
+        attachmentInfo?.add(AddressDetails.fromJson(v));
+      });
+    }
+  }
+
+  String? addressId;
+  String? addressUuid;
+  String? addressReferenceFrom;
+  String? addressReferenceUuid;
+  String? addressType;
+  String? addressAddress;
+  String? addressZipcode;
+  String? addressGeoCode;
+  String? addressGeoAddress;
+  String? addressStatus;
+  List<LocationInfo>? locationInfo;
+  List<dynamic>? attachmentInfo;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['address_id'] = addressId;
+    map['address_uuid'] = addressUuid;
+    map['address_reference_from'] = addressReferenceFrom;
+    map['address_reference_uuid'] = addressReferenceUuid;
+    map['address_type'] = addressType;
+    map['address_address'] = addressAddress;
+    map['address_zipcode'] = addressZipcode;
+    map['address_geo_code'] = addressGeoCode;
+    map['address_geo_address'] = addressGeoAddress;
+    map['address_status'] = addressStatus;
+    if (locationInfo != null) {
+      map['location_info'] = locationInfo?.map((v) => v.toJson()).toList();
+    }
+    if (attachmentInfo != null) {
+      map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class LocationInfo {
+  LocationInfo({
+    this.countryId,
+    this.countryName,
+    this.countryNameLanguage,
+    this.stateId,
+    this.stateName,
+    this.stateNameLanguage,
+    this.cityId,
+    this.cityName,
+    this.cityNameLanguage,
+  });
+
+  LocationInfo.fromJson(dynamic json) {
+    countryId = json['country_id'];
+    countryName = json['country_name'];
+    countryNameLanguage = json['country_name_language'];
+    stateId = json['state_id'];
+    stateName = json['state_name'];
+    stateNameLanguage = json['state_name_language'];
+    cityId = json['city_id'];
+    cityName = json['city_name'];
+    cityNameLanguage = json['city_name_language'];
+  }
+
+  String? countryId;
+  String? countryName;
+  String? countryNameLanguage;
+  String? stateId;
+  String? stateName;
+  String? stateNameLanguage;
+  String? cityId;
+  String? cityName;
+  String? cityNameLanguage;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['country_id'] = countryId;
+    map['country_name'] = countryName;
+    map['country_name_language'] = countryNameLanguage;
+    map['state_id'] = stateId;
+    map['state_name'] = stateName;
+    map['state_name_language'] = stateNameLanguage;
+    map['city_id'] = cityId;
+    map['city_name'] = cityName;
+    map['city_name_language'] = cityNameLanguage;
     return map;
   }
 }
@@ -202,6 +343,8 @@ class AttachmentInfo {
     this.attachmentReferenceCode,
     this.attachmentReferenceUuid,
     this.attachmentPath,
+    this.attachmentType,
+    this.attachmentName,
     this.attachmentStatus,
     this.attachmentCreatedon,
   });
@@ -211,6 +354,8 @@ class AttachmentInfo {
     attachmentReferenceCode = json['attachment_reference_code'];
     attachmentReferenceUuid = json['attachment_reference_uuid'];
     attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
     attachmentStatus = json['attachment_status'];
     attachmentCreatedon = json['attachment_createdon'];
   }
@@ -219,6 +364,8 @@ class AttachmentInfo {
   String? attachmentReferenceCode;
   String? attachmentReferenceUuid;
   String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
   String? attachmentStatus;
   String? attachmentCreatedon;
 
@@ -228,6 +375,8 @@ class AttachmentInfo {
     map['attachment_reference_code'] = attachmentReferenceCode;
     map['attachment_reference_uuid'] = attachmentReferenceUuid;
     map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
     map['attachment_status'] = attachmentStatus;
     map['attachment_createdon'] = attachmentCreatedon;
     return map;

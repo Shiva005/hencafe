@@ -27,10 +27,10 @@ class ServiceNames {
   static String LIFTING_PRICE_LIST = '${BASE_URL}v1/lifting-sale?sale_from_date=';
   static String CREATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/create';
   static String UPDATE_LIFTING_SALE = '${BASE_URL}v1/lifting-sale/update';
-  static String GET_ADDRESS = '${BASE_URL}v1/address?reference_from=USER&reference_uuid=';
   static String FORGET_PIN = '${BASE_URL}v1/user/forget-password';
   static String GET_SUPPLIES = '${BASE_URL}v1/supplies/';
   static String ATTACHMENT_UPLOAD = '${BASE_URL}v1/attachment/upload';
   static String ATTACHMENT_DELETE = '${BASE_URL}v1/attachment/delete';
+  static String UPDATE_SUPPLY = '${BASE_URL}v1/supplies/supplies-mapping';
 
 }
