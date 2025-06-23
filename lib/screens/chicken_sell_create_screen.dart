@@ -112,7 +112,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
   }
 
   Future<UserFavouriteStateModel> _fetchStates() async {
-    final favStateRes = await AuthServices().getFavouriteStateList(context);
+    final favStateRes = await AuthServices().getFavouriteStateList(context,'');
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {

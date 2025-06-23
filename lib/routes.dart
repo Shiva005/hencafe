@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/responsive_scaffold.dart';
+import 'package:hencafe/screens/addresss_details_screen.dart';
 import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
@@ -168,6 +169,14 @@ class Routes {
             mobile: MyProfileScreen(),
             tablet: MyProfileScreen(),
             desktop: MyProfileScreen(),
+          ),
+        );
+      case AppRoutes.addressDetailsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: AddressDetailsScreen(),
+            tablet: AddressDetailsScreen(),
+            desktop: AddressDetailsScreen(),
           ),
         );
       case AppRoutes.uploadFileScreen:

@@ -29,8 +29,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       userVerified = "",
       role = "",
       maxFavState = "",
+      dob = "",
       memberShipValidFrom = Utils.formatDate(DateTime.now()),
       memberShipValidTo = Utils.formatDate(DateTime.now()),
+      memberShipType = "",
       workType = "";
 
   var selectedIds = '';
@@ -71,6 +73,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         name =
             '${getProfileRes.apiResponse![0].userFirstName} ${getProfileRes.apiResponse![0].userLastName}';
         email = getProfileRes.apiResponse![0].userEmail ?? "";
+        dob = getProfileRes.apiResponse![0].userDob ?? "";
         phone = getProfileRes.apiResponse![0].userMobile ?? "";
         userVerified = getProfileRes.apiResponse![0].userIsVerfied ?? "";
         if (getProfileRes.apiResponse![0].userRoleType == 'U') {
@@ -89,6 +92,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             "";
         memberShipValidTo = getProfileRes
                 .apiResponse![0].userMembershipInfo![0].userMembershipValidTo ??
+            "";
+        memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
+                .userMembershipType.value ??
             "";
         workType = getProfileRes.apiResponse![0].userWorkType.value ?? "";
         if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
@@ -181,6 +187,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               fontWeight: FontWeight.bold,
                               fontSize: 12.0),
                         ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Change Photo',
+                          style: TextStyle(
+                            color: AppColors.primaryColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                        )
                       ],
                     ),
                     const SizedBox(width: 10),
@@ -217,7 +231,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         Text(email),
                                       ],
                                     ),
-                                    SizedBox(height: 8),
+                                    SizedBox(height: 3),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.cake_outlined, size: 16),
+                                        SizedBox(width: 5),
+                                        Text(Utils.threeLetterDateFormatted(
+                                            dob)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
                                   ],
                                 ),
                               ),
@@ -234,7 +257,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                           'mobileNumber': phone,
                                           'profileModel':
                                               getProfileRes.apiResponse![0],
-                                        });
+                                        })?.then((value) {
+                                      loadProfile();
+                                      favStateList.clear();
+                                      suppliesList.clear();
+                                    });
                                   }),
                             ],
                           ),
@@ -345,8 +372,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         children: [
                           Text("Membership Type : ",
                               style: TextStyle(color: Colors.grey.shade700)),
-                          Text(getProfileRes.apiResponse![0]
-                              .userMembershipInfo![0].userMembershipType.value),
+                          Text(memberShipType),
                         ],
                       ),
                     ),
@@ -577,133 +603,104 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    if (getProfileRes?.apiResponse != null &&
-                        getProfileRes!.apiResponse!.isNotEmpty)
-                      SizedBox(
-                        height: 135,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: getProfileRes!
-                              .apiResponse![0].addressDetails.length,
-                          itemBuilder: (context, index) {
-                            final address =
-                                getProfileRes!.apiResponse![0].addressDetails;
-                            return Wrap(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    NavigationHelper.pushNamed(
-                                        AppRoutes.createAddressScreen,
-                                        arguments: {
-                                          'pageType': 'UpdateAddressScreen',
-                                          'addressModel': getProfileRes!
-                                              .apiResponse![0]
-                                              .addressDetails![index],
-                                        })?.then((value) {
-                                      loadProfile();
-                                      favStateList.clear();
-                                      suppliesList.clear();
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: AppColors.primaryColor),
-                                    ),
-                                    width: 220,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                    SizedBox(
+                      height: 135,
+                      child: getProfileRes!
+                              .apiResponse![0].addressDetails.isNotEmpty
+                          ? ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: getProfileRes!
+                                  .apiResponse![0].addressDetails.length,
+                              itemBuilder: (context, index) {
+                                final address = getProfileRes!
+                                    .apiResponse![0].addressDetails;
+                                return Wrap(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        /*SnackbarHelper.showSnackBar( getProfileRes!
+                                            .apiResponse![0]
+                                            .addressDetails![index].addressReferenceUuid);*/
+                                        NavigationHelper.pushNamed(
+                                            AppRoutes.addressDetailsScreen,
+                                            arguments: {
+                                              'pageType':
+                                                  AppRoutes.myProfileScreen,
+                                              'referenceFrom': getProfileRes!
+                                                  .apiResponse![0]
+                                                  .addressDetails![index]
+                                                  .addressReferenceFrom,
+                                              'referenceUUID': getProfileRes!
+                                                  .apiResponse![0]
+                                                  .addressDetails![index]
+                                                  .addressReferenceUuid,
+                                              'addressID': getProfileRes!
+                                                  .apiResponse![0]
+                                                  .addressDetails![index]
+                                                  .addressId,
+                                            })?.then((value) {
+                                          loadProfile();
+                                          favStateList.clear();
+                                          suppliesList.clear();
+                                        });
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: AppColors.primaryColor),
+                                        ),
+                                        width: 220,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            _buildChip(
-                                                address[index].addressType ??
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                _buildChip(address[index]
+                                                        .addressType ??
                                                     "Other"),
-                                            GestureDetector(
-                                              onTap: () {
-                                                AwesomeDialog(
-                                                  context: context,
-                                                  animType:
-                                                      AnimType.bottomSlide,
-                                                  dialogType:
-                                                      DialogType.warning,
-                                                  dialogBackgroundColor:
-                                                      Colors.white,
-                                                  titleTextStyle:
-                                                      AppTheme.appBarText,
-                                                  title:
-                                                      'Are you sure you want to delete this file?',
-                                                  btnCancelOnPress: () {},
-                                                  btnCancelText: 'Cancel',
-                                                  btnOkOnPress: () async {
-                                                    var deleteAddressRes =
-                                                        await AuthServices()
-                                                            .deleteAddress(
-                                                      context,
-                                                      address[0].addressUuid,
-                                                    );
-                                                    if (deleteAddressRes
-                                                            .apiResponse![0]
-                                                            .responseStatus ==
-                                                        true) {
-                                                      setState(() {
-                                                        address.removeAt(
-                                                            index); // Remove the item directly
-                                                      });
-                                                    }
-                                                  },
-                                                  btnOkText: 'Yes',
-                                                  btnOkColor:
-                                                      Colors.yellow.shade700,
-                                                ).show();
-                                              },
-                                              child: Icon(
-                                                Icons.delete_forever,
-                                                color: Colors.red,
-                                              ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_right_alt_outlined,
+                                                  color: AppColors
+                                                      .primaryColor,
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                                address[index].addressAddress ??
+                                                    "No Address"),
+                                            Text(
+                                              "${address[index].locationInfo?[0].cityNameLanguage ?? "City"}, "
+                                              "${address[index].locationInfo?[0].stateNameLanguage ?? "State"}, "
+                                              "${address[index].locationInfo?[0].countryNameLanguage ?? "Country"} - "
+                                              "${address[index].addressZipcode ?? "Zipcode"}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(address[index].addressAddress ??
-                                            "No Address"),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                "${address[index].locationInfo?[0].cityNameLanguage ?? "City"}, "
-                                                "${address[index].locationInfo?[0].stateNameLanguage ?? "State"}, "
-                                                "${address[index].locationInfo?[0].countryNameLanguage ?? "Country"} - "
-                                                "${address[index].addressZipcode ?? "Zipcode"}",
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_right_alt_outlined,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      const Text("No addresses found")
+                                  ],
+                                );
+                              },
+                            )
+                          : Center(
+                              child: Text(
+                              'No Saved Address found!!',
+                              style: TextStyle(color: Colors.grey),
+                            )),
+                    ),
                   ],
                 ),
               )

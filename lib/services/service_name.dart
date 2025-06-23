@@ -10,6 +10,7 @@ class ServiceNames {
   static String LOGIN_PIN_CHECK = '${BASE_URL}v1/auth/';
   static String GET_STATE_LIST = '${BASE_URL}v1/locations/countries';
   static String REGISTRATION_CREATE = '${BASE_URL}v1/user/register';
+  static String UPDATE_BASIC_DETAILS = '${BASE_URL}v1/user/';
   static String GET_PROFILE = '${BASE_URL}v1/user';
   static String UPDATE_FAV_STATE = '${BASE_URL}v1/user/favourite-states';
   static String GET_FAV_STATE_LIST = '${BASE_URL}v1/user';
@@ -22,6 +23,7 @@ class ServiceNames {
   static String SELL_CHICKEN = '${BASE_URL}v1/chicken-sale/create';
   static String UPDATE_SELL_CHICKEN = '${BASE_URL}v1/chicken-sale/update';
   static String EGG_PRICE_LIST = '${BASE_URL}v1/egg-sale?sale_from_date=';
+  static String GET_ADDRESS_LIST = '${BASE_URL}v1/address?reference_from=';
   static String CHICK_PRICE_LIST = '${BASE_URL}v1/chick-sale?sale_from_date=';
   static String CHICKEN_PRICE_LIST =
       '${BASE_URL}v1/chicken-sale?sale_from_date=';

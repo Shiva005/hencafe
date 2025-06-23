@@ -1,8 +1,9 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/navigation_helper.dart';
+import 'package:hencafe/models/address_model.dart';
 import 'package:hencafe/models/city_list_model.dart' as city;
-import 'package:hencafe/models/profile_model.dart';
-import 'package:hencafe/models/state_model.dart' as state;
+import 'package:hencafe/models/user_favourite_state_model.dart' as state;
 import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/values/app_routes.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
@@ -14,6 +15,7 @@ import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_strings.dart';
+import '../values/app_theme.dart';
 
 class CreateAddressScreen extends StatefulWidget {
   const CreateAddressScreen({super.key});
@@ -34,12 +36,12 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
-  List<state.ApiResponse> _states = [];
+  List<state.ApiResponse> _favStates = [];
   List<city.ApiResponse> _city = [];
   String? _selectedStateID;
   String? _selectedCityID;
   bool _isInitialized = false;
-  late final AddressDetails addressDetailsModel;
+  late final AddressModel addressDetailsModel;
 
   void initializeControllers() {
     addressTypeController = TextEditingController()
@@ -77,12 +79,12 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
     super.dispose();
   }
 
-  Future<state.StateModel> _fetchStates() async {
+  Future<state.UserFavouriteStateModel> _fetchStates() async {
     LoadingDialogHelper.showLoadingDialog(context);
-    final stateRes = await AuthServices().getStates(context);
+    final stateRes = await AuthServices().getFavouriteStateList(context, '');
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
       setState(() {
-        _states = stateRes.apiResponse!;
+        _favStates = stateRes.apiResponse!;
       });
     }
     LoadingDialogHelper.dismissLoadingDialog(context);
@@ -107,7 +109,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
     await _fetchStates();
 
     final TextEditingController searchController = TextEditingController();
-    List<state.ApiResponse> filteredStates = List.from(_states);
+    List<state.ApiResponse> filteredStates = List.from(_favStates);
 
     showModalBottomSheet(
       backgroundColor: Colors.white,
@@ -156,9 +158,10 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                           ),
                           onChanged: (query) {
                             setModalState(() {
-                              filteredStates = (_states ?? [])
+                              filteredStates = (_favStates ?? [])
                                   .where((item) =>
-                                      (item.stateNameLanguage ?? '')
+                                      (item.stateInfo![0].stateNameLanguage ??
+                                              '')
                                           .toLowerCase()
                                           .contains(query.toLowerCase()))
                                   .toList();
@@ -166,7 +169,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        (_states.isEmpty)
+                        (_favStates.isEmpty)
                             ? const Center(child: CircularProgressIndicator())
                             : Expanded(
                                 child: filteredStates.isNotEmpty
@@ -180,17 +183,20 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                                           final state = filteredStates[index];
                                           return ListTile(
                                             title: Text(
-                                              state.stateNameLanguage ?? '',
+                                              state.stateInfo![0]
+                                                      .stateNameLanguage ??
+                                                  '',
                                               style:
                                                   const TextStyle(fontSize: 16),
                                             ),
                                             onTap: () {
                                               setState(() {
-                                                stateController.text =
-                                                    state.stateNameLanguage ??
-                                                        '';
+                                                stateController.text = state
+                                                        .stateInfo![0]
+                                                        .stateNameLanguage ??
+                                                    '';
                                                 _selectedStateID =
-                                                    state.stateId;
+                                                    state.stateInfo![0].stateId;
                                                 cityController.clear();
                                               });
                                               Navigator.pop(context);
@@ -350,7 +356,8 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
-                children: ['Home', 'Office', 'Others'].map((type) {
+                children:
+                    ['Home', 'Office', 'Farm', 'Shop', 'Others'].map((type) {
                   return ListTile(
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,15 +400,20 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
 
     if (!_isInitialized && pageType != AppRoutes.createAddressScreen) {
       addressDetailsModel = args!['addressModel'];
-      addressController.text = addressDetailsModel.addressAddress!;
-      addressTypeController.text = addressDetailsModel.addressType!;
-      stateController.text =
-          addressDetailsModel.locationInfo![0].stateNameLanguage!;
-      cityController.text =
-          addressDetailsModel.locationInfo![0].cityNameLanguage!;
-      zipCodeController.text = addressDetailsModel.addressZipcode!;
-      _selectedCityID = addressDetailsModel.locationInfo![0].cityId!;
-      _selectedStateID = addressDetailsModel.locationInfo![0].stateId!;
+      addressController.text =
+          addressDetailsModel.apiResponse![0].addressAddress!;
+      addressTypeController.text =
+          addressDetailsModel.apiResponse![0].addressType!;
+      stateController.text = addressDetailsModel
+          .apiResponse![0].locationInfo![0].stateNameLanguage!;
+      cityController.text = addressDetailsModel
+          .apiResponse![0].locationInfo![0].cityNameLanguage!;
+      zipCodeController.text =
+          addressDetailsModel.apiResponse![0].addressZipcode!;
+      _selectedCityID =
+          addressDetailsModel.apiResponse![0].locationInfo![0].cityId!;
+      _selectedStateID =
+          addressDetailsModel.apiResponse![0].locationInfo![0].stateId!;
       _isInitialized = true;
     }
 
@@ -411,7 +423,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
           preferredSize: Size.fromHeight(60.0),
           child: MyAppBar(
               title: pageType == AppRoutes.createAddressScreen
-                  ? AppStrings.createAccount
+                  ? 'Create Address'
                   : 'Update Address')),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -595,38 +607,67 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
                                 var createAddressRes;
+                                var uuids = uuid.v1();
                                 if (pageType == AppRoutes.createAddressScreen) {
                                   createAddressRes = await AuthServices()
                                       .createAddress(
                                           context,
-                                          uuid.v1(),
+                                          uuids,
                                           'USER',
                                           addressTypeController.text,
                                           addressController.text,
                                           _selectedStateID!,
                                           _selectedCityID!,
                                           zipCodeController.text);
+                                  if (createAddressRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    AwesomeDialog(
+                                      context: context,
+                                      animType: AnimType.bottomSlide,
+                                      dialogType: DialogType.success,
+                                      dialogBackgroundColor: Colors.white,
+                                      title: createAddressRes
+                                          .apiResponse![0].responseDetails,
+                                      titleTextStyle: AppTheme.appBarText,
+                                      descTextStyle: AppTheme.appBarText,
+                                      btnOkOnPress: () {
+                                        NavigationHelper.pushReplacementNamed(
+                                          AppRoutes.uploadFileScreen,
+                                          arguments: {
+                                            'reference_from': 'ADDRESS',
+                                            'reference_uuid': uuids,
+                                            'pageType':
+                                                AppRoutes.createAddressScreen,
+                                          },
+                                        );
+                                      },
+                                      btnCancelOnPress: () {
+                                        NavigationHelper
+                                            .pushReplacementNamedUntil(
+                                          AppRoutes.dashboardScreen,
+                                        );
+                                      },
+                                      btnOkText: 'Yes',
+                                      btnCancelText: 'No',
+                                      btnOkColor: Colors.greenAccent.shade700,
+                                    ).show();
+                                  }
                                 } else {
                                   createAddressRes = await AuthServices()
                                       .updateAddress(
                                           context,
-                                          addressDetailsModel.addressId!,
-                                          addressDetailsModel.addressUuid!,
+                                          addressDetailsModel
+                                              .apiResponse![0].addressId!,
+                                          addressDetailsModel
+                                              .apiResponse![0].addressUuid!,
                                           'USER',
                                           addressTypeController.text,
                                           addressController.text,
                                           _selectedStateID!,
                                           _selectedCityID!,
                                           zipCodeController.text);
-                                }
-
-                                if (createAddressRes
-                                        .apiResponse![0].responseStatus ==
-                                    true) {
-                                  SnackbarHelper.showSnackBar(createAddressRes
-                                      .apiResponse![0].responseDetails!);
                                   NavigationHelper.pop(context);
-                                } else {
                                   SnackbarHelper.showSnackBar(createAddressRes
                                       .apiResponse![0].responseDetails!);
                                 }

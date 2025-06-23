@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
+import 'package:hencafe/models/address_model.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
 import 'package:hencafe/models/chick_price_model.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
@@ -196,6 +197,43 @@ class AuthServices {
     return RegistrationCreateModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> updateBasicDetails(
+      BuildContext context,
+      String firstName,
+      String lastName,
+      String email,
+      String dob,
+      String workType) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'dob': dob,
+      'work_type': workType,
+      'user_id': prefs.getString(AppStrings.prefUserID),
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID),
+    };
+
+    final response = await http.put(
+      Uri.parse(
+          '${ServiceNames.UPDATE_BASIC_DETAILS}${prefs.getString(AppStrings.prefUserID)}/basic-info'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update Details: $payload');
+    logger.d('TAG Update Details: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<ProfileModel> getProfile(
       BuildContext context, String thirdPartUserID) async {
     var prefs = await SharedPreferences.getInstance();
@@ -246,6 +284,8 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
@@ -295,11 +335,12 @@ class AuthServices {
       'address_type': addressType,
       'address': address,
       'zipcode': zipCode,
-      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
       'state_id': stateID,
       'city_id': cityID,
       'address_uuid': addressUUID,
       'reference_from': referenceFrom,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'country_id': prefs.getString(AppStrings.prefCountryCode)!,
       'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
     };
 
@@ -309,13 +350,16 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Update Supplies: $payload');
-    logger.d('TAG Update Supplies: ${jsonDecode(response.body)}');
+    logger.d('TAG Create Address: $payload');
+    logger.d('TAG Create Address: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -782,15 +826,18 @@ class AuthServices {
   }
 
   Future<UserFavouriteStateModel> getFavouriteStateList(
-      BuildContext context) async {
+      BuildContext context, String thirdPartUserID) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states/"),
+          "${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID"),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
@@ -807,6 +854,9 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
@@ -823,6 +873,9 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
@@ -850,6 +903,27 @@ class AuthServices {
 
     logger.d('TAG Get Egg Price List: ${jsonDecode(response.body)}');
     return EggPriceModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<AddressModel> getAddressList(
+      BuildContext context, String referenceFrom, String referenceUUID,String addressID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          '${ServiceNames.GET_ADDRESS_LIST}$referenceFrom&reference_uuid=$referenceUUID&address_id=$addressID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Egg Price List: ${jsonDecode(response.body)}');
+    return AddressModel.fromJson(jsonDecode(response.body));
   }
 
   Future<ChickPriceModel> getChickPriceList(BuildContext context,

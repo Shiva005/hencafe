@@ -38,6 +38,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
   late final TextEditingController addressController;
   late final TextEditingController stateController;
   late final TextEditingController cityController;
+  late final TextEditingController workTypeController;
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
@@ -45,6 +46,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
   List<city.ApiResponse> _city = [];
   String? _selectedStateID;
   String? _selectedCityID;
+  String? _selectedWorkType;
   bool _isInitialized = false;
   late final profile.ApiResponse profileModel;
 
@@ -62,6 +64,8 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
       ..addListener(controllerListener);
     referralCodeController = TextEditingController()
       ..addListener(controllerListener);
+    workTypeController = TextEditingController()
+      ..addListener(controllerListener);
   }
 
   void disposeControllers() {
@@ -74,6 +78,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     addressController.dispose();
     stateController.dispose();
     cityController.dispose();
+    workTypeController.dispose();
   }
 
   void controllerListener() {
@@ -348,6 +353,72 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     );
   }
 
+  final Map<String, String> workTypes = {
+    'FAR': 'Farmer',
+    'SUP': 'Supplier',
+    'TR': 'Trader',
+    'DOC': 'Doctor',
+    'OTH': 'Others',
+  };
+
+  void _showWorkTypeBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0, bottom: 20.0),
+                child: Text(
+                  'Address Type',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: workTypes.entries.map((entry) {
+                  final String key = entry.key;
+                  final String value = entry.value;
+
+                  return ListTile(
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          value,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Divider(
+                            height: 1,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      workTypeController.text = key;
+                      _selectedWorkType = key;
+                      Navigator.pop(context);
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> args =
@@ -363,6 +434,9 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
       addressController.text = profileModel.addressDetails![0].addressAddress!;
       emailController.text = profileModel.userEmail!;
       dateController.text = profileModel.userDob!;
+      workTypeController.text = profileModel.userWorkType!.value!;
+      _selectedWorkType = profileModel.userWorkType!.code!;
+
       stateController.text =
           profileModel.addressDetails![0].locationInfo![0].stateNameLanguage!;
       cityController.text =
@@ -378,7 +452,10 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(title: AppStrings.createAccount)),
+          child: MyAppBar(
+              title: pageType == AppRoutes.myProfileScreen
+                  ? 'Update Basic Details'
+                  : AppStrings.createAccount)),
       body: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 10.0,
@@ -456,9 +533,8 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           return null;
                         },
                       ),
-                      Visibility(
-                        visible: false,
-                        child: SizedBox(
+                      if (pageType == AppRoutes.myProfileScreen)
+                        SizedBox(
                           height: 70.0,
                           child: GestureDetector(
                             child: TextFormField(
@@ -496,7 +572,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                     lastDate: DateTime(2040));
                                 if (pickedDate != null) {
                                   String formattedDate =
-                                      DateFormat('dd-MM-yyyy')
+                                      DateFormat('yyyy-MM-dd')
                                           .format(pickedDate);
                                   setState(() =>
                                       dateController.text = formattedDate);
@@ -505,117 +581,164 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                             ),
                           ),
                         ),
-                      ),
-                      AppTextFormField(
-                        controller: addressController,
-                        labelText: AppStrings.address,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        enabled: true,
-                        minLines: 2,
-                        maxLines: 2,
-                        prefixIcon: Icon(Icons.location_pin),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your address';
-                          }
-                          return null;
-                        },
-                      ),
-                      GestureDetector(
-                        child: SizedBox(
-                          height: 70.0,
-                          child: TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: stateController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.grey),
-                              prefixIcon: Icon(Icons.location_city),
-                              iconColor: Colors.white,
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "State",
-                              suffixIcon: Icon(Icons.keyboard_arrow_down),
-                              border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
+                      if (pageType != AppRoutes.myProfileScreen)
+                        AppTextFormField(
+                          controller: addressController,
+                          labelText: AppStrings.address,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          enabled: true,
+                          minLines: 2,
+                          maxLines: 2,
+                          prefixIcon: Icon(Icons.location_pin),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your address';
+                            }
+                            return null;
+                          },
+                        ),
+                      if (pageType != AppRoutes.myProfileScreen)
+                        GestureDetector(
+                          child: SizedBox(
+                            height: 70.0,
+                            child: TextFormField(
+                              style: TextStyle(color: Colors.black),
+                              controller: stateController,
+                              decoration: InputDecoration(
+                                labelStyle: TextStyle(color: Colors.grey),
+                                prefixIcon: Icon(Icons.location_city),
+                                iconColor: Colors.white,
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: "State",
+                                suffixIcon: Icon(Icons.keyboard_arrow_down),
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.green.shade200),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              readOnly: true,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value == 'Select State') {
+                                  return 'Please select your state';
+                                }
+                                return null;
+                              },
+                              onTap: _showStateBottomSheet,
                             ),
-                            readOnly: true,
-                            validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty ||
-                                  value == 'Select State') {
-                                return 'Please select your state';
-                              }
-                              return null;
-                            },
-                            onTap: _showStateBottomSheet,
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        child: SizedBox(
-                          height: 70.0,
-                          child: TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: cityController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.grey),
-                              prefixIcon: Icon(Icons.location_city),
-                              iconColor: Colors.white,
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "City",
-                              suffixIcon: Icon(Icons.keyboard_arrow_down),
-                              border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
+                      if (pageType != AppRoutes.myProfileScreen)
+                        GestureDetector(
+                          child: SizedBox(
+                            height: 70.0,
+                            child: TextFormField(
+                              style: TextStyle(color: Colors.black),
+                              controller: cityController,
+                              decoration: InputDecoration(
+                                labelStyle: TextStyle(color: Colors.grey),
+                                prefixIcon: Icon(Icons.location_city),
+                                iconColor: Colors.white,
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: "City",
+                                suffixIcon: Icon(Icons.keyboard_arrow_down),
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.green.shade200),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              readOnly: true,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value == 'Select City') {
+                                  return 'Please select your city';
+                                }
+                                return null;
+                              },
+                              onTap: _showCityBottomSheet,
                             ),
-                            readOnly: true,
-                            validator: (value) {
-                              if (value == null ||
-                                  value.isEmpty ||
-                                  value == 'Select City') {
-                                return 'Please select your city';
-                              }
-                              return null;
-                            },
-                            onTap: _showCityBottomSheet,
                           ),
                         ),
-                      ),
-                      AppTextFormField(
-                        controller: referralCodeController,
-                        labelText: AppStrings.referralCode,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        enabled: true,
-                        prefixIcon: Icon(Icons.card_giftcard),
-                      ),
+                      if (pageType != AppRoutes.myProfileScreen)
+                        AppTextFormField(
+                          controller: referralCodeController,
+                          labelText: AppStrings.referralCode,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          enabled: true,
+                          prefixIcon: Icon(Icons.card_giftcard),
+                        ),
+                      if (pageType == AppRoutes.myProfileScreen)
+                        GestureDetector(
+                          child: SizedBox(
+                            height: 70.0,
+                            child: TextFormField(
+                              style: TextStyle(color: Colors.black),
+                              controller: workTypeController,
+                              decoration: InputDecoration(
+                                labelStyle: TextStyle(color: Colors.grey),
+                                prefixIcon: Icon(Icons.my_location),
+                                iconColor: Colors.white,
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: "Work Type",
+                                suffixIcon: Icon(Icons.keyboard_arrow_down),
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.green.shade200),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              readOnly: true,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value == 'Select Work Type') {
+                                  return 'Please select work type';
+                                }
+                                return null;
+                              },
+                              onTap: _showWorkTypeBottomSheet,
+                            ),
+                          ),
+                        ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -625,30 +748,48 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                             controller: _btnController,
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                var generateOtpRes = await AuthServices()
-                                    .otpGenerate(
-                                        context, mobileController.text);
-                                if (generateOtpRes
-                                        .apiResponse![0].responseStatus ==
-                                    true) {
-                                  NavigationHelper.pushNamed(
-                                    AppRoutes.loginOtp,
-                                    arguments: {
-                                      'pageType':
-                                          AppRoutes.registerBasicDetails,
-                                      'firstName': firstNameController.text,
-                                      'lastName': lastNameController.text,
-                                      'mobileNumber': mobileController.text,
-                                      'email': emailController.text,
-                                      'city_id': _selectedCityID,
-                                      'address': addressController.text,
-                                      'stateID': _selectedStateID,
-                                      'referralCode':
-                                          referralCodeController.text,
-                                    },
-                                  );
+                                if (pageType != AppRoutes.myProfileScreen) {
+                                  var generateOtpRes = await AuthServices()
+                                      .otpGenerate(
+                                          context, mobileController.text);
+                                  if (generateOtpRes
+                                          .apiResponse![0].responseStatus ==
+                                      true) {
+                                    NavigationHelper.pushNamed(
+                                      AppRoutes.loginOtp,
+                                      arguments: {
+                                        'pageType':
+                                            AppRoutes.registerBasicDetails,
+                                        'firstName': firstNameController.text,
+                                        'lastName': lastNameController.text,
+                                        'mobileNumber': mobileController.text,
+                                        'email': emailController.text,
+                                        'city_id': _selectedCityID,
+                                        'address': addressController.text,
+                                        'stateID': _selectedStateID,
+                                        'referralCode':
+                                            referralCodeController.text,
+                                      },
+                                    );
+                                  } else {
+                                    SnackbarHelper.showSnackBar(generateOtpRes
+                                        .apiResponse![0].responseDetails!);
+                                  }
                                 } else {
-                                  SnackbarHelper.showSnackBar(generateOtpRes
+                                  var updateDetailsRes = await AuthServices()
+                                      .updateBasicDetails(
+                                      context,
+                                      firstNameController.text,
+                                      lastNameController.text,
+                                      emailController.text,
+                                      dateController.text,
+                                      _selectedWorkType!);
+                                  if (updateDetailsRes
+                                      .apiResponse![0].responseStatus ==
+                                      true) {
+                                    NavigationHelper.pop(context);
+                                  }
+                                  SnackbarHelper.showSnackBar(updateDetailsRes
                                       .apiResponse![0].responseDetails!);
                                 }
                               }

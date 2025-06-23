@@ -20,6 +20,7 @@ class AppRoutes {
   static const String sellChickenScreen = 'sell_chicken_screen';
   static const String sellLiftingScreen = 'sell_Lifting_screen';
   static const String myProfileScreen = 'my_profile_screen';
+  static const String addressDetailsScreen = 'address_details_screen';
   static const String uploadFileScreen = 'upload_file_screen';
   static const String saleDetailsScreen = 'sale_details_screen';
   static const String videoPlayerScreen = 'video_player_screen';
