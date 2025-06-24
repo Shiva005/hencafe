@@ -68,7 +68,7 @@ class _HomeFragment2State extends State<HomeFragment2>
               children: [
                 Expanded(
                     child: _buildDashboardCard(
-                        AppIconsData.colorVideo, "Sale Videos")),
+                        AppIconsData.colorCompanies, "Companies")),
                 SizedBox(width: 20),
                 Expanded(
                     child: _buildDashboardCard(
@@ -194,6 +194,10 @@ class _HomeFragment2State extends State<HomeFragment2>
             } else if (label == 'Lifting Sale') {
               NavigationHelper.pushNamed(
                 AppRoutes.liftingPriceScreen,
+              );
+            } else if (label == 'Companies') {
+              NavigationHelper.pushNamed(
+                AppRoutes.companyListScreen,
               );
             }
           },

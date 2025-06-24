@@ -5,6 +5,8 @@ import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
 import 'package:hencafe/screens/chicken_sell_create_screen.dart';
+import 'package:hencafe/screens/company_details_screen.dart';
+import 'package:hencafe/screens/company_list%20screen.dart';
 import 'package:hencafe/screens/create_address_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
@@ -121,6 +123,22 @@ class Routes {
             mobile: const LiftingPriceScreen(),
             tablet: LiftingPriceScreen(),
             desktop: LiftingPriceScreen(),
+          ),
+        );
+      case AppRoutes.companyListScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const CompanyListScreen(),
+            tablet: CompanyListScreen(),
+            desktop: CompanyListScreen(),
+          ),
+        );
+      case AppRoutes.companyDetailsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const CompanyDetailsScreen(),
+            tablet: CompanyDetailsScreen(),
+            desktop: CompanyDetailsScreen(),
           ),
         );
       case AppRoutes.dashboardScreen:

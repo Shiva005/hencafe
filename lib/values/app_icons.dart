@@ -13,6 +13,7 @@ class AppIconsData {
   static const String colorContact = 'assets/icons/color_contact.png';
   static const String colorLiftingSale = 'assets/icons/lifting_sale.png';
   static const String weighingMachine = 'assets/icons/weighing_scale.png';
+  static const String colorCompanies = 'assets/icons/color_companies.png';
   static const String hen = 'assets/icons/hen.png';
 
 

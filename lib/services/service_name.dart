@@ -16,6 +16,7 @@ class ServiceNames {
   static String GET_FAV_STATE_LIST = '${BASE_URL}v1/user';
   static String GET_BIRD_BREED_LIST = '${BASE_URL}v1/birdbreed/';
   static String GET_COMPANY_LIST = '${BASE_URL}v1/company/';
+  static String GET_COMPANY_PROVIDERS_LIST = '${BASE_URL}v1/company?company_uuid=';
   static String SELL_EGG = '${BASE_URL}v1/egg-sale/create';
   static String UPDATE_SELL_EGG = '${BASE_URL}v1/egg-sale/update';
   static String SELL_CHICK = '${BASE_URL}v1/chick-sale/create';

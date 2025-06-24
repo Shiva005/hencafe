@@ -1,7 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/address_model.dart';
-import 'package:hencafe/screens/image_preview_screen.dart';
+import 'package:hencafe/screens/video_player_screen.dart';
 import 'package:hencafe/utils/my_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,7 +13,7 @@ import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
-import 'video_player_screen.dart';
+import 'image_preview_screen.dart';
 
 class AddressDetailsScreen extends StatefulWidget {
   const AddressDetailsScreen({super.key});
@@ -275,60 +275,15 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                     child: GestureDetector(
                                       onTap: () {
                                         if (pageType ==
-                                            AppRoutes.eggPriceScreen) {
+                                            AppRoutes.myProfileScreen) {
                                           NavigationHelper.pushNamed(
                                             AppRoutes.uploadFileScreen,
                                             arguments: {
-                                              'reference_from': 'EGG_SALE',
+                                              'reference_from': 'ADDRESS',
                                               'reference_uuid': detailsModel
-                                                  .apiResponse![0].eggsaleUuid,
-                                              'pageType':
-                                                  AppRoutes.sellEggScreen,
-                                            },
-                                          )?.then((value) {
-                                            loadData();
-                                          });
-                                        } else if (pageType ==
-                                            AppRoutes.chickPriceScreen) {
-                                          NavigationHelper.pushNamed(
-                                            AppRoutes.uploadFileScreen,
-                                            arguments: {
-                                              'reference_from': 'CHICK_SALE',
-                                              'reference_uuid': detailsModel
-                                                  .apiResponse![0]
-                                                  .chicksaleUuid,
-                                              'pageType':
-                                                  AppRoutes.sellChickScreen,
-                                            },
-                                          )?.then((value) {
-                                            loadData();
-                                          });
-                                        } else if (pageType ==
-                                            AppRoutes.chickenPriceScreen) {
-                                          NavigationHelper.pushNamed(
-                                            AppRoutes.uploadFileScreen,
-                                            arguments: {
-                                              'reference_from': 'CHICKEN_SALE',
-                                              'reference_uuid': detailsModel
-                                                  .apiResponse![0]
-                                                  .chickensaleUuid,
-                                              'pageType':
-                                                  AppRoutes.sellChickenScreen,
-                                            },
-                                          )?.then((value) {
-                                            loadData();
-                                          });
-                                        } else if (pageType ==
-                                            AppRoutes.liftingPriceScreen) {
-                                          NavigationHelper.pushNamed(
-                                            AppRoutes.uploadFileScreen,
-                                            arguments: {
-                                              'reference_from': 'LIFTING_SALE',
-                                              'reference_uuid': detailsModel
-                                                  .apiResponse![0]
-                                                  .liftingsaleUuid,
-                                              'pageType':
-                                                  AppRoutes.sellLiftingScreen,
+                                                  .apiResponse![0].addressUuid,
+                                              'pageType': AppRoutes
+                                                  .addressDetailsScreen,
                                             },
                                           )?.then((value) {
                                             loadData();
@@ -359,9 +314,16 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                           ),
                           Expanded(
                             child: attachments.isNotEmpty
-                                ? ListView.builder(
+                                ? GridView.builder(
+                                    shrinkWrap: false,
+                                    physics: AlwaysScrollableScrollPhysics(),
                                     padding: const EdgeInsets.all(10),
                                     itemCount: attachments.length,
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.88,
+                                    ),
                                     itemBuilder: (context, index) {
                                       final attachment = attachments[index];
                                       final path =
@@ -371,24 +333,26 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                       final fileName =
                                           attachment.attachmentName ?? '';
 
-                                      Widget leadingWidget;
+                                      Widget mediaWidget;
 
                                       if (attType == 'image') {
-                                        leadingWidget = ClipRRect(
+                                        mediaWidget = ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(8),
-                                          child: Image.network(path,
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.cover),
+                                          child: Image.network(
+                                            path,
+                                            width: 150,
+                                            height: 150,
+                                            fit: BoxFit.cover,
+                                          ),
                                         );
                                       } else if (attType == 'video') {
-                                        leadingWidget = Stack(
+                                        mediaWidget = Stack(
                                           alignment: Alignment.center,
                                           children: [
                                             Container(
-                                              width: 60,
-                                              height: 60,
+                                              width: double.maxFinite,
+                                              height: 150,
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(8),
@@ -397,14 +361,15 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                               child: const Icon(Icons.videocam,
                                                   color: Colors.grey),
                                             ),
-                                            const Icon(Icons.play_circle_fill,
-                                                size: 28, color: Colors.white),
+                                            const Icon(Icons.videocam,
+                                                size: 28,
+                                                color: AppColors.primaryColor),
                                           ],
                                         );
                                       } else if (attType == 'pdf') {
-                                        leadingWidget = Container(
-                                          width: 60,
-                                          height: 60,
+                                        mediaWidget = Container(
+                                          width: 150,
+                                          height: 150,
                                           decoration: BoxDecoration(
                                             color: Colors.red[50],
                                             borderRadius:
@@ -415,120 +380,168 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                               color: Colors.red),
                                         );
                                       } else {
-                                        leadingWidget = const Icon(
-                                            Icons.insert_drive_file,
-                                            color: Colors.blue);
+                                        mediaWidget = Container(
+                                          width: 150,
+                                          height: 150,
+                                          alignment: Alignment.center,
+                                          child: const Icon(
+                                              Icons.insert_drive_file,
+                                              color: Colors.blue),
+                                        );
                                       }
 
-                                      return Card(
-                                        elevation: 0.0,
-                                        color: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              color: Colors.grey.shade400,
-                                              width: 1),
-                                          // Change color here
-                                          borderRadius: BorderRadius.circular(
-                                              8.0), // Optional: Adjust border radius
-                                        ),
-                                        child: ListTile(
-                                          leading: leadingWidget,
-                                          trailing: Visibility(
-                                            visible: detailsModel
-                                                    .apiResponse![0]
-                                                    .userBasicInfo![0]
-                                                    .userId ==
-                                                prefs.getString(
-                                                    AppStrings.prefUserID),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                IconButton(
-                                                  icon: Icon(
-                                                      Icons.delete_forever),
-                                                  color: Colors.red,
-                                                  onPressed: () async {
-                                                    AwesomeDialog(
-                                                      context: context,
-                                                      animType:
-                                                          AnimType.bottomSlide,
-                                                      dialogType:
-                                                          DialogType.warning,
-                                                      dialogBackgroundColor:
-                                                          Colors.white,
-                                                      titleTextStyle:
-                                                          AppTheme.appBarText,
-                                                      title:
-                                                          'Are you sure you want to delete this file?',
-                                                      btnCancelOnPress: () {},
-                                                      btnCancelText: 'Cancel',
-                                                      btnOkOnPress: () async {
-                                                        var attachmentDeleteRes =
-                                                            await AuthServices()
-                                                                .attachmentDelete(
-                                                                    context,
-                                                                    attachment
-                                                                        .attachmentId!,
-                                                                    attachment
-                                                                        .attachmentPath!);
-                                                        if (attachmentDeleteRes
-                                                                .apiResponse![0]
-                                                                .responseStatus ==
-                                                            true) {
-                                                          setState(() {
-                                                            attachments.removeAt(
-                                                                index); // Remove the item directly
-                                                          });
-                                                        }
-                                                      },
-                                                      btnOkText: 'Yes',
-                                                      btnOkColor: Colors
-                                                          .yellow.shade700,
-                                                    ).show();
-                                                  },
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (attType == 'image') {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      ImagePreviewScreen(
+                                                          imageUrl: path),
+                                                ));
+                                          } else if (attType == 'video') {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      VideoPlayerScreen(
+                                                          videoUrl: path),
+                                                ));
+                                          } else if (attType == 'pdf') {
+                                            _openExternalApp(path);
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      "Unsupported file format")),
+                                            );
+                                          }
+                                        },
+                                        child: Card(
+                                          color: Colors.white,
+                                          elevation: 0.0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            side: BorderSide(
+                                                color: Colors.grey.shade300),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius
+                                                            .vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                    12)),
+                                                    child: mediaWidget,
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 6),
+                                                    child: Text(
+                                                      fileName,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                  ),
+                                                  /*Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2),
+                                                    child: Text(overflow:
+                                                    TextOverflow.ellipsis,
+                                                      'Date: ${attachment.attachmentCreatedon ?? "Unknown"}',
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ),*/
+                                                ],
+                                              ),
+
+                                              // Delete button
+                                              if (detailsModel
+                                                      .apiResponse![0]
+                                                      .userBasicInfo![0]
+                                                      .userId ==
+                                                  prefs.getString(
+                                                      AppStrings.prefUserID))
+                                                Positioned(
+                                                  top: 4,
+                                                  right: 4,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      AwesomeDialog(
+                                                        context: context,
+                                                        animType: AnimType
+                                                            .bottomSlide,
+                                                        dialogType:
+                                                            DialogType.warning,
+                                                        dialogBackgroundColor:
+                                                            Colors.white,
+                                                        titleTextStyle:
+                                                            AppTheme.appBarText,
+                                                        title:
+                                                            'Are you sure you want to delete this file?',
+                                                        btnCancelOnPress: () {},
+                                                        btnCancelText: 'Cancel',
+                                                        btnOkOnPress: () async {
+                                                          var attachmentDeleteRes =
+                                                              await AuthServices()
+                                                                  .attachmentDelete(
+                                                            context,
+                                                            attachment
+                                                                .attachmentId!,
+                                                            attachment
+                                                                .attachmentPath!,
+                                                          );
+                                                          if (attachmentDeleteRes
+                                                                  .apiResponse![
+                                                                      0]
+                                                                  .responseStatus ==
+                                                              true) {
+                                                            setState(() {
+                                                              attachments
+                                                                  .removeAt(
+                                                                      index);
+                                                            });
+                                                          }
+                                                        },
+                                                        btnOkText: 'Yes',
+                                                        btnOkColor: Colors
+                                                            .yellow.shade700,
+                                                      ).show();
+                                                    },
+                                                    child: const CircleAvatar(
+                                                      radius: 14,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      child: Icon(
+                                                          Icons.delete_forever,
+                                                          size: 16,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
+                                            ],
                                           ),
-                                          title: Text(
-                                            fileName,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          subtitle: Text(
-                                              'Uploaded: ${attachment.attachmentCreatedon ?? "Unknown"}'),
-                                          onTap: () {
-                                            if (attType == 'image') {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        ImagePreviewScreen(
-                                                            imageUrl: path),
-                                                  ));
-                                            } else if (attType == 'video') {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        VideoPlayerScreen(
-                                                            videoUrl: path),
-                                                  ));
-                                            } else if (attType == 'pdf') {
-                                              _openExternalApp(path);
-                                            } else {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                    content: Text(
-                                                        "Unsupported file format")),
-                                              );
-                                            }
-                                          },
                                         ),
                                       );
                                     },
