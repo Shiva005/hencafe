@@ -15,6 +15,8 @@ class AppIconsData {
   static const String weighingMachine = 'assets/icons/weighing_scale.png';
   static const String colorCompanies = 'assets/icons/color_companies.png';
   static const String hen = 'assets/icons/hen.png';
+  static const String noImage = 'assets/icons/no_image.png';
+  static const String whatsappOutline = 'assets/icons/whatsapp.png';
 
 
   /// gifs

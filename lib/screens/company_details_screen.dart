@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/models/company_providers_model.dart';
 import 'package:hencafe/screens/video_player_screen.dart';
 import 'package:hencafe/utils/my_logger.dart';
+import 'package:hencafe/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -67,67 +68,79 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
             } else if (!snapshot.hasData || snapshot.data == null) {
               return Center(child: Text('No data found.'));
             }
-
             final detailsModel = snapshot.data!;
-            final attachments =
-                detailsModel.apiResponse![0].attachmentInfo ?? [];
+            List<AttachmentInfo> attachments = [];
+
+            for (var address
+                in detailsModel.apiResponse![0].addressDetails ?? []) {
+              if (address.attachmentInfo != null &&
+                  address.attachmentInfo!.isNotEmpty) {
+                attachments.addAll(address.attachmentInfo!);
+              }
+            }
+
             final userInfo = detailsModel.apiResponse![0].userBasicInfo ?? [];
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0, right: 20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      AwesomeDialog(
-                        context: context,
-                        animType: AnimType.bottomSlide,
-                        dialogType: DialogType.warning,
-                        dialogBackgroundColor: Colors.white,
-                        titleTextStyle: AppTheme.appBarText,
-                        title: 'Are you sure you want to delete this Address?',
-                        btnCancelOnPress: () {},
-                        btnCancelText: 'Cancel',
-                        btnOkOnPress: () async {
-                          var deleteAddressRes =
-                              await AuthServices().deleteAddress(
-                            context,
-                            detailsModel.apiResponse![0].addressUuid,
-                          );
-                          if (deleteAddressRes.apiResponse![0].responseStatus ==
-                              true) {
-                            NavigationHelper.pop(context);
-                          }
-                        },
-                        btnOkText: 'Yes',
-                        btnOkColor: Colors.yellow.shade700,
-                      ).show();
-                    },
-                    child: Container(
-                        width: 145,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.red),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Delete Address',
-                              style: const TextStyle(
-                                  color: Colors.red, fontSize: 13),
-                            ),
-                            SizedBox(width: 5),
-                            Icon(
-                              Icons.delete_forever,
-                              color: Colors.red,
-                              size: 18,
-                            ),
-                          ],
-                        )),
+                Visibility(
+                  visible: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10.0, right: 20.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        AwesomeDialog(
+                          context: context,
+                          animType: AnimType.bottomSlide,
+                          dialogType: DialogType.warning,
+                          dialogBackgroundColor: Colors.white,
+                          titleTextStyle: AppTheme.appBarText,
+                          title:
+                              'Are you sure you want to delete this Address?',
+                          btnCancelOnPress: () {},
+                          btnCancelText: 'Cancel',
+                          btnOkOnPress: () async {
+                            var deleteAddressRes =
+                                await AuthServices().deleteAddress(
+                              context,
+                              detailsModel.apiResponse![0].addressUuid,
+                            );
+                            if (deleteAddressRes
+                                    .apiResponse![0].responseStatus ==
+                                true) {
+                              NavigationHelper.pop(context);
+                            }
+                          },
+                          btnOkText: 'Yes',
+                          btnOkColor: Colors.yellow.shade700,
+                        ).show();
+                      },
+                      child: Container(
+                          width: 145,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.red),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Delete Address',
+                                style: const TextStyle(
+                                    color: Colors.red, fontSize: 13),
+                              ),
+                              SizedBox(width: 5),
+                              Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                            ],
+                          )),
+                    ),
                   ),
                 ),
                 SizedBox(height: 5),
@@ -152,41 +165,76 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                               style:
                                   TextStyle(fontSize: 18, color: Colors.black),
                             ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade800,
+                                border:
+                                    Border.all(color: Colors.green.shade800),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Utils.openDialPad(detailsModel.apiResponse![0]
+                                      .companyContactUserMobile);
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.call_outlined,
+                                      color: Colors.white,
+                                      size: 15,
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      'Call Now',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             if (userInfo![0].userId ==
                                 prefs.getString(AppStrings.prefUserID))
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  border:
-                                      Border.all(color: AppColors.primaryColor),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    NavigationHelper.pushNamed(
-                                      AppRoutes.createAddressScreen,
-                                      arguments: {
-                                        'addressModel': detailsModel,
-                                        'pageType': "UpdateAddressScreen",
-                                      },
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        'Edit Info',
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 13),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                    ],
+                              Visibility(
+                                visible: false,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    border: Border.all(
+                                        color: AppColors.primaryColor),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.createAddressScreen,
+                                        arguments: {
+                                          'addressModel': detailsModel,
+                                          'pageType': "UpdateAddressScreen",
+                                        },
+                                      );
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Edit Info',
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13),
+                                        ),
+                                        SizedBox(width: 5),
+                                        Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                          size: 15,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
@@ -207,82 +255,134 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     ),
                   ),
                 ),
-                Card(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: AppColors.primaryColor, width: 1),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Company Address',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
-                            ),
-                            Visibility(
-                              visible: userInfo![0].userId ==
-                                  prefs.getString(AppStrings.prefUserID),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  border:
-                                      Border.all(color: AppColors.primaryColor),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    NavigationHelper.pushNamed(
-                                      AppRoutes.createAddressScreen,
-                                      arguments: {
-                                        'addressModel': detailsModel,
-                                        'pageType': "UpdateAddressScreen",
-                                      },
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        'Edit Info',
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 13),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                    ],
-                                  ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Company Addresses',
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                          Visibility(
+                            visible: false,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                border:
+                                    Border.all(color: AppColors.primaryColor),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  NavigationHelper.pushNamed(
+                                    AppRoutes.createAddressScreen,
+                                    arguments: {
+                                      'addressModel': detailsModel,
+                                      'pageType': "UpdateAddressScreen",
+                                    },
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Edit Info',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                      size: 15,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        buildRow('Address Type',
-                            '${detailsModel.apiResponse![0].addressDetails![0].addressType ?? ''}'),
-                        buildRow('Address',
-                            '${detailsModel.apiResponse![0].addressDetails![0].addressAddress ?? ''}'),
-                        buildRow('ZipCode',
-                            '${detailsModel.apiResponse![0].addressDetails![0].addressZipcode ?? ''}'),
-                        buildRow('City',
-                            '${detailsModel.apiResponse![0].addressDetails![0].locationInfo![0].cityNameLanguage ?? ''}'),
-                        buildRow('State',
-                            '${detailsModel.apiResponse![0].addressDetails![0].locationInfo![0].stateNameLanguage ?? ''}'),
-                      ],
-                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        height: 125,
+                        child: detailsModel != null &&
+                                detailsModel!.apiResponse != null &&
+                                detailsModel!.apiResponse!.isNotEmpty &&
+                                detailsModel!.apiResponse![0].addressDetails !=
+                                    null &&
+                                detailsModel!
+                                    .apiResponse![0].addressDetails!.isNotEmpty
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: detailsModel!
+                                    .apiResponse![0].addressDetails.length,
+                                itemBuilder: (context, index) {
+                                  final address = detailsModel!
+                                      .apiResponse![0].addressDetails;
+                                  return Wrap(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          NavigationHelper.pushNamed(
+                                              AppRoutes.addressDetailsScreen,
+                                              arguments: {
+                                                'addressModel': address[index],
+                                              });
+                                        },
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 8),
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                color: AppColors.primaryColor),
+                                          ),
+                                          width: 220,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              _buildChip(
+                                                  address[index].addressType ??
+                                                      "Other"),
+                                              const SizedBox(height: 8),
+                                              Text(address[index]
+                                                      .addressAddress ??
+                                                  "No Address"),
+                                              Text(
+                                                "${address[index].locationInfo?[0].cityNameLanguage ?? "City"}, "
+                                                "${address[index].locationInfo?[0].stateNameLanguage ?? "State"}, "
+                                                "${address[index].locationInfo?[0].countryNameLanguage ?? "Country"} - "
+                                                "${address[index].addressZipcode ?? "Zipcode"}",
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: Text(
+                                'No Saved Address found!!',
+                                style: TextStyle(color: Colors.grey),
+                              )),
+                      ),
+                    ],
                   ),
                 ),
                 Card(
@@ -299,12 +399,10 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Feeds Provided',
-                          style:
-                          TextStyle(fontSize: 18, color: Colors.black),
+                          'Company Supplies',
+                          style: TextStyle(fontSize: 18, color: Colors.black),
                         ),
-                        SizedBox(height: 10
-                        ),
+                        SizedBox(height: 10),
                         SizedBox(
                           height: 30, // adjust height as needed
                           child: ListView.builder(
@@ -312,8 +410,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                             itemCount:
                                 detailsModel.apiResponse![0].supplyInfo!.length,
                             itemBuilder: (context, index) {
-                              final supply =
-                                  detailsModel.apiResponse![0].supplyInfo![index];
+                              final supply = detailsModel
+                                  .apiResponse![0].supplyInfo![index];
                               final supplyName = supply.supplytypeName ?? '';
 
                               return Padding(
@@ -324,7 +422,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                       horizontal: 12, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade200,
-                                    border: Border.all(color: Colors.grey.shade400),
+                                    border:
+                                        Border.all(color: Colors.grey.shade400),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Center(
@@ -431,6 +530,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                     ),
                                     itemBuilder: (context, index) {
                                       final attachment = attachments[index];
+                                      logger.w(attachment);
                                       final path =
                                           attachment.attachmentPath ?? '';
                                       final attType =
@@ -664,6 +764,21 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           }),
     );
   }
+}
+
+Widget _buildChip(String label) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade200,
+      border: Border.all(color: Colors.grey.shade400),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(color: Colors.black, fontSize: 12),
+    ),
+  );
 }
 
 Widget buildRow(String title, String value,

@@ -23,12 +23,20 @@ class Utils {
       return formatDate(DateTime.now());
     }
   }
+
   static openDialPad(String phoneNumber) async {
     final Uri telUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(telUri)) {
       await launchUrl(telUri);
     } else {
       throw 'Could not open dial pad';
+    }
+  }
+
+  static void openLink(String urlLink) async {
+    final Uri url = Uri.parse(urlLink);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
   }
 }

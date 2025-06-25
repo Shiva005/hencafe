@@ -174,7 +174,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 12.0, horizontal: 12),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,14 +226,35 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                           ],
                         ),
                         const Spacer(),
-                        FloatingActionButton(
-                          onPressed: () {
-                            Utils.openDialPad(
-                                '${priceModel.apiResponse![0].userBasicInfo![0].userMobile}');
-                          },
-                          backgroundColor: Colors.white,
-                          child: const Icon(Icons.call,
-                              color: AppColors.primaryColor),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                border:
+                                    Border.all(color: AppColors.primaryColor),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'View full Profile',
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                              ),
+                            ),
+                            SizedBox(height: 10.0),
+                            FloatingActionButton(
+                              onPressed: () {
+                                Utils.openDialPad(
+                                    '${priceModel.apiResponse![0].userBasicInfo![0].userMobile}');
+                              },
+                              backgroundColor: Colors.white,
+                              child: const Icon(Icons.call,
+                                  color: AppColors.primaryColor),
+                            ),
+                          ],
                         ),
                       ],
                     ),

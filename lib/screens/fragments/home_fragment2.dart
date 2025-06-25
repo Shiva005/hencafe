@@ -199,6 +199,10 @@ class _HomeFragment2State extends State<HomeFragment2>
               NavigationHelper.pushNamed(
                 AppRoutes.companyListScreen,
               );
+            } else if (label == 'Contact Us') {
+              NavigationHelper.pushNamed(
+                AppRoutes.contactUsScreen,
+              );
             }
           },
           child: Padding(

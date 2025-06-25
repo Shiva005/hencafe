@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_theme.dart';
@@ -159,10 +160,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Divider(
-                        color: Colors.grey.shade300,
-                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 10.0),
+                      child: Divider(height: 1, color: Colors.grey.shade300),
                     ),
                     ListTile(
                       onTap: () {
@@ -175,7 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           width: 23,
                           height: 23,
                           child: Icon(
-                            Icons.home_sharp,
+                            Icons.home_outlined,
                             color: AppColors.primaryColor,
                           )),
                     ),
@@ -192,8 +192,38 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.person,
+                          child: Icon(Icons.person_outlined,
                               color: AppColors.primaryColor)),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        _scaffoldKey.currentState?.closeDrawer();
+                      },
+                      visualDensity:
+                          const VisualDensity(horizontal: 0, vertical: -3),
+                      title: const Text('Change Password'),
+                      leading: SizedBox(
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.lock_open,
+                              color: AppColors.primaryColor)),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        _scaffoldKey.currentState?.closeDrawer();
+                      },
+                      visualDensity:
+                          const VisualDensity(horizontal: 0, vertical: -3),
+                      title: const Text('Change Mobile Number'),
+                      leading: SizedBox(
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.perm_phone_msg_outlined,
+                              color: AppColors.primaryColor)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Divider(height: 1, color: Colors.grey.shade300),
                     ),
                     ListTile(
                       onTap: () {
@@ -221,7 +251,39 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child: Icon(Icons.location_pin,
+                          child: Icon(Icons.location_on_outlined,
+                              color: AppColors.primaryColor)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Divider(height: 1, color: Colors.grey.shade300),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        Utils.openLink(
+                            "https://svpfarms.in/privacy_policy.html");
+                      },
+                      visualDensity:
+                          const VisualDensity(horizontal: 0, vertical: -3),
+                      title: const Text('Privacy Policy'),
+                      leading: SizedBox(
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.privacy_tip_outlined,
+                              color: AppColors.primaryColor)),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        Utils.openLink(
+                            "https://svpfarms.in/privacy_policy.html");
+                      },
+                      visualDensity:
+                          const VisualDensity(horizontal: 0, vertical: -3),
+                      title: const Text('Delete Account'),
+                      leading: SizedBox(
+                          width: 23,
+                          height: 23,
+                          child: Icon(Icons.delete_outline,
                               color: AppColors.primaryColor)),
                     ),
                     ListTile(
@@ -234,8 +296,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                       leading: SizedBox(
                           width: 23,
                           height: 23,
-                          child:
-                              Icon(Icons.share, color: AppColors.primaryColor)),
+                          child: Icon(Icons.share_outlined,
+                              color: AppColors.primaryColor)),
                     ),
                     ListTile(
                       onTap: () {

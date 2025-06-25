@@ -1,4 +1,3 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/utils/loading_dialog_helper.dart';
@@ -11,6 +10,7 @@ import '../services/services.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_theme.dart';
+import 'image_preview_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -158,9 +158,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: CircleAvatar(
-                                radius: 40,
-                                backgroundImage: NetworkImage(userImage),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ImagePreviewScreen(
+                                            imageUrl: userImage),
+                                      ));
+                                },
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: NetworkImage(userImage),
+                                ),
                               ),
                             ),
                             Positioned(
@@ -605,8 +615,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     const SizedBox(height: 8),
                     SizedBox(
                       height: 135,
-                      child: getProfileRes!
-                              .apiResponse![0].addressDetails.isNotEmpty
+                      child: getProfileRes != null &&
+                              getProfileRes!.apiResponse != null &&
+                              getProfileRes!.apiResponse!.isNotEmpty &&
+                              getProfileRes!.apiResponse![0].addressDetails !=
+                                  null &&
+                              getProfileRes!
+                                  .apiResponse![0].addressDetails!.isNotEmpty
                           ? ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: getProfileRes!
@@ -670,8 +685,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                                 Icon(
                                                   Icons
                                                       .arrow_right_alt_outlined,
-                                                  color: AppColors
-                                                      .primaryColor,
+                                                  color: AppColors.primaryColor,
                                                 ),
                                               ],
                                             ),

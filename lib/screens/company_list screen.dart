@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/values/app_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
@@ -7,6 +8,7 @@ import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
+import 'image_preview_screen.dart';
 
 class CompanyListScreen extends StatefulWidget {
   const CompanyListScreen({super.key});
@@ -80,17 +82,40 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (company.attachmentInfo != null &&
-                                  company.attachmentInfo!.isNotEmpty)
-                                ClipRRect(
+                              GestureDetector(
+                                onTap: () {
+                                  if (company.attachmentLogoInfo![0]
+                                      .attachmentPath!.isNotEmpty) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ImagePreviewScreen(
+                                              imageUrl: company
+                                                  .attachmentLogoInfo![0]
+                                                  .attachmentPath!),
+                                        ));
+                                  }
+                                },
+                                child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    company.attachmentInfo![0].attachmentPath!,
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: company.attachmentLogoInfo != null &&
+                                          company.attachmentLogoInfo!.isNotEmpty
+                                      ? Image.network(
+                                          company.attachmentLogoInfo![0]
+                                              .attachmentPath!,
+                                          width: 70,
+                                          height: 70,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          AppIconsData
+                                              .noImage, // your fallback asset image
+                                          width: 70,
+                                          height: 70,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
+                              ),
                               SizedBox(width: 10),
                               Expanded(
                                 child: Column(
@@ -126,6 +151,9 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                                       ],
                                     ),
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      // Ensures top alignment
                                       children: [
                                         Icon(Icons.rice_bowl,
                                             color: AppColors.primaryColor,
@@ -133,15 +161,18 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                                         SizedBox(width: 5.0),
                                         if (company.supplyInfo != null &&
                                             company.supplyInfo!.isNotEmpty)
-                                          Text(
-                                            company.supplyInfo!
-                                                .map((e) =>
-                                                    e.supplytypeNameLanguage ??
-                                                    '')
-                                                .where(
-                                                    (name) => name.isNotEmpty)
-                                                .join(', '),
-                                          )
+                                          Expanded(
+                                            child: Text(
+                                              company.supplyInfo!
+                                                  .map((e) =>
+                                                      e.supplytypeNameLanguage ??
+                                                      '')
+                                                  .where(
+                                                      (name) => name.isNotEmpty)
+                                                  .join(', '),
+                                              softWrap: true,
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ],

@@ -55,6 +55,7 @@ class ApiResponse {
     this.supplyInfo,
     this.userBasicInfo,
     this.attachmentInfo,
+    this.attachmentLogoInfo,
     this.addressDetails,
   });
 
@@ -85,6 +86,12 @@ class ApiResponse {
         attachmentInfo?.add(AttachmentInfo.fromJson(v));
       });
     }
+    if (json['attachment_logo_info'] != null) {
+      attachmentLogoInfo = [];
+      json['attachment_logo_info'].forEach((v) {
+        attachmentLogoInfo?.add(AttachmentInfo.fromJson(v));
+      });
+    }
     if (json['address_details'] != null) {
       addressDetails = [];
       json['address_details'].forEach((v) {
@@ -104,6 +111,7 @@ class ApiResponse {
   List<SupplyInfo>? supplyInfo;
   List<UserBasicInfo>? userBasicInfo;
   List<AttachmentInfo>? attachmentInfo;
+  List<dynamic>? attachmentLogoInfo;
   List<AddressDetails>? addressDetails;
 
   Map<String, dynamic> toJson() {
@@ -124,6 +132,10 @@ class ApiResponse {
     }
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
+    }
+    if (attachmentLogoInfo != null) {
+      map['attachment_logo_info'] =
+          attachmentLogoInfo?.map((v) => v.toJson()).toList();
     }
     if (addressDetails != null) {
       map['address_details'] = addressDetails?.map((v) => v.toJson()).toList();
@@ -364,102 +376,6 @@ class LocationInfo {
     return map;
   }
 }
-
-/*class AttachmentInfo {
-  AttachmentInfo({
-    this.attachmentId,
-    this.attachmentReferenceCode,
-    this.attachmentReferenceUuid,
-    this.attachmentPath,
-    this.attachmentType,
-    this.attachmentName,
-    this.attachmentStatus,
-    this.attachmentCreatedon,
-  });
-
-  AttachmentInfo.fromJson(dynamic json) {
-    attachmentId = json['attachment_id'];
-    attachmentReferenceCode = json['attachment_reference_code'];
-    attachmentReferenceUuid = json['attachment_reference_uuid'];
-    attachmentPath = json['attachment_path'];
-    attachmentType = json['attachment_type'];
-    attachmentName = json['attachment_name'];
-    attachmentStatus = json['attachment_status'];
-    attachmentCreatedon = json['attachment_createdon'];
-  }
-
-  String? attachmentId;
-  String? attachmentReferenceCode;
-  String? attachmentReferenceUuid;
-  String? attachmentPath;
-  String? attachmentType;
-  String? attachmentName;
-  String? attachmentStatus;
-  String? attachmentCreatedon;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['attachment_id'] = attachmentId;
-    map['attachment_reference_code'] = attachmentReferenceCode;
-    map['attachment_reference_uuid'] = attachmentReferenceUuid;
-    map['attachment_path'] = attachmentPath;
-    map['attachment_type'] = attachmentType;
-    map['attachment_name'] = attachmentName;
-    map['attachment_status'] = attachmentStatus;
-    map['attachment_createdon'] = attachmentCreatedon;
-    return map;
-  }
-}
-
-class UserBasicInfo {
-  UserBasicInfo({
-    this.userId,
-    this.userUuid,
-    this.userFirstName,
-    this.userLastName,
-    this.userMobile,
-    this.userEmail,
-    this.userRoleType,
-    this.userWorkType,
-    this.userIsVerfied,
-  });
-
-  UserBasicInfo.fromJson(dynamic json) {
-    userId = json['user_id'];
-    userUuid = json['user_uuid'];
-    userFirstName = json['user_first_name'];
-    userLastName = json['user_last_name'];
-    userMobile = json['user_mobile'];
-    userEmail = json['user_email'];
-    userRoleType = json['user_role_type'];
-    userWorkType = json['user_work_type'];
-    userIsVerfied = json['user_is_verfied'];
-  }
-
-  String? userId;
-  String? userUuid;
-  String? userFirstName;
-  String? userLastName;
-  String? userMobile;
-  String? userEmail;
-  String? userRoleType;
-  String? userWorkType;
-  String? userIsVerfied;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['user_id'] = userId;
-    map['user_uuid'] = userUuid;
-    map['user_first_name'] = userFirstName;
-    map['user_last_name'] = userLastName;
-    map['user_mobile'] = userMobile;
-    map['user_email'] = userEmail;
-    map['user_role_type'] = userRoleType;
-    map['user_work_type'] = userWorkType;
-    map['user_is_verfied'] = userIsVerfied;
-    return map;
-  }
-}*/
 
 class SupplyInfo {
   SupplyInfo({

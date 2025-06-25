@@ -7,6 +7,7 @@ import 'package:hencafe/screens/chicken_price_screen.dart';
 import 'package:hencafe/screens/chicken_sell_create_screen.dart';
 import 'package:hencafe/screens/company_details_screen.dart';
 import 'package:hencafe/screens/company_list%20screen.dart';
+import 'package:hencafe/screens/contact_us_screen.dart';
 import 'package:hencafe/screens/create_address_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
@@ -219,6 +220,14 @@ class Routes {
             mobile: CreateAddressScreen(),
             tablet: CreateAddressScreen(),
             desktop: CreateAddressScreen(),
+          ),
+        );
+      case AppRoutes.contactUsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: ContactUsScreen(),
+            tablet: ContactUsScreen(),
+            desktop: ContactUsScreen(),
           ),
         );
       default:
