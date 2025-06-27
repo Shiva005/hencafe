@@ -41,7 +41,6 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
       referenceUUID = args['referenceUUID'] ?? '';
       pageType = args['pageType'] ?? '';
       addressID = args['addressID'] ?? '';
-      logger.w(referenceUUID);
       if (pageType == AppRoutes.myProfileScreen) {
         addressData =
             _fetchUserAddress(referenceFrom, referenceUUID, addressID);

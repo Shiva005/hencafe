@@ -38,7 +38,6 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       referenceUUID = args['companyUUID'] ?? '';
       companyPromotionStatus = args['companyUUID'] ?? '';
-      logger.w(referenceUUID);
       companyData = _fetchCompanyDetails(referenceUUID, companyPromotionStatus);
     }
   }
@@ -530,7 +529,6 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                     ),
                                     itemBuilder: (context, index) {
                                       final attachment = attachments[index];
-                                      logger.w(attachment);
                                       final path =
                                           attachment.attachmentPath ?? '';
                                       final attType =

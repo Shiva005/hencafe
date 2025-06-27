@@ -26,6 +26,7 @@ import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/contact_history_model.dart';
 import '../models/lifting_price_model.dart';
 import '../models/login_pin_check_model.dart';
 import '../utils/my_logger.dart';
@@ -590,8 +591,8 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    logger.d('TAG Create Sell Chick: $payload');
+    logger.d('TAG Create Sell Chick: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -641,8 +642,47 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    logger.d('TAG Create Lifting Sale: $payload');
+    logger.d('TAG Create Lifting Sale: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> createContactSupport(
+      BuildContext context,
+      String uuid,
+      String type,
+      String subject,
+      String details,
+      String email,
+      String mobile) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'uuid': uuid,
+      'type': type,
+      'subject': subject,
+      'details': details,
+      'email': email,
+      'mobile': mobile,
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+      'assigned_user_id': prefs.getString(AppStrings.prefUserID)!,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.CREATE_CONTACT_SUPPORT),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Create Support: $payload');
+    logger.d('TAG Create Support: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -694,8 +734,8 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    logger.d('TAG Update Lifting Sale: $payload');
+    logger.d('TAG Update Lifting Sale: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -749,8 +789,8 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    logger.d('TAG Update Sell Chick: $payload');
+    logger.d('TAG Update Sell Chick: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -801,8 +841,8 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
+    logger.d('TAG Create Sell Chicken: $payload');
+    logger.d('TAG Create Sell Chicken: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -881,6 +921,29 @@ class AuthServices {
     return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<ContactHistoryModel> getContactHistory(BuildContext context,
+      String communicationType, String communicationID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.w('TAG Get Contact History: ${jsonDecode(response.body)}');
+    logger.w(
+        'TAG Get Contact History: ${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID');
+    return ContactHistoryModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<BirdBreedModel> getBirdList(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
@@ -937,8 +1000,6 @@ class AuthServices {
     );
 
     logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
-    logger.d(
-        'TAG Get Company providers List: ${ServiceNames.GET_COMPANY_PROVIDERS_LIST}$companyUUID&&promotion_status=true');
     return CompanyProvidersModel.fromJson(jsonDecode(response.body));
   }
 
@@ -1072,6 +1133,26 @@ class AuthServices {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_ADDRESS}$addressUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> deleteContactRecord(
+      BuildContext context, String communicationUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_CONTACT_RECORD}$communicationUUID'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
