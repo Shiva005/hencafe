@@ -29,4 +29,6 @@ class AppRoutes {
   static const String imagePreviewScreen = 'image_preview_screen';
   static const String createAddressScreen = 'create_address_screen';
   static const String contactUsScreen = 'contact_us_screen';
+  static const String changePassword = 'changePassword';
+  static const String medicineScreen = 'medicine_screen';
 }

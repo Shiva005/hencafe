@@ -17,6 +17,7 @@ class AppIconsData {
   static const String hen = 'assets/icons/hen.png';
   static const String noImage = 'assets/icons/no_image.png';
   static const String whatsappOutline = 'assets/icons/whatsapp.png';
+  static const String medicine = 'assets/icons/medicine.png';
 
 
   /// gifs

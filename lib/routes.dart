@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/responsive_scaffold.dart';
 import 'package:hencafe/screens/addresss_details_screen.dart';
+import 'package:hencafe/screens/change_password_screen.dart';
 import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
@@ -17,6 +18,7 @@ import 'package:hencafe/screens/lifting_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
+import 'package:hencafe/screens/medicine_screen.dart';
 import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
@@ -228,6 +230,22 @@ class Routes {
             mobile: ContactUsScreen(),
             tablet: ContactUsScreen(),
             desktop: ContactUsScreen(),
+          ),
+        );
+      case AppRoutes.changePassword:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: ChangePasswordScreen(),
+            tablet: ChangePasswordScreen(),
+            desktop: ChangePasswordScreen(),
+          ),
+        );
+      case AppRoutes.medicineScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: MedicineScreen(),
+            tablet: MedicineScreen(),
+            desktop: MedicineScreen(),
           ),
         );
       default:

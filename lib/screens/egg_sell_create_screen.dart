@@ -109,7 +109,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   }
 
   Future<UserFavouriteStateModel> _fetchStates() async {
-    final favStateRes = await AuthServices().getFavouriteStateList(context,'');
+    final favStateRes = await AuthServices().getFavouriteStateList(context, '');
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
@@ -532,49 +532,30 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                   ),
                                   readOnly: true,
                                   onTap: () async {
+                                    DateTime? startDate;
+                                    try {
+                                      startDate = DateFormat('yyyy-MM-dd')
+                                          .parse(startDateController.text);
+                                    } catch (e) {
+                                      startDate = DateTime
+                                          .now(); // fallback if parsing fails
+                                    }
                                     DateTime? pickedDate = await showDatePicker(
                                       context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime(2040),
+                                      initialDate:
+                                          startDate.add(Duration(days: 0)),
+                                      // ensure it's after start date
+                                      firstDate:
+                                          startDate.add(Duration(days: 0)),
+                                      // user must pick after start date
+                                      lastDate:
+                                          startDate.add(Duration(days: 14)),
                                     );
-
-                                    if (pickedDate != null) {
-                                      if (startDateController.text.isNotEmpty) {
-                                        DateTime? startDate = DateTime.tryParse(
-                                            startDateController.text);
-                                        if (startDate != null) {
-                                          int diff = pickedDate
-                                              .difference(startDate)
-                                              .inDays;
-                                          if (diff > 7) {
-                                            AwesomeDialog(
-                                              context: context,
-                                              animType: AnimType.bottomSlide,
-                                              dialogType: DialogType.warning,
-                                              dialogBackgroundColor:
-                                                  Colors.white,
-                                              titleTextStyle:
-                                                  AppTheme.appBarText,
-                                              title:
-                                                  'You can only select up to 7 days from the start date.',
-                                              btnOkOnPress: () {},
-                                              btnOkText: 'OK',
-                                              btnOkColor:
-                                                  Colors.yellow.shade700,
-                                            ).show();
-                                            endDateController.text = "";
-                                            return;
-                                          }
-                                        }
-                                      }
-
-                                      String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
-                                      setState(() => endDateController.text =
-                                          formattedDate);
-                                    }
+                                    String formattedDate =
+                                        DateFormat('yyyy-MM-dd')
+                                            .format(pickedDate!);
+                                    setState(() =>
+                                        endDateController.text = formattedDate);
                                   },
                                 ),
                               ),

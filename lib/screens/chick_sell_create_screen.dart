@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
-import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
@@ -114,7 +113,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
   }
 
   Future<UserFavouriteStateModel> _fetchStates() async {
-    final favStateRes = await AuthServices().getFavouriteStateList(context,'');
+    final favStateRes = await AuthServices().getFavouriteStateList(context, '');
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
@@ -211,7 +210,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
                           child: Column(
                             children: [
                               Text(
@@ -235,8 +235,12 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                   setModalState(() {
                                     filteredData = Map.fromEntries(
                                       allData.entries.where((entry) =>
-                                      entry.key.toLowerCase().contains(query.toLowerCase()) ||
-                                          entry.value.toLowerCase().contains(query.toLowerCase())),
+                                          entry.key
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase()) ||
+                                          entry.value
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase())),
                                     );
                                   });
                                 },
@@ -248,38 +252,42 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                           height: MediaQuery.of(context).size.height * 0.5,
                           child: filteredData.isNotEmpty
                               ? ListView.builder(
-                            shrinkWrap: true,
-                            physics: const ClampingScrollPhysics(),
-                            itemCount: filteredData.length,
-                            itemBuilder: (context, index) {
-                              final key = filteredData.keys.elementAt(index);
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    title: Text(
-                                      key,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    onTap: () {
-                                      controller.text = key;
-                                      Navigator.pop(context);
-                                      if (title == "State") {
-                                        cityList.clear();
-                                        cityController.text = "";
-                                        getCityData(statelist[key].toString());
-                                      } else if (title == "City") {
-                                        selectedCityID = cityList[key].toString();
-                                      }
-                                    },
-                                  ),
-                                  Divider(
-                                    color: Colors.grey.shade200,
-                                    height: 2,
-                                  ),
-                                ],
-                              );
-                            },
-                          )
+                                  shrinkWrap: true,
+                                  physics: const ClampingScrollPhysics(),
+                                  itemCount: filteredData.length,
+                                  itemBuilder: (context, index) {
+                                    final key =
+                                        filteredData.keys.elementAt(index);
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          title: Text(
+                                            key,
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                          onTap: () {
+                                            controller.text = key;
+                                            Navigator.pop(context);
+                                            if (title == "State") {
+                                              cityList.clear();
+                                              cityController.text = "";
+                                              getCityData(
+                                                  statelist[key].toString());
+                                            } else if (title == "City") {
+                                              selectedCityID =
+                                                  cityList[key].toString();
+                                            }
+                                          },
+                                        ),
+                                        Divider(
+                                          color: Colors.grey.shade200,
+                                          height: 2,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
                               : const Center(child: Text("No results found.")),
                         ),
                         Padding(
@@ -300,8 +308,6 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -534,78 +540,59 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               height: 70.0,
                               child: GestureDetector(
                                 child: TextFormField(
-                                  style: TextStyle(color: Colors.black),
-                                  controller: endDateController,
-                                  decoration: InputDecoration(
-                                    labelStyle: TextStyle(color: Colors.grey),
-                                    prefixIcon: Icon(Icons.calendar_month),
-                                    iconColor: Colors.white,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    labelText: "End Date",
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.grey.shade400),
-                                      borderRadius: BorderRadius.circular(10),
+                                    style: TextStyle(color: Colors.black),
+                                    controller: endDateController,
+                                    decoration: InputDecoration(
+                                      labelStyle: TextStyle(color: Colors.grey),
+                                      prefixIcon: Icon(Icons.calendar_month),
+                                      iconColor: Colors.white,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      labelText: "End Date",
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade400),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade400),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.green.shade200),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.grey.shade400),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.green.shade200),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  readOnly: true,
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime(2040),
-                                    );
-
-                                    if (pickedDate != null) {
-                                      if (startDateController.text.isNotEmpty) {
-                                        DateTime? startDate = DateTime.tryParse(
-                                            startDateController.text);
-                                        if (startDate != null) {
-                                          int diff = pickedDate
-                                              .difference(startDate)
-                                              .inDays;
-                                          if (diff > 7) {
-                                            AwesomeDialog(
-                                              context: context,
-                                              animType: AnimType.bottomSlide,
-                                              dialogType: DialogType.warning,
-                                              dialogBackgroundColor:
-                                                  Colors.white,
-                                              titleTextStyle:
-                                                  AppTheme.appBarText,
-                                              title:
-                                                  'You can only select up to 7 days from the start date.',
-                                              btnOkOnPress: () {},
-                                              btnOkText: 'OK',
-                                              btnOkColor:
-                                                  Colors.yellow.shade700,
-                                            ).show();
-                                            endDateController.text = "";
-                                            return;
-                                          }
-                                        }
+                                    readOnly: true,
+                                    onTap: () async {
+                                      DateTime? startDate;
+                                      try {
+                                        startDate = DateFormat('yyyy-MM-dd')
+                                            .parse(startDateController.text);
+                                      } catch (e) {
+                                        startDate = DateTime
+                                            .now(); // fallback if parsing fails
                                       }
-
+                                      DateTime? pickedDate =
+                                          await showDatePicker(
+                                        context: context,
+                                        initialDate:
+                                            startDate.add(Duration(days: 0)),
+                                        // ensure it's after start date
+                                        firstDate:
+                                            startDate.add(Duration(days: 0)),
+                                        // user must pick after start date
+                                        lastDate:
+                                            startDate.add(Duration(days: 14)),
+                                      );
                                       String formattedDate =
                                           DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
+                                              .format(pickedDate!);
                                       setState(() => endDateController.text =
                                           formattedDate);
-                                    }
-                                  },
-                                ),
+                                    }),
                               ),
                             ),
                           ),

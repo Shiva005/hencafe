@@ -71,10 +71,12 @@ class _HomeFragment2State extends State<HomeFragment2>
                         AppIconsData.colorCompanies, "Companies")),
                 SizedBox(width: 20),
                 Expanded(
-                    child: _buildDashboardCard(
-                        AppIconsData.colorContact, "Contact Us")),
+                    child:
+                        _buildDashboardCard(AppIconsData.medicine, "FAQ's")),
               ],
             ),
+            SizedBox(height: 20),
+            _buildDashboardCard(AppIconsData.colorContact, "Contact Us"),
           ],
         ),
       ),
@@ -198,6 +200,10 @@ class _HomeFragment2State extends State<HomeFragment2>
             } else if (label == 'Companies') {
               NavigationHelper.pushNamed(
                 AppRoutes.companyListScreen,
+              );
+            } else if (label == 'FAQ\'s') {
+              NavigationHelper.pushNamed(
+                AppRoutes.medicineScreen,
               );
             } else if (label == 'Contact Us') {
               NavigationHelper.pushNamed(

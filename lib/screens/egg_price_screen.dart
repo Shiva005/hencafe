@@ -56,7 +56,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   }
 
   Future<void> getFavouriteStateData() async {
-    final res = await AuthServices().getFavouriteStateList(context,'');
+    final res = await AuthServices().getFavouriteStateList(context, '');
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!

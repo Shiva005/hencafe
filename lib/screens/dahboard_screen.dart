@@ -198,6 +198,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ListTile(
                       onTap: () {
                         _scaffoldKey.currentState?.closeDrawer();
+                        NavigationHelper.pushNamed(
+                          AppRoutes.changePassword,
+                        );
                       },
                       visualDensity:
                           const VisualDensity(horizontal: 0, vertical: -3),

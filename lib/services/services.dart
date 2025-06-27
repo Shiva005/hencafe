@@ -13,6 +13,7 @@ import 'package:hencafe/models/company_providers_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
+import 'package:hencafe/models/medicine_mode.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
 import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/registration_check_model.dart';
@@ -235,6 +236,38 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> updatePassword(
+    BuildContext context,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'old_password': oldPassword,
+      'new_password': newPassword,
+      'user_id': prefs.getString(AppStrings.prefUserID),
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID),
+    };
+
+    final response = await http.put(
+      Uri.parse(
+          '${ServiceNames.CHANGE_PASSWORD}${prefs.getString(AppStrings.prefUserID)}/change-password'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Update Details: $payload');
+    logger.d('TAG Update Details: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<ProfileModel> getProfile(
       BuildContext context, String thirdPartUserID) async {
     var prefs = await SharedPreferences.getInstance();
@@ -288,6 +321,7 @@ class AuthServices {
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
       },
       body: jsonEncode(payload),
     );
@@ -906,6 +940,26 @@ class AuthServices {
     logger.d(
         'TAG Get Company providers List: ${ServiceNames.GET_COMPANY_PROVIDERS_LIST}$companyUUID&&promotion_status=true');
     return CompanyProvidersModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<MedicineModel> getMedicine(
+      BuildContext context, String medicineID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse('${ServiceNames.GET_MEDICINE}$medicineID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
+    return MedicineModel.fromJson(jsonDecode(response.body));
   }
 
   Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
