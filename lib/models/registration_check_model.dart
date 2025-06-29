@@ -49,7 +49,6 @@ class ApiResponse {
     this.registrationStatus,
     this.responseCode,
     this.responseDetails,
-    this.responseDetailsLanguage,
     this.responseLogs,
   });
 
@@ -57,14 +56,12 @@ class ApiResponse {
     registrationStatus = json['response_status'];
     responseCode = json['response_code'];
     responseDetails = json['response_details'];
-    responseDetailsLanguage = json['response_details_language'];
     responseLogs = json['response_logs'];
   }
 
   bool? registrationStatus;
   String? responseCode;
   String? responseDetails;
-  String? responseDetailsLanguage;
   String? responseLogs;
 
   Map<String, dynamic> toJson() {
@@ -72,7 +69,6 @@ class ApiResponse {
     map['response_status'] = registrationStatus;
     map['response_code'] = responseCode;
     map['response_details'] = responseDetails;
-    map['response_details_language'] = responseDetailsLanguage;
     map['response_logs'] = responseLogs;
     return map;
   }

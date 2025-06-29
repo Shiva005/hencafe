@@ -43,6 +43,7 @@ class _HomeFragmentState extends State<HomeFragment> {
               Expanded(child: _buildDashboardCard(Icons.phone, "Contact")),
             ],
           ),
+
         ],
       ),
     );

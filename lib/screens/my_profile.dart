@@ -570,43 +570,40 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         Text("Saved Addresses",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              border: Border.all(color: AppColors.primaryColor),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                NavigationHelper.pushNamed(
-                                    AppRoutes.createAddressScreen,
-                                    arguments: {
-                                      'pageType': AppRoutes.createAddressScreen
-                                    })?.then((value) {
-                                  loadProfile();
-                                  favStateList.clear();
-                                  suppliesList.clear();
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Add Address',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 13),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Icon(
-                                    Icons.add_circle_outline,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            border: Border.all(color: AppColors.primaryColor),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              NavigationHelper.pushNamed(
+                                  AppRoutes.createAddressScreen,
+                                  arguments: {
+                                    'pageType': AppRoutes.createAddressScreen
+                                  })?.then((value) {
+                                loadProfile();
+                                favStateList.clear();
+                                suppliesList.clear();
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Add Address',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 13),
+                                ),
+                                SizedBox(width: 5),
+                                Icon(
+                                  Icons.add_circle_outline,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ],
                             ),
                           ),
                         ),

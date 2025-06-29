@@ -214,6 +214,8 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
                             descTextStyle: AppTheme.appBarText,
                             btnOkOnPress: () {
                               NavigationHelper.pop(context);
+                              prefs.setBool(
+                                  AppStrings.prefIsFavStateSelected, true);
                             },
                             btnOkText: 'OK',
                             btnOkColor: Colors.greenAccent.shade700,

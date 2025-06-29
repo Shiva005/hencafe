@@ -58,12 +58,26 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^5.0.0
+  package_rename: ^1.5.3
+  change_app_package_name: ^1.1.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icons/logo.png"
+  image_path: "assets/icons/svpf_logo.png"
   min_sdk_android: 21
+
+package_rename_config:
+  android:
+    app_name: Hen Cafe
+    package_name: com.svpfarms.hencafe
+    override_old_package:
+    lang: java
+
+  ios:
+    app_name: Hen Cafe
+    bundle_name:
+    package_name:
 
 flutter:
   uses-material-design: true

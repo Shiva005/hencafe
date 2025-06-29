@@ -67,6 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
     }
     if (getProfileRes.apiResponse![0].userFavouriteStateInfo!.isEmpty) {
+      prefs.setBool(AppStrings.prefIsFavStateSelected, false);
       NavigationHelper.pushNamed(
         AppRoutes.stateSelection,
       );

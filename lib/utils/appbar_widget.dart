@@ -1,9 +1,11 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../values/app_colors.dart';
+import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 
 class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -29,49 +31,65 @@ class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _MyAppBarState extends State<MyAppBar> {
   var availPoints;
-  var prfs;
+  var prefs;
+  bool isFavStateSelected = false;
 
   @override
   void initState() {
     super.initState();
+    getFavStateSelected();
+  }
+
+  Future<void> getFavStateSelected() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isFavStateSelected =
+          prefs!.getBool(AppStrings.prefIsFavStateSelected) ?? false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: true,
-      backgroundColor: AppColors.primaryColor,
-      elevation: 1.0,
-      leading: IconButton(
-        onPressed: () {
-          NavigationHelper.pop();
-        },
-        icon: const Icon(
-          Icons.keyboard_backspace,
-          color: Colors.white,
+    return WillPopScope(
+      onWillPop: () async => isFavStateSelected,
+      child: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: AppColors.primaryColor,
+        elevation: 1.0,
+        leading: Visibility(
+          visible: isFavStateSelected,
+          child: IconButton(
+            onPressed: () {
+              NavigationHelper.pop();
+            },
+            icon: Icon(
+              Icons.keyboard_backspace,
+              color: Colors.white,
+            ),
+          ),
         ),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20),
+          ),
         ),
-      ),
-      centerTitle: widget.centerTitle,
-      title: widget.centerTitle == false
-          ? Align(
-              alignment: Localizations.localeOf(context) == const Locale('ar')
-                  ? const Alignment(1.5, 0)
-                  : const Alignment(-1.1, 0),
-              child: Text(
+        centerTitle: widget.centerTitle,
+        title: widget.centerTitle == false
+            ? Align(
+                alignment: Localizations.localeOf(context) == const Locale('ar')
+                    ? const Alignment(1.5, 0)
+                    : const Alignment(-1.1, 0),
+                child: Text(
+                  widget.title.toString(),
+                  style: AppTheme.textFormFieldTitle,
+                  maxLines: 1,
+                ))
+            : Text(
                 widget.title.toString(),
                 style: AppTheme.textFormFieldTitle,
                 maxLines: 1,
-              ))
-          : Text(
-              widget.title.toString(),
-              style: AppTheme.textFormFieldTitle,
-              maxLines: 1,
-            ),
+              ),
+      ),
     );
   }
 }

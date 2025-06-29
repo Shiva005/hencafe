@@ -1,6 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/values/app_constants.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/app_text_form_field.dart';
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
@@ -298,7 +298,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                       dialogBackgroundColor: Colors.white,
                                       title: registrationCheckRes
                                           .apiResponse![0]
-                                          .responseDetailsLanguage,
+                                          .responseDetails,
                                       titleTextStyle: AppTheme.appBarText,
                                       descTextStyle: AppTheme.appBarText,
                                       btnOkOnPress: () {
@@ -346,10 +346,10 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
           Column(
             children: [
               TextButton(
-                child: Text('Privacy Policy', style: AppTheme.linkText),
+                child: Text(AppStrings.privacyPolicy,
+                    style: TextStyle(color: AppColors.primaryColor)),
                 onPressed: () {
-                  SnackbarHelper.openUrl(
-                      "https://pub.dev/packages/awesome_dialog");
+                  Utils.openLink(AppStrings.privacyPolicyLink);
                 },
               ),
               Row(

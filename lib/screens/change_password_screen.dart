@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +11,7 @@ import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
+import '../values/app_theme.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -203,33 +205,50 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   .apiResponse![0].responseStatus ==
                               true) {
                             LoadingDialogHelper.dismissLoadingDialog(context);
-                            var mb =
-                                prefs.getString(AppStrings.prefMobileNumber);
-                            var language =
-                                prefs.getString(AppStrings.prefLanguage);
-                            var countryCode =
-                                prefs.getString(AppStrings.prefCountryCode);
-                            var sessionID =
-                                prefs.getString(AppStrings.prefSessionID);
-                            prefs.clear();
-                            prefs.setString(AppStrings.prefLanguage, language);
-                            prefs.setString(AppStrings.prefMobileNumber, mb);
-                            prefs.setString(
-                                AppStrings.prefCountryCode, countryCode);
-                            prefs.setString(
-                                AppStrings.prefSessionID, sessionID);
-                            NavigationHelper.pushReplacementNamedUntil(
-                              AppRoutes.loginPin,
-                              arguments: {
-                                'mobileNumber': prefs
-                                    .getString(AppStrings.prefMobileNumber),
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.bottomSlide,
+                              dialogType: DialogType.success,
+                              dialogBackgroundColor: Colors.white,
+                              titleTextStyle: AppTheme.appBarText,
+                              dismissOnTouchOutside: false,
+                              dismissOnBackKeyPress: false,
+                              title: updatePasswordRes
+                                  .apiResponse![0].responseDetails!,
+                              btnOkOnPress: () async {
+                                var mb = prefs
+                                    .getString(AppStrings.prefMobileNumber);
+                                var language =
+                                    prefs.getString(AppStrings.prefLanguage);
+                                var countryCode =
+                                    prefs.getString(AppStrings.prefCountryCode);
+                                var sessionID =
+                                    prefs.getString(AppStrings.prefSessionID);
+                                prefs.clear();
+                                prefs.setString(
+                                    AppStrings.prefLanguage, language);
+                                prefs.setString(
+                                    AppStrings.prefMobileNumber, mb);
+                                prefs.setString(
+                                    AppStrings.prefCountryCode, countryCode);
+                                prefs.setString(
+                                    AppStrings.prefSessionID, sessionID);
+                                NavigationHelper.pushReplacementNamedUntil(
+                                  AppRoutes.loginPin,
+                                  arguments: {
+                                    'mobileNumber': prefs
+                                        .getString(AppStrings.prefMobileNumber),
+                                  },
+                                );
                               },
-                            );
+                              btnOkText: 'OK',
+                              btnOkColor: Colors.greenAccent.shade700,
+                            ).show();
                           } else {
                             LoadingDialogHelper.dismissLoadingDialog(context);
+                            SnackbarHelper.showSnackBar(updatePasswordRes
+                                .apiResponse![0].responseDetails!);
                           }
-                          SnackbarHelper.showSnackBar(updatePasswordRes
-                              .apiResponse![0].responseDetails!);
                         }
                       },
                       child: const Text(

@@ -37,13 +37,4 @@ class SnackbarHelper {
       throw 'Could not launch $url';
     }
   }
-
-  static Future<void> openUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
 }

@@ -81,9 +81,9 @@ class _ContactHistoryPageState extends State<ContactHistoryPage> {
   }
 
   Future<void> fetchContactHistory() async {
+    setState(() => isLoading = true);
     final contactData =
         await AuthServices().getContactHistory(context, "CON", "");
-
     setState(() {
       complaintList = contactData.apiResponse ?? [];
       isLoading = false;
@@ -105,148 +105,138 @@ class _ContactHistoryPageState extends State<ContactHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return complaintList.isEmpty
-        ? const Center(child: CircularProgressIndicator())
-        : RefreshIndicator(
-            onRefresh: () {
-              return fetchContactHistory();
-            },
-            child: ListView.builder(
-              itemCount: complaintList.length,
-              itemBuilder: (context, index) {
-                final item = complaintList[index];
-                final statusValue = item.status?.value ?? "Unknown";
-                final statusCode = item.status?.code ?? "Unknown";
-                final statusColor = _getStatusColor(statusCode);
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (complaintList.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
 
-                return Dismissible(
-                  key: Key(item.id ?? index.toString()),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red),
-                    ),
-                    padding:
-                        const EdgeInsets.only(right: 40), // space from the left
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(Icons.delete_forever, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                  confirmDismiss: (direction) async {
-                    return await AwesomeDialog(
-                      context: context,
-                      animType: AnimType.bottomSlide,
-                      dialogType: DialogType.warning,
-                      dialogBackgroundColor: Colors.white,
-                      titleTextStyle: AppTheme.appBarText,
-                      title: 'Are you sure you want to delete this record?',
-                      btnCancelOnPress: () {},
-                      btnCancelText: 'Cancel',
-                      btnOkOnPress: () async {
-                        var deleteRecordRes =
-                            await AuthServices().deleteContactRecord(
-                          context,
-                          item.uuid.toString(),
-                        );
-                        if (deleteRecordRes.apiResponse![0].responseStatus ==
-                            true) {
-                          setState(() {
-                            complaintList.removeAt(index);
-                          });
-                        }
-                        SnackbarHelper.showSnackBar(
-                            deleteRecordRes.apiResponse![0].responseDetails);
-                      },
-                      btnOkText: 'Yes',
-                      btnOkColor: Colors.yellow.shade700,
-                    ).show();
-                  },
-                  onDismissed: (direction) {
+    return RefreshIndicator(
+      onRefresh: fetchContactHistory,
+      child: ListView.builder(
+        itemCount: complaintList.length,
+        itemBuilder: (context, index) {
+          final item = complaintList[index];
+          final statusValue = item.status?.value ?? "Unknown";
+          final statusCode = item.status?.code ?? "Unknown";
+          final statusColor = _getStatusColor(statusCode);
+
+          return Dismissible(
+            key: Key(item.id ?? index.toString()),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red),
+              ),
+              padding: const EdgeInsets.only(right: 40),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.delete_forever, color: Colors.white),
+                ],
+              ),
+            ),
+            confirmDismiss: (direction) async {
+              return await AwesomeDialog(
+                context: context,
+                animType: AnimType.bottomSlide,
+                dialogType: DialogType.warning,
+                dialogBackgroundColor: Colors.white,
+                titleTextStyle: AppTheme.appBarText,
+                title: 'Are you sure you want to delete this record?',
+                btnCancelOnPress: () {},
+                btnCancelText: 'Cancel',
+                btnOkOnPress: () async {
+                  var deleteRecordRes =
+                      await AuthServices().deleteContactRecord(
+                    context,
+                    item.uuid.toString(),
+                  );
+                  if (deleteRecordRes.apiResponse![0].responseStatus == true) {
                     setState(() {
-                      complaintList.removeAt(index);
+                      complaintList.removeAt(index); // ✅ REMOVE FROM STATE
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Item deleted")),
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("ID: #${item.id ?? ''}",
-                                  style: TextStyle(
-                                      color: Colors.grey.shade700,
-                                      fontSize: 13)),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: statusColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                statusValue,
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 12),
-                              ),
-                            )
-                          ],
+                  }
+                  SnackbarHelper.showSnackBar(
+                      deleteRecordRes.apiResponse![0].responseDetails);
+                },
+                btnOkText: 'Yes',
+                btnOkColor: Colors.yellow.shade700,
+              ).show();
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text("ID: #${item.id ?? ''}",
+                            style: TextStyle(
+                                color: Colors.grey.shade700, fontSize: 13)),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          item.subjectLanguage ?? "No Subject",
+                        child: Text(
+                          statusValue,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                              color: Colors.white, fontSize: 12),
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          item.detailsLanguage ?? "No Details",
-                          style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        ),
-                        const SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Updated: ${Utils.threeLetterDateFormatted(item.updatedOn.toString()).substring(0, 10)}",
-                              style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 13),
-                            ),
-                            Text(
-                              "Created: ${Utils.threeLetterDateFormatted(item.createdOn.toString()).substring(0, 10)}",
-                              style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 13),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                );
-              },
+                  const SizedBox(height: 3),
+                  Text(
+                    item.subjectLanguage ?? "No Subject",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    item.detailsLanguage ?? "No Details",
+                    style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Updated: ${Utils.threeLetterDateFormatted(item.updatedOn.toString()).substring(0, 10)}",
+                        style: TextStyle(
+                            color: Colors.grey.shade600, fontSize: 13),
+                      ),
+                      Text(
+                        "Created: ${Utils.threeLetterDateFormatted(item.createdOn.toString()).substring(0, 10)}",
+                        style: TextStyle(
+                            color: Colors.grey.shade600, fontSize: 13),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
           );
+        },
+      ),
+    );
   }
 }
 

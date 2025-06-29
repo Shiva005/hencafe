@@ -82,8 +82,13 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                   SizedBox(width: 10),
                   const Text(
-                    'HenCafe',
-                    style: AppTheme.rejectedTitle,
+                    AppStrings.appName,
+                    style: TextStyle(
+                      color: Colors.red,
+                      letterSpacing: 0.3,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),

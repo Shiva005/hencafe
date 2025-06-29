@@ -1,7 +1,7 @@
 class AppStrings {
   const AppStrings._();
 
-  static const String appName = 'Hencafe';
+  static const String appName = 'Hen Cafe';
   static const String uhOhPageNotFound = 'Sorry!\nPage not found';
   static const String register = 'Register';
   static const String login = 'Login';
@@ -25,6 +25,8 @@ class AppStrings {
   static const String otp = 'OTP';
   static const String verify = 'Verify';
   static const String forgetPin = 'Forget Pin?';
+  static const String privacyPolicy = 'Privacy Policy';
+  static const String privacyPolicyLink = 'https://svpfarms.in/privacy_policy.html';
 
   ///Headers
   static const String createAccount = 'Create Account';
@@ -55,4 +57,5 @@ class AppStrings {
   static const String prefFavStateMaxCount = 'fav_state_max_count';
   static const String prefIsUserVerified = 'is_user_verified';
   static const String prefSessionID = 'session_id';
+  static const String prefIsFavStateSelected = 'is_fav_state_selected';
 }
