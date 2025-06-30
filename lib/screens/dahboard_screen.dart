@@ -88,7 +88,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           elevation: 1.0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
+              bottom: Radius.circular(18),
             ),
           ),
           title: Text(
@@ -113,7 +113,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Icons.notifications_active_outlined,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () {
+                NavigationHelper.pushNamed(
+                  AppRoutes.notificationsScreen,
+                );
+              },
             ),
           ],
         ),
@@ -128,193 +132,231 @@ class _DashboardScreenState extends State<DashboardScreen>
               children: [
                 Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 40.0),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(
-                                prefs.getString(AppStrings.prefUserImage) ??
-                                    ''),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 15.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}',
-                                  style: AppTheme.primaryColorTExtStyle,
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  prefs.getString(AppStrings.prefMobileNumber),
-                                  style: AppTheme.secondaryHeadingDrawer,
-                                ),
-                              ],
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.blueGrey.shade100),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(18),
+                          bottomRight: Radius.circular(18),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 30.0, left: 10, right: 10, bottom: 15),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(
+                                  prefs.getString(AppStrings.prefUserImage) ??
+                                      ''),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}',
+                                    style: AppTheme.primaryColorTExtStyle,
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    prefs
+                                        .getString(AppStrings.prefMobileNumber),
+                                    style: AppTheme.secondaryHeadingDrawer,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.blueGrey.shade100),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Home'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.home_outlined,
+                                  color: AppColors.primaryColor,
+                                )),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                              NavigationHelper.pushNamed(
+                                AppRoutes.myProfileScreen,
+                                arguments: {
+                                  'pageType': AppRoutes.dashboardScreen,
+                                },
+                              );
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('My Profile'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.person_outlined,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                              NavigationHelper.pushNamed(
+                                AppRoutes.changePassword,
+                              );
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Change Password'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.lock_open,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Change Mobile Number'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.perm_phone_msg_outlined,
+                                    color: AppColors.primaryColor)),
                           ),
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20.0, horizontal: 10.0),
-                      child: Divider(height: 1, color: Colors.grey.shade300),
+                    SizedBox(height: 5),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.blueGrey.shade100),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Change Language'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.language,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                              NavigationHelper.pushNamed(
+                                AppRoutes.stateSelection,
+                              );
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Favourite States'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.location_on_outlined,
+                                    color: AppColors.primaryColor)),
+                          ),
+                        ],
+                      ),
                     ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Home'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(
-                            Icons.home_outlined,
-                            color: AppColors.primaryColor,
-                          )),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                        NavigationHelper.pushNamed(
-                          AppRoutes.myProfileScreen,
-                        );
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('My Profile'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.person_outlined,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                        NavigationHelper.pushNamed(
-                          AppRoutes.changePassword,
-                        );
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Change Password'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.lock_open,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Change Mobile Number'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.perm_phone_msg_outlined,
-                              color: AppColors.primaryColor)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Divider(height: 1, color: Colors.grey.shade300),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Change Language'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.language,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                        NavigationHelper.pushNamed(
-                          AppRoutes.stateSelection,
-                        );
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Favourite States'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.location_on_outlined,
-                              color: AppColors.primaryColor)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Divider(height: 1, color: Colors.grey.shade300),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        Utils.openLink(
-                            "https://svpfarms.in/privacy_policy.html");
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Privacy Policy'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.privacy_tip_outlined,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        Utils.openLink(
-                            "https://svpfarms.in/privacy_policy.html");
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Delete Account'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.delete_outline,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Share App'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.share_outlined,
-                              color: AppColors.primaryColor)),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                      },
-                      visualDensity:
-                          const VisualDensity(horizontal: 0, vertical: -3),
-                      title: const Text('Rate App'),
-                      leading: SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: Icon(Icons.star_purple500,
-                              color: AppColors.primaryColor)),
+                    SizedBox(height: 5),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.blueGrey.shade100),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            onTap: () {
+                              Utils.openLink(
+                                  "https://svpfarms.in/privacy_policy.html");
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Privacy Policy'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.privacy_tip_outlined,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              Utils.openLink(
+                                  "https://svpfarms.in/privacy_policy.html");
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Delete Account'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.delete_outline,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Share App'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.share_outlined,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Rate App'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.star_purple500,
+                                    color: AppColors.primaryColor)),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -373,7 +415,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       builder: (BuildContext context) {
         return Dialog(
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           backgroundColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(20.0),

@@ -7,8 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/navigation_helper.dart';
 import '../models/supplies_model.dart';
 import '../services/services.dart';
+import '../utils/my_logger.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
+import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 import 'image_preview_screen.dart';
 
@@ -41,12 +43,36 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   List<ApiResponse> _allSupplies = [];
   List<ApiResponse> _filteredSupplies = [];
   List<String> _selectedSupplyIDs = [];
+  String pageType = '';
+  String userID = '';
+  bool _isInit = true;
 
   @override
-  void initState() {
-    loadProfile();
-    _fetchSupplies();
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+      pageType = args['pageType'] ?? '';
+
+      SharedPreferences.getInstance().then((sharedPrefs) {
+        prefs = sharedPrefs;
+
+        if (pageType == AppRoutes.dashboardScreen) {
+          userID = prefs.getString(AppStrings.prefUserID) ?? '';
+        } else if (pageType == AppRoutes.saleDetailsScreen) {
+          userID = args['userID'] ?? '';
+
+          logger.w(userID);
+        }
+
+        loadProfile();
+        _fetchSupplies();
+      });
+
+      _isInit = false;
+    }
   }
 
   Future<List<ApiResponse>> _fetchSupplies() async {
@@ -65,7 +91,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
     LoadingDialogHelper.showLoadingDialog(context);
-    getProfileRes = await AuthServices().getProfile(context, '');
+    getProfileRes = await AuthServices().getProfile(context, userID);
     getSuppliesRes = await AuthServices().getSupplies(context);
     if (getProfileRes.errorCount == 0) {
       LoadingDialogHelper.dismissLoadingDialog(context);
@@ -135,7 +161,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
           ),
           title: Text(
-            "My Profile",
+            userID == prefs.getString(AppStrings.prefUserID)
+                ? "My Profile"
+                : "Seller Details",
             style: AppTheme.primaryHeadingDrawer,
           ),
           centerTitle: false,
@@ -198,13 +226,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                               fontSize: 12.0),
                         ),
                         SizedBox(height: 5),
-                        Text(
-                          'Change Photo',
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            decoration: TextDecoration.underline,
-                          ),
-                        )
+                        if (userID == prefs.getString(AppStrings.prefUserID))
+                          Text(
+                            'Change Photo',
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              decoration: TextDecoration.underline,
+                            ),
+                          )
                       ],
                     ),
                     const SizedBox(width: 10),
@@ -254,25 +283,28 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    NavigationHelper.pushNamed(
-                                        AppRoutes.registerBasicDetails,
-                                        arguments: {
-                                          'pageType': AppRoutes.myProfileScreen,
-                                          'mobileNumber': phone,
-                                          'profileModel':
-                                              getProfileRes.apiResponse![0],
-                                        })?.then((value) {
-                                      loadProfile();
-                                      favStateList.clear();
-                                      suppliesList.clear();
-                                    });
-                                  }),
+                              if (userID ==
+                                  prefs.getString(AppStrings.prefUserID))
+                                IconButton(
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    onPressed: () {
+                                      NavigationHelper.pushNamed(
+                                          AppRoutes.registerBasicDetails,
+                                          arguments: {
+                                            'pageType':
+                                                AppRoutes.myProfileScreen,
+                                            'mobileNumber': phone,
+                                            'profileModel':
+                                                getProfileRes.apiResponse![0],
+                                          })?.then((value) {
+                                        loadProfile();
+                                        favStateList.clear();
+                                        suppliesList.clear();
+                                      });
+                                    }),
                             ],
                           ),
                           Row(
@@ -326,8 +358,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ],
                 ),
               ),
-
+              if (userID == prefs.getString(AppStrings.prefUserID))
               const SizedBox(height: 10),
+              if (userID == prefs.getString(AppStrings.prefUserID))
               _card(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
@@ -342,6 +375,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           loadProfile();
                         });
                       }),
+                      SizedBox(height: 7),
                       SizedBox(
                         height: 25,
                         child: ListView.builder(
@@ -359,7 +393,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                 ),
               ),
+              if (userID == prefs.getString(AppStrings.prefUserID))
               const SizedBox(height: 10),
+              if (userID == prefs.getString(AppStrings.prefUserID))
               _card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,6 +577,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             },
                           );
                         }),
+                        SizedBox(height: 7),
                         SizedBox(
                           height: 25,
                           child: ListView.builder(
@@ -570,43 +607,44 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         Text("Saved Addresses",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            border: Border.all(color: AppColors.primaryColor),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              NavigationHelper.pushNamed(
-                                  AppRoutes.createAddressScreen,
-                                  arguments: {
-                                    'pageType': AppRoutes.createAddressScreen
-                                  })?.then((value) {
-                                loadProfile();
-                                favStateList.clear();
-                                suppliesList.clear();
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Add Address',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 13),
-                                ),
-                                SizedBox(width: 5),
-                                Icon(
-                                  Icons.add_circle_outline,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              ],
+                        if (userID == prefs.getString(AppStrings.prefUserID))
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              border: Border.all(color: AppColors.primaryColor),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                NavigationHelper.pushNamed(
+                                    AppRoutes.createAddressScreen,
+                                    arguments: {
+                                      'pageType': AppRoutes.createAddressScreen
+                                    })?.then((value) {
+                                  loadProfile();
+                                  favStateList.clear();
+                                  suppliesList.clear();
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Add Address',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 13),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Icon(
+                                    Icons.add_circle_outline,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -743,7 +781,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       children: [
         Text(title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        if (onEdit != null)
+        if (onEdit != null && userID == prefs.getString(AppStrings.prefUserID))
           IconButton(
               icon: const Icon(Icons.edit, color: AppColors.primaryColor),
               onPressed: onEdit),

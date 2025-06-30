@@ -16,7 +16,8 @@ class ServiceNames {
   static String GET_FAV_STATE_LIST = '${BASE_URL}v1/user';
   static String GET_BIRD_BREED_LIST = '${BASE_URL}v1/birdbreed/';
   static String GET_COMPANY_LIST = '${BASE_URL}v1/company/';
-  static String GET_COMPANY_PROVIDERS_LIST = '${BASE_URL}v1/company?company_uuid=';
+  static String GET_COMPANY_PROVIDERS_LIST =
+      '${BASE_URL}v1/company?company_uuid=';
   static String SELL_EGG = '${BASE_URL}v1/egg-sale/create';
   static String UPDATE_SELL_EGG = '${BASE_URL}v1/egg-sale/update';
   static String SELL_CHICK = '${BASE_URL}v1/chick-sale/create';
@@ -43,6 +44,15 @@ class ServiceNames {
   static String CHANGE_PASSWORD = '${BASE_URL}v1/user/';
   static String GET_MEDICINE = '${BASE_URL}v1/medicine?medicine_id=';
   static String CREATE_CONTACT_SUPPORT = '${BASE_URL}v1/communication/create';
-  static String GET_CONTACT_HISTORY = '${BASE_URL}v1/communication?communication_type=';
-  static String DELETE_CONTACT_RECORD = '${BASE_URL}v1/communication/delete?communication_uuid=';
+  static String GET_CONTACT_HISTORY =
+      '${BASE_URL}v1/communication?communication_type=';
+  static String DELETE_CONTACT_RECORD =
+      '${BASE_URL}v1/communication/delete?communication_uuid=';
+  static String DELETE_EGG_SALE = '${BASE_URL}v1/egg-sale/delete?eggsale_uuid=';
+  static String DELETE_CHICK_SALE =
+      '${BASE_URL}v1/chick-sale/delete?chicksale_uuid=';
+  static String DELETE_CHICKEN_SALE =
+      '${BASE_URL}v1/chicken-sale/delete?chickensale_uuid=';
+  static String DELETE_LIFTING_SALE =
+      '${BASE_URL}v1/lifting-sale/delete?liftingsale_uuid=';
 }

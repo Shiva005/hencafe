@@ -203,16 +203,12 @@ class _ContactHistoryPageState extends State<ContactHistoryPage> {
                   const SizedBox(height: 3),
                   Text(
                     item.subjectLanguage ?? "No Subject",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     item.detailsLanguage ?? "No Details",
-                    style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
                   ),
                   const SizedBox(height: 3),
                   Row(
@@ -221,12 +217,12 @@ class _ContactHistoryPageState extends State<ContactHistoryPage> {
                       Text(
                         "Updated: ${Utils.threeLetterDateFormatted(item.updatedOn.toString()).substring(0, 10)}",
                         style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 13),
+                            color: Colors.grey.shade600, fontSize: 12),
                       ),
                       Text(
                         "Created: ${Utils.threeLetterDateFormatted(item.createdOn.toString()).substring(0, 10)}",
                         style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 13),
+                            color: Colors.grey.shade600, fontSize: 12),
                       ),
                     ],
                   )

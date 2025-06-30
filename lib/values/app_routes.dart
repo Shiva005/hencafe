@@ -31,4 +31,5 @@ class AppRoutes {
   static const String contactUsScreen = 'contact_us_screen';
   static const String changePassword = 'changePassword';
   static const String medicineScreen = 'medicine_screen';
+  static const String notificationsScreen = 'notifications_screen';
 }

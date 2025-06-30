@@ -159,7 +159,111 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
             final priceModel = snapshot.data!;
             final attachments = priceModel.apiResponse![0].attachmentInfo ?? [];
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (priceModel.apiResponse![0].userBasicInfo![0].userId ==
+                    prefs.getString(AppStrings.prefUserID))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, right: 15.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        AwesomeDialog(
+                          context: context,
+                          animType: AnimType.bottomSlide,
+                          dialogType: DialogType.warning,
+                          dialogBackgroundColor: Colors.white,
+                          titleTextStyle: AppTheme.appBarText,
+                          title: 'Are you sure you want to delete this Sale?',
+                          btnCancelOnPress: () {},
+                          btnCancelText: 'Cancel',
+                          btnOkOnPress: () async {
+                            if (pageType == AppRoutes.eggPriceScreen) {
+                              var deleteEggSaleRes =
+                                  await AuthServices().deleteEggSaleRecord(
+                                context,
+                                priceModel.apiResponse![0].eggsaleUuid,
+                              );
+                              if (deleteEggSaleRes
+                                      .apiResponse![0].responseStatus ==
+                                  true) {
+                                NavigationHelper.pushReplacementNamed(
+                                  AppRoutes.eggPriceScreen,
+                                );
+                              }
+                            } else if (pageType == AppRoutes.chickPriceScreen) {
+                              var deleteChickSaleRes =
+                                  await AuthServices().deleteChickSaleRecord(
+                                context,
+                                priceModel.apiResponse![0].chicksaleUuid,
+                              );
+                              if (deleteChickSaleRes
+                                      .apiResponse![0].responseStatus ==
+                                  true) {
+                                NavigationHelper.pushReplacementNamed(
+                                  AppRoutes.chickPriceScreen,
+                                );
+                              }
+                            } else if (pageType ==
+                                AppRoutes.chickenPriceScreen) {
+                              var deleteChickenSaleRes =
+                                  await AuthServices().deleteChickenSaleRecord(
+                                context,
+                                priceModel.apiResponse![0].chickensaleUuid,
+                              );
+                              if (deleteChickenSaleRes
+                                      .apiResponse![0].responseStatus ==
+                                  true) {
+                                NavigationHelper.pushReplacementNamed(
+                                  AppRoutes.chickenPriceScreen,
+                                );
+                              }
+                            } else if (pageType ==
+                                AppRoutes.liftingPriceScreen) {
+                              var deleteLiftingSaleRes =
+                                  await AuthServices().deleteLiftingSaleRecord(
+                                context,
+                                priceModel.apiResponse![0].liftingsaleUuid,
+                              );
+                              if (deleteLiftingSaleRes
+                                      .apiResponse![0].responseStatus ==
+                                  true) {
+                                NavigationHelper.pushReplacementNamed(
+                                  AppRoutes.liftingPriceScreen,
+                                );
+                              }
+                            }
+                          },
+                          btnOkText: 'Yes',
+                          btnOkColor: Colors.yellow.shade700,
+                        ).show();
+                      },
+                      child: Container(
+                          width: 135,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.red),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Delete Sale',
+                                style: const TextStyle(
+                                    color: Colors.red, fontSize: 13),
+                              ),
+                              SizedBox(width: 5),
+                              Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                            ],
+                          )),
+                    ),
+                  ),
                 SizedBox(height: 5),
                 Card(
                   color: Colors.white,
@@ -229,19 +333,32 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                border:
-                                    Border.all(color: AppColors.primaryColor),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                'View full Profile',
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                            GestureDetector(
+                              onTap: () {
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.myProfileScreen,
+                                  arguments: {
+                                    'pageType': AppRoutes.saleDetailsScreen,
+                                    'userID': priceModel.apiResponse![0]
+                                        .userBasicInfo![0].userId
+                                        .toString(),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  border:
+                                      Border.all(color: AppColors.primaryColor),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  'View full Profile',
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 13),
+                                ),
                               ),
                             ),
                             SizedBox(height: 10.0),

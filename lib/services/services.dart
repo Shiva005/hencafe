@@ -1168,6 +1168,84 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> deleteEggSaleRecord(
+      BuildContext context, String eggSaleUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_EGG_SALE}$eggSaleUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Delete Egg Sale: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SuccessModel> deleteChickSaleRecord(
+      BuildContext context, String chickSaleUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_CHICK_SALE}$chickSaleUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Delete Chick Sale: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+  Future<SuccessModel> deleteChickenSaleRecord(
+      BuildContext context, String chickSaleUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_CHICKEN_SALE}$chickSaleUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Delete Chicken Sale: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+  Future<SuccessModel> deleteLiftingSaleRecord(
+      BuildContext context, String chickSaleUUID) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.delete(
+      Uri.parse('${ServiceNames.DELETE_LIFTING_SALE}$chickSaleUUID'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Delete Lifting Sale: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<ForgetPinModel> forgetPin(
       BuildContext context, String mobileNumber, String otp) async {
     var prefs = await SharedPreferences.getInstance();

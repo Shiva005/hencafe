@@ -20,6 +20,7 @@ import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
 import 'package:hencafe/screens/medicine_screen.dart';
 import 'package:hencafe/screens/my_profile.dart';
+import 'package:hencafe/screens/notifiaction_screen.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
 import 'package:hencafe/screens/sale_details_screen.dart';
@@ -246,6 +247,14 @@ class Routes {
             mobile: MedicineScreen(),
             tablet: MedicineScreen(),
             desktop: MedicineScreen(),
+          ),
+        );
+      case AppRoutes.notificationsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: NotificationScreen(),
+            tablet: NotificationScreen(),
+            desktop: NotificationScreen(),
           ),
         );
       default:
