@@ -199,10 +199,8 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                                       stateID,
                                       referralCode);
                               if (registrationCreateRes.errorCount == 0) {
-                                prefs.setString(
-                                    AppStrings.prefUserID,
-                                    registrationCreateRes
-                                        .regUserInfo!.userId!);
+                                prefs.setString(AppStrings.prefUserID,
+                                    registrationCreateRes.regUserInfo!.userId!);
                                 prefs.setString(
                                     AppStrings.prefUserUUID,
                                     registrationCreateRes
@@ -215,7 +213,7 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
                                     AppStrings.prefAuthID,
                                     registrationCreateRes
                                         .regUserInfo!.authUuid!);
-                                NavigationHelper.pushNamed(
+                                NavigationHelper.pushReplacementNamedUntil(
                                   AppRoutes.dashboardScreen,
                                   arguments: {
                                     'mobileNumber': mobileNumber,

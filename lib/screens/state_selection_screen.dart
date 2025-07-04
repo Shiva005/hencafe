@@ -1,6 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/utils/appbar_widget.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -80,157 +79,186 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
-          child: const MyAppBar(
-            title: 'Select Favourite States',
-          )),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 20, left: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: AppColors.primaryColor,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  "Maximum $maxSelections Favourite States",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
+    return WillPopScope(
+      onWillPop: () async =>
+          prefs != null && prefs.getBool(AppStrings.prefIsFavStateSelected),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: AppColors.primaryColor,
+          elevation: 1.0,
+          title: Text(
+            'State Selection',
+            style: TextStyle(color: Colors.white, fontSize: 16.0),
+          ),
+          leading: Visibility(
+            visible: prefs != null &&
+                prefs.getBool(AppStrings.prefIsFavStateSelected),
+            child: IconButton(
+              onPressed: () {
+                NavigationHelper.pop();
+              },
+              icon: Icon(
+                Icons.keyboard_backspace,
+                color: Colors.white,
+              ),
             ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 30),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: "Search states...",
-                  prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(color: AppColors.primaryColor),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20, left: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: AppColors.primaryColor,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    "Maximum $maxSelections Favourite States",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 30),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: "Search states...",
+                    prefixIcon:
+                        Icon(Icons.search, color: AppColors.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: AppColors.primaryColor),
+                    ),
+                  ),
+                  onChanged: _filterStates,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: FutureBuilder<List<ApiResponse>>(
+                  future: _dataFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryColor,
+                          strokeWidth: 2,
+                        ),
+                      );
+                    } else if (snapshot.hasError ||
+                        snapshot.data == null ||
+                        snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No Data Found!!',
+                          style: AppTheme.rejectedTitle,
+                        ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _filteredStates.length,
+                        itemBuilder: (context, index) {
+                          return CheckboxListTile(
+                            activeColor: AppColors.primaryColor,
+                            title: Text(_filteredStates[index].stateName!),
+                            value: _selectedStateID
+                                .contains(_filteredStates[index].stateId!),
+                            onChanged: (bool? isChecked) {
+                              setState(() {
+                                String stateId =
+                                    _filteredStates[index].stateId!;
+
+                                if (isChecked == true) {
+                                  if (_selectedStateID.length <
+                                      maxSelections!) {
+                                    _selectedStateID.add(stateId);
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: const Text("Favourite States"),
+                                        content: Text(
+                                            'Only $maxSelections selections allowed'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("OK"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  _selectedStateID.remove(stateId);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 30),
+                child: RoundedLoadingButton(
+                  width: double.maxFinite,
+                  controller: _btnController,
+                  onPressed: _selectedStateID.isNotEmpty
+                      ? () async {
+                          var updateFavStateRes = await AuthServices()
+                              .updateFavState(
+                                  context, _selectedStateID.join(","));
+                          if (updateFavStateRes.errorCount == 0) {
+                            _btnController.reset();
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.bottomSlide,
+                              dialogType: DialogType.success,
+                              dialogBackgroundColor: Colors.white,
+                              title: updateFavStateRes
+                                  .apiResponse![0].responseDetails,
+                              titleTextStyle: AppTheme.appBarText,
+                              descTextStyle: AppTheme.appBarText,
+                              btnOkOnPress: () {
+                                NavigationHelper.pop(context);
+                                prefs.setBool(
+                                    AppStrings.prefIsFavStateSelected, true);
+                              },
+                              btnOkText: 'OK',
+                              btnOkColor: Colors.greenAccent.shade700,
+                            ).show();
+                          }
+                        }
+                      : null,
+                  color: AppColors.primaryColor,
+                  child: const Text(
+                    AppStrings.submit,
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                onChanged: _filterStates,
               ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: FutureBuilder<List<ApiResponse>>(
-                future: _dataFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryColor,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  } else if (snapshot.hasError ||
-                      snapshot.data == null ||
-                      snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No Data Found!!',
-                        style: AppTheme.rejectedTitle,
-                      ),
-                    );
-                  } else {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: _filteredStates.length,
-                      itemBuilder: (context, index) {
-                        return CheckboxListTile(
-                          activeColor: AppColors.primaryColor,
-                          title: Text(_filteredStates[index].stateName!),
-                          value: _selectedStateID
-                              .contains(_filteredStates[index].stateId!),
-                          onChanged: (bool? isChecked) {
-                            setState(() {
-                              String stateId = _filteredStates[index].stateId!;
-
-                              if (isChecked == true) {
-                                if (_selectedStateID.length < maxSelections!) {
-                                  _selectedStateID.add(stateId);
-                                } else {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      title: const Text("Favourite States"),
-                                      content: Text(
-                                          'Only $maxSelections selections allowed'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text("OK"),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              } else {
-                                _selectedStateID.remove(stateId);
-                              }
-                            });
-                          },
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 30),
-              child: RoundedLoadingButton(
-                width: double.maxFinite,
-                controller: _btnController,
-                onPressed: _selectedStateID.isNotEmpty
-                    ? () async {
-                        var updateFavStateRes = await AuthServices()
-                            .updateFavState(
-                                context, _selectedStateID.join(","));
-                        if (updateFavStateRes.errorCount == 0) {
-                          _btnController.reset();
-                          AwesomeDialog(
-                            context: context,
-                            animType: AnimType.bottomSlide,
-                            dialogType: DialogType.success,
-                            dialogBackgroundColor: Colors.white,
-                            title: updateFavStateRes
-                                .apiResponse![0].responseDetails,
-                            titleTextStyle: AppTheme.appBarText,
-                            descTextStyle: AppTheme.appBarText,
-                            btnOkOnPress: () {
-                              NavigationHelper.pop(context);
-                              prefs.setBool(
-                                  AppStrings.prefIsFavStateSelected, true);
-                            },
-                            btnOkText: 'OK',
-                            btnOkColor: Colors.greenAccent.shade700,
-                          ).show();
-                        }
-                      }
-                    : null,
-                color: AppColors.primaryColor,
-                child: const Text(
-                  AppStrings.submit,
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

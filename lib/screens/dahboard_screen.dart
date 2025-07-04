@@ -317,8 +317,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                           ListTile(
                             onTap: () {
-                              Utils.openLink(
-                                  "https://svpfarms.in/privacy_policy.html");
+                              NavigationHelper.pushNamed(
+                                AppRoutes.deleteAccountScreen,
+                              );
                             },
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -3),
@@ -332,6 +333,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ListTile(
                             onTap: () {
                               _scaffoldKey.currentState?.closeDrawer();
+
                             },
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -3),

@@ -215,6 +215,11 @@ class _LoginPagePinState extends State<LoginPagePin> {
                                     AppStrings.prefAuthID,
                                     loginPinRes.apiResponse![0].userLoginInfo!
                                         .authUuid!);
+                                prefs.setString(
+                                    AppStrings.prefMobileNumber,
+                                    mobileController.text);
+                                prefs.setString(
+                                    AppStrings.prefCountryCode, '101');
                                 NavigationHelper.pushNamed(
                                   AppRoutes.dashboardScreen,
                                   arguments: {

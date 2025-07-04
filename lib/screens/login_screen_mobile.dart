@@ -297,8 +297,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                                       dialogType: DialogType.warning,
                                       dialogBackgroundColor: Colors.white,
                                       title: registrationCheckRes
-                                          .apiResponse![0]
-                                          .responseDetails,
+                                          .apiResponse![0].responseDetails,
                                       titleTextStyle: AppTheme.appBarText,
                                       descTextStyle: AppTheme.appBarText,
                                       btnOkOnPress: () {

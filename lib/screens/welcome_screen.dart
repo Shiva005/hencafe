@@ -27,16 +27,19 @@ class _WelcomePageState extends State<WelcomePage> {
     var prefs = await SharedPreferences.getInstance();
     final String? loginUUID = prefs.getString(AppStrings.prefUserID);
     final String? language = prefs.getString(AppStrings.prefLanguage);
+    final String? countryCode = prefs.getString(AppStrings.prefCountryCode);
 
     Timer(Duration(seconds: 1), () {
       if (language == null) {
         prefs.setString(AppStrings.prefLanguage, "en");
       }
+      if (countryCode == null) {
+        prefs.setString(AppStrings.prefCountryCode, "101");
+      }
       if (loginUUID != null && loginUUID.isNotEmpty) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => DashboardScreen()), // Your home screen
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
       } else {
         Navigator.pushReplacement(

@@ -237,6 +237,43 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
+  Future<SuccessModel> deleteProfile(
+      BuildContext context,
+      String userID,
+      String mobileNumber,
+      String reason,
+      String comment,
+      String password,
+      String otp) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile_number': mobileNumber,
+      'user_id': userID,
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+      'reason': reason,
+      'comment': comment,
+      'password': password,
+      'otp': otp,
+    };
+
+    final response = await http.put(
+      Uri.parse('${ServiceNames.DELETE_PROFILE}/$userID/delete-user-account'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Delete Profile: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuccessModel> updatePassword(
     BuildContext context,
     String oldPassword,
@@ -1144,7 +1181,7 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
+    logger.d('TAG Delete Address: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
@@ -1207,6 +1244,7 @@ class AuthServices {
     logger.d('TAG Delete Chick Sale: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
+
   Future<SuccessModel> deleteChickenSaleRecord(
       BuildContext context, String chickSaleUUID) async {
     var prefs = await SharedPreferences.getInstance();
@@ -1226,6 +1264,7 @@ class AuthServices {
     logger.d('TAG Delete Chicken Sale: ${jsonDecode(response.body)}');
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
+
   Future<SuccessModel> deleteLiftingSaleRecord(
       BuildContext context, String chickSaleUUID) async {
     var prefs = await SharedPreferences.getInstance();

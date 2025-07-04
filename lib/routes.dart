@@ -11,6 +11,7 @@ import 'package:hencafe/screens/company_list%20screen.dart';
 import 'package:hencafe/screens/contact_us_screen.dart';
 import 'package:hencafe/screens/create_address_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
+import 'package:hencafe/screens/delete_account_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
 import 'package:hencafe/screens/lifting_price_screen.dart';
@@ -255,6 +256,14 @@ class Routes {
             mobile: NotificationScreen(),
             tablet: NotificationScreen(),
             desktop: NotificationScreen(),
+          ),
+        );
+      case AppRoutes.deleteAccountScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: DeleteAccountScreen(),
+            tablet: DeleteAccountScreen(),
+            desktop: DeleteAccountScreen(),
           ),
         );
       default:
