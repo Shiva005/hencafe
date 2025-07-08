@@ -16,6 +16,7 @@ import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/medicine_mode.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
 import 'package:hencafe/models/profile_model.dart';
+import 'package:hencafe/models/referral_model.dart';
 import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
@@ -1038,6 +1039,26 @@ class AuthServices {
 
     logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
     return CompanyProvidersModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<ReferralModel> getReferralsList(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(
+          "${ServiceNames.GET_REFERRALS_LIST}${prefs.getString(AppStrings.prefUserID)}/referral-bonus?target_user_mobile=${prefs.getString(AppStrings.prefMobileNumber)}"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+    );
+
+    logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
+    return ReferralModel.fromJson(jsonDecode(response.body));
   }
 
   Future<MedicineModel> getMedicine(

@@ -12,6 +12,7 @@ class ServiceNames {
   static String REGISTRATION_CREATE = '${BASE_URL}v1/user/register';
   static String UPDATE_BASIC_DETAILS = '${BASE_URL}v1/user/';
   static String GET_PROFILE = '${BASE_URL}v1/user';
+  static String GET_REFERRALS_LIST = '${BASE_URL}v1/user/';
   static String DELETE_PROFILE = '${BASE_URL}v1/user';
   static String UPDATE_FAV_STATE = '${BASE_URL}v1/user/favourite-states';
   static String GET_FAV_STATE_LIST = '${BASE_URL}v1/user';

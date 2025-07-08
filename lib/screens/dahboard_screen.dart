@@ -289,6 +289,22 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 child: Icon(Icons.location_on_outlined,
                                     color: AppColors.primaryColor)),
                           ),
+                          ListTile(
+                            onTap: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                              NavigationHelper.pushNamed(
+                                AppRoutes.referralBonusScreen,
+                              );
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Referral Bonus'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.card_giftcard,
+                                    color: AppColors.primaryColor)),
+                          ),
                         ],
                       ),
                     ),
@@ -301,20 +317,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       child: Column(
                         children: [
-                          ListTile(
-                            onTap: () {
-                              Utils.openLink(
-                                  "https://svpfarms.in/privacy_policy.html");
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Privacy Policy'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.privacy_tip_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
                           ListTile(
                             onTap: () {
                               NavigationHelper.pushNamed(
@@ -332,8 +334,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                           ListTile(
                             onTap: () {
+                              Utils.openLink(
+                                  "https://svpfarms.in/privacy_policy.html");
+                            },
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -3),
+                            title: const Text('Privacy Policy'),
+                            leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(Icons.privacy_tip_outlined,
+                                    color: AppColors.primaryColor)),
+                          ),
+                          ListTile(
+                            onTap: () {
                               _scaffoldKey.currentState?.closeDrawer();
-
                             },
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -3),

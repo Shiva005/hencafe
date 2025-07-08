@@ -22,6 +22,7 @@ import 'package:hencafe/screens/login_screen_pin.dart';
 import 'package:hencafe/screens/medicine_screen.dart';
 import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/notifiaction_screen.dart';
+import 'package:hencafe/screens/referral_bonus_screen.dart';
 import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
 import 'package:hencafe/screens/sale_details_screen.dart';
@@ -264,6 +265,14 @@ class Routes {
             mobile: DeleteAccountScreen(),
             tablet: DeleteAccountScreen(),
             desktop: DeleteAccountScreen(),
+          ),
+        );
+      case AppRoutes.referralBonusScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: ReferralBonusScreen(),
+            tablet: ReferralBonusScreen(),
+            desktop: ReferralBonusScreen(),
           ),
         );
       default:
