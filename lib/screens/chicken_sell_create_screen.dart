@@ -6,6 +6,7 @@ import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../components/app_text_form_field.dart';
@@ -58,6 +59,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
   var saleType = "N";
   bool _isInitialized = false;
   late final chickenPrice.ApiResponse chickenPriceModel;
+  late SharedPreferences prefs;
 
   void initializeControllers() {
     farmerPriceController = TextEditingController()
@@ -111,7 +113,8 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
   }
 
   Future<UserFavouriteStateModel> _fetchStates() async {
-    final favStateRes = await AuthServices().getFavouriteStateList(context, '');
+    prefs = await SharedPreferences.getInstance();
+    final favStateRes = await AuthServices().getFavouriteStateList(context,  prefs.getString(AppStrings.prefUserID)!);
     if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
@@ -702,12 +705,6 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                         minLines: 2,
                         maxLines: 2,
                         prefixIcon: Icon(Icons.comment),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter comment';
-                          }
-                          return null;
-                        },
                       ),
                       Row(
                         children: [

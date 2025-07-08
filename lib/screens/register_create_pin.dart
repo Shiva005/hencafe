@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/values/app_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -91,6 +92,8 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: ListView(
           children: [
+            SizedBox(height: 20),
+            Image.asset(AppIconsData.createPin, height: 180),
             Form(
               key: _formKey,
               child: Padding(

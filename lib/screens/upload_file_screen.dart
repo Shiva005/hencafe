@@ -13,6 +13,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:image/image.dart' as img;
 
 class UploadFileScreen extends StatefulWidget {
   @override
@@ -32,25 +33,62 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
 
     if (result != null) {
       for (var file in result.files) {
-        files.add(_UploadFile(file: File(file.path!), name: file.name));
+        File selectedFile = File(file.path!);
+        files.add(_UploadFile(file: selectedFile, name: file.name));
       }
       setState(() {});
     }
   }
 
+  bool _isImageFile(String path) {
+    final ext = extension(path).toLowerCase();
+    return ['.jpg', '.jpeg', '.png'].contains(ext);
+  }
+
+  /// Compress image and return compressed File
+  Future<File> _compressImage(File file) async {
+    final bytes = await file.readAsBytes();
+    final originalImage = img.decodeImage(bytes);
+    if (originalImage == null) return file;
+
+    final resized = img.copyResize(originalImage,
+        width: (originalImage.width * 0.5).toInt(),
+        height: (originalImage.height * 0.5).toInt());
+
+    final compressedPath = file.path.replaceFirst(
+        RegExp(r'(.jpg|.jpeg|.png)$'), '_compressed.jpg');
+    final compressedFile = File(compressedPath)
+      ..writeAsBytesSync(img.encodeJpg(resized, quality: 85));
+
+    return compressedFile;
+  }
+
   Future<void> uploadFile(_UploadFile fileData, String referenceFrom,
       String referenceUUID, String fileName) async {
     final dio = Dio();
-    final file = fileData.file;
-    final fileName = basename(file.path);
+    File file = fileData.file;
+
+    // Compress image here, if applicable
+    if (_isImageFile(file.path)) {
+      try {
+        fileData.status = UploadStatus.compressing;
+        setState(() {});
+        file = await _compressImage(file);
+      } catch (e) {
+        logger.e('Image compression failed: $e');
+        // fallback to original file if compression fails
+      }
+    }
+
     final prefs = await SharedPreferences.getInstance();
 
     final userId = prefs.getString(AppStrings.prefUserID) ?? '';
     final userUUID = prefs.getString(AppStrings.prefUserUUID) ?? '';
     final authUUID = prefs.getString(AppStrings.prefAuthID) ?? '';
     final language = prefs.getString(AppStrings.prefLanguage) ?? 'en';
+    final sessionID = prefs.getString(AppStrings.prefSessionID) ?? '';
 
-    logger.d("Uploading file: $fileName");
+    logger.d("Uploading file: ${basename(file.path)}");
     logger.d("User ID: $userId, UUID: $userUUID, Auth UUID: $authUUID");
     logger.d("attachment: ${_getAttachmentType(file.path)}");
 
@@ -64,13 +102,13 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
       final formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(
           file.path,
-          filename: fileName,
+          filename: basename(file.path),
           contentType: contentType,
         ),
         "reference_from": referenceFrom,
         "reference_uuid": referenceUUID,
         "attachment_type": _getAttachmentType(file.path),
-        "attachment_name": fileName,
+        "attachment_name": basename(file.path),
       });
 
       final response = await dio.post(
@@ -82,6 +120,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
             'user-id': userId,
             'user-uuid': userUUID,
             'auth-uuid': authUUID,
+            'session-id': sessionID,
           },
         ),
         onSendProgress: (sent, total) {
@@ -127,7 +166,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
       case '.mp4':
         return 'video/mp4';
       default:
-        return 'application/octet-stream'; // fallback
+        return 'application/octet-stream';
     }
   }
 
@@ -145,7 +184,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final String referenceUUID = args?['reference_uuid'] ?? '';
     final String referenceFrom = args?['reference_from'] ?? '';
     final String pageType = args?['pageType'] ?? '';
@@ -167,19 +206,18 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                 itemBuilder: (_, index) {
                   final file = files[index];
                   return GestureDetector(
-                    onTap: file.status == UploadStatus.initial
+                    onTap: (file.status == UploadStatus.initial ||
+                        file.status == UploadStatus.failed)
                         ? () => uploadFile(
-                            file, referenceFrom, referenceUUID, file.name)
+                        file, referenceFrom, referenceUUID, file.name)
                         : null,
                     child: Card(
                       elevation: 0.0,
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
                         side:
-                            BorderSide(color: AppColors.primaryColor, width: 1),
-                        // Change color here
-                        borderRadius: BorderRadius.circular(
-                            8.0), // Optional: Adjust border radius
+                        BorderSide(color: AppColors.primaryColor, width: 1),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -187,7 +225,6 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // File Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,65 +243,63 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                         color: Colors.orange,
                                       ),
                                     )
-                                  else if (file.status ==
-                                      UploadStatus.uploading)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 15.0, top: 5.0, bottom: 5.0),
-                                      child: LinearProgressIndicator(
-                                        value: file.progress,
-                                        color: Colors.green.shade600,
+                                  else if (file.status == UploadStatus.compressing)
+                                    Text(
+                                      "File upload in progress...",
+                                      style: TextStyle(
+                                        color: Colors.blue,
                                       ),
                                     )
-                                  else if (file.status == UploadStatus.success)
-                                    Text("File Uploaded Successfully!!",
-                                        style: TextStyle(color: Colors.green))
-                                  else if (file.status == UploadStatus.failed)
-                                    Text("Upload failed",
-                                        style: TextStyle(color: Colors.red)),
+                                  else if (file.status == UploadStatus.uploading)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 15.0, top: 5.0, bottom: 5.0),
+                                        child: LinearProgressIndicator(
+                                          value: file.progress,
+                                          color: Colors.green.shade600,
+                                        ),
+                                      )
+                                    else if (file.status == UploadStatus.success)
+                                        Text("File Uploaded Successfully!!",
+                                            style: TextStyle(color: Colors.green))
+                                      else if (file.status == UploadStatus.failed)
+                                          Text("Upload failed",
+                                              style: TextStyle(color: Colors.red)),
                                 ],
                               ),
                             ),
                             if (file.status == UploadStatus.initial ||
-                                file.status == UploadStatus.uploading)
+                                file.status == UploadStatus.failed)
                               IconButton(
                                 icon: Icon(
                                   Icons.upload,
                                   color: AppColors.primaryColor,
                                   size: 30,
                                 ),
-                                onPressed: () => uploadFile(file, referenceFrom,
-                                    referenceUUID, file.name),
-                              )
-                            else if (file.status == UploadStatus.failed)
+                                onPressed: () => uploadFile(
+                                    file, referenceFrom, referenceUUID, file.name),
+                              ),
+                            if (file.status == UploadStatus.failed)
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.refresh,
-                                        color: Colors.orange),
+                                    icon: Icon(Icons.refresh, color: Colors.orange),
                                     onPressed: () => uploadFile(
-                                        file,
-                                        referenceFrom,
-                                        referenceUUID,
-                                        file.name),
+                                        file, referenceFrom, referenceUUID, file.name),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete_forever,
-                                        color: Colors.red),
+                                    icon: Icon(Icons.delete_forever, color: Colors.red),
                                     onPressed: () =>
                                         setState(() => files.removeAt(index)),
                                   ),
                                 ],
                               ),
-
                             if (file.status == UploadStatus.initial)
                               IconButton(
-                                icon: Icon(Icons.delete_forever,
-                                    color: Colors.red),
+                                icon: Icon(Icons.delete_forever, color: Colors.red),
                                 onPressed: () =>
                                     setState(() => files.removeAt(index)),
                               ),
-
                             if (file.status == UploadStatus.success)
                               IconButton(
                                 icon: Icon(Icons.close, color: Colors.red),
@@ -343,7 +378,7 @@ class DottedBorderBox extends StatelessWidget {
   }
 }
 
-enum UploadStatus { initial, uploading, success, failed }
+enum UploadStatus { initial, compressing, uploading, success, failed }
 
 class _UploadFile {
   final File file;

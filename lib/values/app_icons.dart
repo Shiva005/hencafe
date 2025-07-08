@@ -18,6 +18,8 @@ class AppIconsData {
   static const String noImage = 'assets/icons/no_image.png';
   static const String whatsappOutline = 'assets/icons/whatsapp.png';
   static const String medicine = 'assets/icons/medicine.png';
+  static const String createPin = 'assets/icons/create_pin.png';
+  static const String forgotPassword = 'assets/icons/forgot_password.png';
 
 
   /// gifs

@@ -7,6 +7,7 @@ import 'package:hencafe/models/user_favourite_state_model.dart' as state;
 import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/values/app_routes.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../components/app_text_form_field.dart';
@@ -42,6 +43,8 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
   String? _selectedCityID;
   bool _isInitialized = false;
   late final AddressModel addressDetailsModel;
+
+  late SharedPreferences prefs;
 
   void initializeControllers() {
     addressTypeController = TextEditingController()
@@ -80,8 +83,9 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
   }
 
   Future<state.UserFavouriteStateModel> _fetchStates() async {
+    prefs = await SharedPreferences.getInstance();
     LoadingDialogHelper.showLoadingDialog(context);
-    final stateRes = await AuthServices().getFavouriteStateList(context, '');
+    final stateRes = await AuthServices().getFavouriteStateList(context, prefs.getString(AppStrings.prefUserID)!);
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
       setState(() {
         _favStates = stateRes.apiResponse!;

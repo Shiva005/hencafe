@@ -84,7 +84,7 @@ class AuthServices {
       'otp': otp,
     };
 
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse(ServiceNames.OTP_VALIDATE),
       headers: {
         'Content-Type': 'application/json',
@@ -334,7 +334,10 @@ class AuthServices {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
     );
@@ -351,7 +354,7 @@ class AuthServices {
       'state_id_list': stateID,
     };
 
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse(ServiceNames.UPDATE_FAV_STATE),
       headers: {
         'Content-Type': 'application/json',

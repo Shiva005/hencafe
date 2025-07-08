@@ -611,7 +611,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                 iconColor: Colors.white,
                                 filled: true,
                                 fillColor: Colors.white,
-                                labelText: "State",
+                                labelText: "State*",
                                 suffixIcon: Icon(Icons.keyboard_arrow_down),
                                 border: OutlineInputBorder(
                                   borderSide:
@@ -655,7 +655,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                 iconColor: Colors.white,
                                 filled: true,
                                 fillColor: Colors.white,
-                                labelText: "City",
+                                labelText: "City*",
                                 suffixIcon: Icon(Icons.keyboard_arrow_down),
                                 border: OutlineInputBorder(
                                   borderSide:
@@ -690,9 +690,10 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                         AppTextFormField(
                           controller: referralCodeController,
                           labelText: AppStrings.referralCode,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
                           enabled: true,
+                          maxLength: 10,
                           prefixIcon: Icon(Icons.card_giftcard),
                         ),
                       if (pageType == AppRoutes.myProfileScreen)

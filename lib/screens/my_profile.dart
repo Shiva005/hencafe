@@ -109,19 +109,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         } else if (getProfileRes.apiResponse![0].userRoleType == 'S') {
           role = "Super Admin";
         }
-        memberShipValidFrom = getProfileRes.apiResponse![0]
-                .userMembershipInfo![0].userMembershipValidFrom ??
-            "";
-        maxFavState = getProfileRes
-                .apiResponse![0].userMembershipInfo![0].userFavStateMaxCount
-                .toString() ??
-            "";
-        memberShipValidTo = getProfileRes
-                .apiResponse![0].userMembershipInfo![0].userMembershipValidTo ??
-            "";
-        memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
-                .userMembershipType.value ??
-            "";
+        if (getProfileRes.apiResponse![0].userMembershipInfo!.length != 0) {
+          memberShipValidFrom = getProfileRes.apiResponse![0]
+              .userMembershipInfo![0].userMembershipValidFrom ??
+              "";
+          maxFavState = getProfileRes
+              .apiResponse![0].userMembershipInfo![0].userFavStateMaxCount
+              .toString();
+          memberShipValidTo = getProfileRes
+              .apiResponse![0].userMembershipInfo![0].userMembershipValidTo ??
+              "";
+          memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
+              .userMembershipType.value ??
+              "";
+        }
         workType = getProfileRes.apiResponse![0].userWorkType.value ?? "";
         if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
           userImage =
@@ -359,110 +360,110 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
               ),
               if (userID == prefs.getString(AppStrings.prefUserID))
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
               if (userID == prefs.getString(AppStrings.prefUserID))
-              _card(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                _card(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                    child: Column(
+                      children: [
+                        _sectionHeader("Favorite states", onEdit: () {
+                          NavigationHelper.pushNamed(
+                            AppRoutes.stateSelection,
+                          )?.then((value) {
+                            favStateList.clear();
+                            suppliesList.clear();
+                            loadProfile();
+                          });
+                        }),
+                        SizedBox(height: 7),
+                        SizedBox(
+                          height: 25,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: favStateList.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: _buildChip(favStateList[index]),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              if (userID == prefs.getString(AppStrings.prefUserID))
+                const SizedBox(height: 10),
+              if (userID == prefs.getString(AppStrings.prefUserID))
+                _card(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionHeader("Favorite states", onEdit: () {
-                        NavigationHelper.pushNamed(
-                          AppRoutes.stateSelection,
-                        )?.then((value) {
-                          favStateList.clear();
-                          suppliesList.clear();
-                          loadProfile();
-                        });
-                      }),
-                      SizedBox(height: 7),
-                      SizedBox(
-                        height: 25,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: favStateList.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: _buildChip(favStateList[index]),
-                            );
-                          },
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 10.0, top: 5.0, bottom: 10.0),
+                        child: Text(
+                          "Membership Details",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                         ),
-                      )
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Membership Type : ",
+                                style: TextStyle(color: Colors.grey.shade700)),
+                            Text(memberShipType),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Maximum Favourite State : ",
+                                style: TextStyle(color: Colors.grey.shade700)),
+                            Text(maxFavState),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Start Date :",
+                                style: TextStyle(color: Colors.grey.shade700)),
+                            Text(Utils.threeLetterDateFormatted(
+                                memberShipValidFrom)),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("End Date :",
+                                style: TextStyle(color: Colors.grey.shade700)),
+                            Text(Utils.threeLetterDateFormatted(
+                                memberShipValidTo)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-              const SizedBox(height: 10),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-              _card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 10.0, top: 5.0, bottom: 10.0),
-                      child: Text(
-                        "Membership Details",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Membership Type : ",
-                              style: TextStyle(color: Colors.grey.shade700)),
-                          Text(memberShipType),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Maximum Favourite State : ",
-                              style: TextStyle(color: Colors.grey.shade700)),
-                          Text(maxFavState),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Start Date :",
-                              style: TextStyle(color: Colors.grey.shade700)),
-                          Text(Utils.threeLetterDateFormatted(
-                              memberShipValidFrom)),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("End Date :",
-                              style: TextStyle(color: Colors.grey.shade700)),
-                          Text(Utils.threeLetterDateFormatted(
-                              memberShipValidTo)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 10),
               // Supplies
               Visibility(
