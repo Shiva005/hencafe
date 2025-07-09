@@ -507,12 +507,15 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                         labelText: AppStrings.mobile,
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.next,
-                        maxLength: 15,
+                        maxLength: 10,
                         enabled: false,
                         prefixIcon: Icon(Icons.call),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your mobile number';
+                          }
+                          if (value.length!=10) {
+                            return 'Mobile number must be exact 10 character';
                           }
                           return null;
                         },

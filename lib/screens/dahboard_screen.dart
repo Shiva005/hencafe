@@ -241,6 +241,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ListTile(
                             onTap: () {
                               _scaffoldKey.currentState?.closeDrawer();
+                              NavigationHelper.pushNamed(
+                                AppRoutes.changeMobileScreen,
+                              );
                             },
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -3),

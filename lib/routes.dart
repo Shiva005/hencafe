@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/responsive_scaffold.dart';
 import 'package:hencafe/screens/addresss_details_screen.dart';
+import 'package:hencafe/screens/change_mobile_screen.dart';
 import 'package:hencafe/screens/change_password_screen.dart';
 import 'package:hencafe/screens/chick_price_screen.dart';
 import 'package:hencafe/screens/chick_sell_create_screen.dart';
@@ -273,6 +274,14 @@ class Routes {
             mobile: ReferralBonusScreen(),
             tablet: ReferralBonusScreen(),
             desktop: ReferralBonusScreen(),
+          ),
+        );
+      case AppRoutes.changeMobileScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: ChangeMobileScreen(),
+            tablet: ChangeMobileScreen(),
+            desktop: ChangeMobileScreen(),
           ),
         );
       default:

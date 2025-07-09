@@ -298,6 +298,45 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                         SnackbarHelper.showSnackBar(
                             loginPinRes.apiResponse![0].responseDetails!);
                       }
+                    } else if (pageType == AppRoutes.changeMobileScreen) {
+                      var loginPinRes = await AuthServices().updateMobileNumber(
+                          context, mobileNumber, otpController.text);
+                      if (loginPinRes.apiResponse?[0].responseStatus == true) {
+                        AwesomeDialog(
+                          context: context,
+                          animType: AnimType.bottomSlide,
+                          dialogType: DialogType.success,
+                          dialogBackgroundColor: Colors.white,
+                          titleTextStyle: AppTheme.appBarText,
+                          dismissOnTouchOutside: false,
+                          dismissOnBackKeyPress: false,
+                          title: loginPinRes.apiResponse![0].responseDetails!,
+                          btnOkOnPress: () async {
+                            var prefs = await SharedPreferences.getInstance();
+                            var mb =
+                                prefs.getString(AppStrings.prefMobileNumber);
+                            var language =
+                                prefs.getString(AppStrings.prefLanguage);
+                            var countryCode =
+                                prefs.getString(AppStrings.prefCountryCode);
+                            var sessionID =
+                                prefs.getString(AppStrings.prefSessionID);
+                            prefs.clear();
+                            prefs.setString(AppStrings.prefLanguage, language!);
+                            prefs.setString(AppStrings.prefMobileNumber, mb!);
+                            prefs.setString(
+                                AppStrings.prefCountryCode, countryCode!);
+                            prefs.setString(
+                                AppStrings.prefSessionID, sessionID!);
+                            NavigationHelper.pushReplacementNamedUntil(
+                                AppRoutes.loginMobile);
+                            SnackbarHelper.showSnackBar(
+                                loginPinRes.apiResponse![0].responseDetails!);
+                          },
+                          btnOkText: 'OK',
+                          btnOkColor: Colors.greenAccent.shade700,
+                        ).show();
+                      }
                     }
                   }
                   _btnVerifyController.reset();

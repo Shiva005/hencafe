@@ -20,6 +20,7 @@ class AppIconsData {
   static const String medicine = 'assets/icons/medicine.png';
   static const String createPin = 'assets/icons/create_pin.png';
   static const String forgotPassword = 'assets/icons/forgot_password.png';
+  static const String changeMobileIcon = 'assets/icons/change_mobile.jpg';
 
 
   /// gifs

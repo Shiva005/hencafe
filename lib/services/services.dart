@@ -101,8 +101,43 @@ class AuthServices {
     return ValidateOtpModel.fromJson(jsonDecode(response.body));
   }
 
-  Future<LoginPinCheckModel> loginPinCheck(BuildContext context,
-      String mobileNumber, String pin, String loginType, String isInsertAuth) async {
+  Future<SuccessModel> updateMobileNumber(
+      BuildContext context, String newMobileNumber, String otp) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'user_id': prefs.getString(AppStrings.prefUserID),
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID),
+      'old_mobile_number': prefs.getString(AppStrings.prefMobileNumber),
+      'new_mobile_number': newMobileNumber,
+      'otp': otp,
+    };
+
+    final response = await http.put(
+      Uri.parse(
+          '${ServiceNames.UPDATE_MOBILE_NUMBER}${prefs.getString(AppStrings.prefUserID)}/change-mobile-number'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('TAG Change Number: $payload');
+    logger.d('TAG Change Number: ${jsonDecode(response.body)}');
+    return SuccessModel.fromJson(jsonDecode(response.body));
+  }
+
+  Future<LoginPinCheckModel> loginPinCheck(
+      BuildContext context,
+      String mobileNumber,
+      String pin,
+      String loginType,
+      String isInsertAuth) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'mobile_number': mobileNumber,
