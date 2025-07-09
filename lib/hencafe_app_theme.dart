@@ -30,7 +30,7 @@ class _MainAppState extends State<MainApp> {
   @override
   void dispose() {
     _lifecycleObserver.stop();
-    super.dispose();
+    super.dispose(); 
   }
 
   @override

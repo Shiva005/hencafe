@@ -221,7 +221,8 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                     if (pageType == AppRoutes.registerBasicDetails) {
                       var validateOtpRes = await AuthServices().otpValidate(
                           context, mobileNumber, otpController.text);
-                      if (validateOtpRes.apiResponse![0].responseStatus == true) {
+                      if (validateOtpRes.apiResponse![0].responseStatus ==
+                          true) {
                         NavigationHelper.pushNamed(
                           AppRoutes.registerCreatePin,
                           arguments: {
@@ -236,7 +237,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                             'referralCode': referralCode,
                           },
                         );
-                      }else{
+                      } else {
                         SnackbarHelper.showSnackBar(
                             validateOtpRes.apiResponse![0].responseDetails!);
                       }
@@ -268,7 +269,11 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                       }
                     } else if (pageType == 'LoginWithOtp') {
                       var loginPinRes = await AuthServices().loginPinCheck(
-                          context, mobileNumber, otpController.text, "otp");
+                          context,
+                          mobileNumber,
+                          otpController.text,
+                          "otp",
+                          "true");
                       if (loginPinRes.apiResponse?[0].responseStatus == true) {
                         var prefs = await SharedPreferences.getInstance();
                         prefs.setString(AppStrings.prefUserID,

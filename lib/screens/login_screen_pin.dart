@@ -194,7 +194,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                             if (_formKey.currentState!.validate()) {
                               var loginPinRes = await AuthServices()
                                   .loginPinCheck(context, mobileController.text,
-                                      pinController.text, "password");
+                                      pinController.text, "password", "true");
                               if (loginPinRes.apiResponse![0].responseStatus ==
                                   true) {
                                 var prefs =
@@ -215,8 +215,7 @@ class _LoginPagePinState extends State<LoginPagePin> {
                                     AppStrings.prefAuthID,
                                     loginPinRes.apiResponse![0].userLoginInfo!
                                         .authUuid!);
-                                prefs.setString(
-                                    AppStrings.prefMobileNumber,
+                                prefs.setString(AppStrings.prefMobileNumber,
                                     mobileController.text);
                                 prefs.setString(
                                     AppStrings.prefCountryCode, '101');

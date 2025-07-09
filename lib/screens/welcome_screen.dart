@@ -28,6 +28,8 @@ class _WelcomePageState extends State<WelcomePage> {
     final String? loginUUID = prefs.getString(AppStrings.prefUserID);
     final String? language = prefs.getString(AppStrings.prefLanguage);
     final String? countryCode = prefs.getString(AppStrings.prefCountryCode);
+    final bool? isFavStateSelected =
+        prefs.getBool(AppStrings.prefIsFavStateSelected);
 
     Timer(Duration(seconds: 1), () {
       if (language == null) {
@@ -35,6 +37,9 @@ class _WelcomePageState extends State<WelcomePage> {
       }
       if (countryCode == null) {
         prefs.setString(AppStrings.prefCountryCode, "101");
+      }
+      if (isFavStateSelected == null) {
+        prefs.setBool(AppStrings.prefIsFavStateSelected, true);
       }
       if (loginUUID != null && loginUUID.isNotEmpty) {
         Navigator.pushReplacement(

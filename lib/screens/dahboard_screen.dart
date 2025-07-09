@@ -47,7 +47,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
-    getProfileRes = await AuthServices().getProfile(context, prefs.getString(AppStrings.prefUserID));
+    getProfileRes = await AuthServices()
+        .getProfile(context, prefs.getString(AppStrings.prefUserID));
     if (getProfileRes.errorCount == 0) {
       prefs.setString(AppStrings.prefFirstName,
           getProfileRes.apiResponse![0].userFirstName);
@@ -71,6 +72,8 @@ class _DashboardScreenState extends State<DashboardScreen>
       NavigationHelper.pushNamed(
         AppRoutes.stateSelection,
       );
+    } else {
+      prefs.setBool(AppStrings.prefIsFavStateSelected, true);
     }
     setState(() {});
   }

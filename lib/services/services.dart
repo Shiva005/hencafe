@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/address_model.dart';
 import 'package:hencafe/models/bird_breed_model.dart';
 import 'package:hencafe/models/chick_price_model.dart';
@@ -27,10 +26,12 @@ import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/navigation_helper.dart';
 import '../models/contact_history_model.dart';
 import '../models/lifting_price_model.dart';
 import '../models/login_pin_check_model.dart';
 import '../utils/my_logger.dart';
+import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import 'service_name.dart';
 
@@ -101,12 +102,13 @@ class AuthServices {
   }
 
   Future<LoginPinCheckModel> loginPinCheck(BuildContext context,
-      String mobileNumber, String pin, String loginType) async {
+      String mobileNumber, String pin, String loginType, String isInsertAuth) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'mobile_number': mobileNumber,
       'password_otp': pin,
       'login_type': loginType,
+      'insert_auth_uuid': isInsertAuth,
     };
 
     final response = await http.post(
@@ -307,24 +309,31 @@ class AuthServices {
     return SuccessModel.fromJson(jsonDecode(response.body));
   }
 
-  Future<ProfileModel> getProfile(
+  Future<ProfileModel?> getProfile(
       BuildContext context, String thirdPartUserID) async {
     var prefs = await SharedPreferences.getInstance();
+
     final response = await http.get(
       Uri.parse(
           "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile?profile_id=$thirdPartUserID"),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'language': prefs.getString(AppStrings.prefLanguage)!,
-        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
-        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'language': prefs.getString(AppStrings.prefLanguage) ?? 'en',
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
+        'session-id': prefs.getString(AppStrings.prefSessionID) ?? '',
       },
     );
 
-    logger.d('TAG Get Profile: ${jsonDecode(response.body)}');
-    return ProfileModel.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      logger.d('Response Body: ${response.body}');
+      return ProfileModel.fromJson(jsonDecode(response.body));
+    } else {
+      StatusCodeHandler.handleStatusCode(
+          context, response.statusCode, response.body);
+      return null;
+    }
   }
 
   Future<SuppliesModel> getSupplies(BuildContext context) async {
@@ -1382,11 +1391,9 @@ class StatusCodeHandler {
         case 403:
         case 404:
         case 500:
-          SnackbarHelper.showSnackBar(body.toString());
-          _showErrorDialog(context, errorModel);
+          _showErrorDialog(context, errorModel, statusCode);
           return errorModel;
         default:
-          // Handle unexpected status codes gracefully
           logger.e('Unexpected Error: $statusCode $body');
           throw Exception('Unexpected Error: $statusCode $body');
       }
@@ -1397,7 +1404,8 @@ class StatusCodeHandler {
     }
   }
 
-  static void _showErrorDialog(BuildContext context, ErrorModel errorModel) {
+  static void _showErrorDialog(
+      BuildContext context, ErrorModel errorModel, int statusCode) {
     var message = '';
     for (int i = 0; i < errorModel.errorCount!; i++) {
       message = '$message\n${errorModel.errorMessage![i].errorDetails!}';
@@ -1410,7 +1418,21 @@ class StatusCodeHandler {
       dialogBackgroundColor: Colors.white,
       desc: message,
       descTextStyle: const TextStyle(color: Colors.black),
-      btnOkOnPress: () {},
+      btnOkOnPress: () async {
+        if (statusCode == 401) {
+          var prefs = await SharedPreferences.getInstance();
+          var mb = prefs.getString(AppStrings.prefMobileNumber);
+          var language = prefs.getString(AppStrings.prefLanguage);
+          var countryCode = prefs.getString(AppStrings.prefCountryCode);
+          var sessionID = prefs.getString(AppStrings.prefSessionID);
+          prefs.clear();
+          prefs.setString(AppStrings.prefLanguage, language!);
+          prefs.setString(AppStrings.prefMobileNumber, mb!);
+          prefs.setString(AppStrings.prefCountryCode, countryCode!);
+          prefs.setString(AppStrings.prefSessionID, sessionID!);
+          NavigationHelper.pushReplacementNamedUntil(AppRoutes.loginMobile);
+        }
+      },
       btnOkColor: Colors.red,
     ).show();
   }

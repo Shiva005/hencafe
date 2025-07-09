@@ -67,10 +67,9 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
     var getProfileRes = await AuthServices().getProfile(context, prefs.getString(AppStrings.prefUserID));
-    if (getProfileRes.errorCount == 0) {
+    if (getProfileRes?.errorCount == 0) {
       setState(() {
-        for (var favState
-            in getProfileRes.apiResponse![0].userFavouriteStateInfo!) {
+        for (var favState in getProfileRes?.apiResponse?[0].userFavouriteStateInfo ?? []) {
           String stateId = favState.stateInfo![0].stateId!;
           _selectedStateID.add(stateId);
         }
