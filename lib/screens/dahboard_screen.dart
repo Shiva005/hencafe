@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/screens/fragments/home_fragment2.dart';
 import 'package:hencafe/values/app_strings.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
@@ -24,6 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   var getProfileRes;
   int _tabIndex = 1;
   var prefs;
+  String _packageName = '';
 
   int get tabIndex => _tabIndex;
 
@@ -47,6 +51,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    _packageName = packageInfo.packageName;
     getProfileRes = await AuthServices()
         .getProfile(context, prefs.getString(AppStrings.prefUserID));
     if (getProfileRes.errorCount == 0) {
@@ -354,6 +360,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                           ListTile(
                             onTap: () {
+                              SharePlus.instance.share(ShareParams(
+                                  text: AppStrings.shareText + _packageName));
                               _scaffoldKey.currentState?.closeDrawer();
                             },
                             visualDensity: const VisualDensity(
@@ -368,6 +376,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ListTile(
                             onTap: () {
                               _scaffoldKey.currentState?.closeDrawer();
+                              rateApp();
                             },
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -3),
@@ -430,6 +439,15 @@ class _DashboardScreenState extends State<DashboardScreen>
       ),
       body: HomeFragment2(),
     );
+  }
+
+  void rateApp() async {
+    String url = AppStrings.playStoreLink + _packageName;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   void showLogoutDialog(BuildContext context) {

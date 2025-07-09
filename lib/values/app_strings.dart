@@ -27,6 +27,10 @@ class AppStrings {
   static const String forgetPin = 'Forget Pin?';
   static const String privacyPolicy = 'Privacy Policy';
   static const String privacyPolicyLink = 'https://svpfarms.in/privacy_policy.html';
+  static const String shareText =
+      'Please, Check out my app https://play.google.com/store/apps/details?';
+  static const String playStoreLink =
+      'https://play.google.com/store/apps/details?';
 
   ///Headers
   static const String createAccount = 'Create Account';
