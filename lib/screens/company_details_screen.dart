@@ -333,6 +333,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                               AppRoutes.addressDetailsScreen,
                                               arguments: {
                                                 'addressModel': address[index],
+                                                'pageType':
+                                                AppRoutes.companyDetailsScreen,
+                                                'referenceFrom': detailsModel!
+                                                    .apiResponse![0]
+                                                    .addressDetails![index]
+                                                    .addressReferenceFrom,
+                                                'referenceUUID': detailsModel!
+                                                    .apiResponse![0]
+                                                    .addressDetails![index]
+                                                    .addressReferenceUuid,
+                                                'addressID': detailsModel!
+                                                    .apiResponse![0]
+                                                    .addressDetails![index]
+                                                    .addressId,
                                               });
                                         },
                                         child: Container(

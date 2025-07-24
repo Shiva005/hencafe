@@ -56,7 +56,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
   }
 
   Future<void> getFavouriteStateData() async {
-    final res = await AuthServices().getFavouriteStateList(context,'');
+    final res = await AuthServices().getFavouriteStateList(context,prefs.getString(AppStrings.prefUserID)!);
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!

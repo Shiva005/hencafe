@@ -371,6 +371,27 @@ class AuthServices {
     }
   }
 
+  Future<ProfileModel?> getUsers(
+      BuildContext context, String promotionStatus) async {
+    var prefs = await SharedPreferences.getInstance();
+
+    final response = await http.get(
+      Uri.parse("${ServiceNames.GET_USERS}/$promotionStatus"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage) ?? 'en',
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
+        'session-id': prefs.getString(AppStrings.prefSessionID) ?? '',
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+      },
+    );
+
+    logger.d('TAG Get Users List: ${response.body}');
+    return ProfileModel.fromJson(jsonDecode(response.body));
+  }
+
   Future<SuppliesModel> getSupplies(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
@@ -514,6 +535,9 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),

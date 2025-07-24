@@ -1,5 +1,6 @@
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,10 +24,16 @@ class _HomeFragment2State extends State<HomeFragment2>
   late AnimationController _animationController;
   late SharedPreferences prefs;
   late Future<CompanyProvidersModel> companyListData;
+  late Future<ProfileModel?> profileListData;
 
-  Future<CompanyProvidersModel> _fetchData() async {
+  Future<CompanyProvidersModel> _fetchCompanyData() async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getCompanyProvidersList(context, '', 'true');
+  }
+
+  Future<ProfileModel?> _fetchProfileData() async {
+    prefs = await SharedPreferences.getInstance();
+    return await AuthServices().getUsers(context, 'true');
   }
 
   Color _getRandomColor(String key) {
@@ -45,7 +52,8 @@ class _HomeFragment2State extends State<HomeFragment2>
 
   @override
   void initState() {
-    companyListData = _fetchData();
+    companyListData = _fetchCompanyData();
+    profileListData = _fetchProfileData();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 260),
@@ -70,7 +78,7 @@ class _HomeFragment2State extends State<HomeFragment2>
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
+          child: ListView(
             children: [
               Row(
                 children: [
@@ -115,6 +123,275 @@ class _HomeFragment2State extends State<HomeFragment2>
                 children: [
                   SizedBox(height: 20),
                   Text("Companies",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    height: 170,
+                    child: FutureBuilder<ProfileModel?>(
+                      future: profileListData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(
+                              child: Text("Error: ${snapshot.error}"));
+                        }
+
+                        final profiles = snapshot.data?.apiResponse ?? [];
+                        return profiles.isNotEmpty
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: profiles.length,
+                                itemBuilder: (context, index) {
+                                  final profile = profiles[index];
+                                  return GestureDetector(
+                                      onTap: () {
+                                        NavigationHelper.pushNamed(
+                                            AppRoutes.myProfileScreen);
+                                      },
+                                      child: Wrap(
+                                        children: [
+                                          Container(
+                                            width: 300,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                  color:
+                                                      AppColors.primaryColor),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: StreamBuilder<Object>(
+                                                  stream: null,
+                                                  builder: (context, snapshot) {
+                                                    return Column(
+                                                      children: [
+                                                        /*Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                if (profile
+                                                                        .attachmentInfo![
+                                                                            0]
+                                                                        .attachmentPath !=
+                                                                    null) {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder:
+                                                                          (_) =>
+                                                                              ImagePreviewScreen(
+                                                                        imageUrl: profile
+                                                                            .attachmentInfo![0]
+                                                                            .attachmentPath!,
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              },
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                child: profile.attachmentInfo![0].attachmentPath !=
+                                                                            null &&
+                                                                        profile
+                                                                            .attachmentInfo![
+                                                                                0]
+                                                                            .attachmentPath!
+                                                                            .isNotEmpty
+                                                                    ? Image
+                                                                        .network(
+                                                                  profile
+                                                                      .attachmentInfo![
+                                                                  0]
+                                                                      .attachmentPath!,
+                                                                        width:
+                                                                            70,
+                                                                        height:
+                                                                            70,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      )
+                                                                    : Image
+                                                                        .asset(
+                                                                        AppIconsData
+                                                                            .noImage,
+                                                                        width:
+                                                                            70,
+                                                                        height:
+                                                                            70,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    profile
+                                                                    .userFirstName ??
+                                                                        'No Name',
+                                                                    style: const TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                          Icons
+                                                                              .business_center_outlined,
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade600,
+                                                                          size:
+                                                                              18),
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              5),
+                                                                      Text(profile
+                                                                              .userLastName ??
+                                                                          'No Details'),
+                                                                    ],
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                          Icons
+                                                                              .perm_phone_msg_outlined,
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade600,
+                                                                          size:
+                                                                              18),
+                                                                      const SizedBox(
+                                                                          width:
+                                                                              5),
+                                                                      Text(profile
+                                                                              .userEmail ??
+                                                                          'No Contact'),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                                Icons
+                                                                    .arrow_right_alt_outlined,
+                                                                color: AppColors
+                                                                    .primaryColor),
+                                                          ],
+                                                        ),*/
+                                                        const SizedBox(
+                                                            height: 10),
+                                                        if (profile.supplyInfo !=
+                                                                null &&
+                                                            profile.supplyInfo!
+                                                                .isNotEmpty)
+                                                          SizedBox(
+                                                            height: 40,
+                                                            // Enough height for two rows with padding
+
+                                                            child: ListView(
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              children: [
+                                                                Wrap(
+                                                                  direction: Axis
+                                                                      .horizontal,
+                                                                  // vertical wrap to create 2 rows
+                                                                  runSpacing: 5,
+                                                                  children: profile
+                                                                      .supplyInfo!
+                                                                      .map((e) =>
+                                                                          e.supplytypeNameLanguage ??
+                                                                          '')
+                                                                      .where((name) =>
+                                                                          name
+                                                                              .isNotEmpty)
+                                                                      .map(
+                                                                          (name) {
+                                                                    final bgColor =
+                                                                        _getRandomColor(
+                                                                            name);
+                                                                    return Container(
+                                                                      margin: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              8),
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          horizontal:
+                                                                              10,
+                                                                          vertical:
+                                                                              6),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color:
+                                                                            bgColor,
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(6),
+                                                                      ),
+                                                                      child:
+                                                                          Text(
+                                                                        name,
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontSize:
+                                                                              13,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }).toList(),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    );
+                                                  }),
+                                            ),
+                                          ),
+                                        ],
+                                      ));
+                                },
+                              )
+                            : Center(child: Text("No companies available"));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Users",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   SizedBox(height: 10),
@@ -376,7 +653,7 @@ class _HomeFragment2State extends State<HomeFragment2>
                                       ));
                                 },
                               )
-                            : Center(child: Text("No companies available"));
+                            : Center(child: Text("No Users available"));
                       },
                     ),
                   ),

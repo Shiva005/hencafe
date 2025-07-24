@@ -56,7 +56,9 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
   }
 
   Future<void> getFavouriteStateData() async {
-    final res = await AuthServices().getFavouriteStateList(context,'');
+    prefs = await SharedPreferences.getInstance();
+    final res = await AuthServices().getFavouriteStateList(
+        context, prefs.getString(AppStrings.prefUserID)!);
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!
@@ -533,8 +535,8 @@ class EggPriceCard extends StatelessWidget {
                               fontSize: 12, color: Colors.green.shade700)),
                       Text(
                           'End: ${Utils.threeLetterDateFormatted(chickPriceModel.apiResponse![index].chickaleEffectTo.toString())}',
-                          style:
-                          TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.red.shade700)),
                     ],
                   ),
                   Row(

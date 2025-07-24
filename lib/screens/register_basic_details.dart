@@ -405,7 +405,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                       ],
                     ),
                     onTap: () {
-                      workTypeController.text = key;
+                      workTypeController.text = workTypes[key] ?? '';
                       _selectedWorkType = key;
                       Navigator.pop(context);
                     },

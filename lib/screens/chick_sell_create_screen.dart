@@ -516,6 +516,14 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     ),
                                   ),
                                   readOnly: true,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value == 'Start Date') {
+                                      return 'Please select Start Date';
+                                    }
+                                    return null;
+                                  },
                                   onTap: () async {
                                     DateTime? pickedDate = await showDatePicker(
                                         context: context,
@@ -539,65 +547,77 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: SizedBox(
-                              height: 70.0,
-                              child: GestureDetector(
+                              child: SizedBox(
+                                height: 70.0,
                                 child: TextFormField(
-                                    style: TextStyle(color: Colors.black),
-                                    controller: endDateController,
-                                    decoration: InputDecoration(
-                                      labelStyle: TextStyle(color: Colors.grey),
-                                      prefixIcon: Icon(Icons.calendar_month),
-                                      iconColor: Colors.white,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      labelText: "End Date",
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Colors.grey.shade400),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Colors.grey.shade400),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Colors.green.shade200),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
+                                  style: TextStyle(color: Colors.black),
+                                  controller: endDateController,
+                                  decoration: InputDecoration(
+                                    labelStyle: TextStyle(color: Colors.grey),
+                                    prefixIcon: Icon(Icons.calendar_month),
+                                    iconColor: Colors.white,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    labelText: "End Date",
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    readOnly: true,
-                                    onTap: () async {
-                                      DateTime? startDate;
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.green.shade200),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  readOnly: true,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value == 'End Date') {
+                                      return 'Please select End Date';
+                                    }
+                                    return null;
+                                  },
+                                  onTap: () async {
+                                    // Try parsing start date
+                                    DateTime startDate;
+                                    try {
+                                      startDate = DateFormat('yyyy-MM-dd').parse(startDateController.text);
+                                    } catch (e) {
+                                      startDate = DateTime.now();
+                                    }
+
+                                    // Try parsing current end date if it's not empty
+                                    DateTime initialDate;
+                                    if (endDateController.text.isNotEmpty) {
                                       try {
-                                        startDate = DateFormat('yyyy-MM-dd')
-                                            .parse(startDateController.text);
+                                        initialDate = DateFormat('yyyy-MM-dd').parse(endDateController.text);
                                       } catch (e) {
-                                        startDate = DateTime
-                                            .now(); // fallback if parsing fails
+                                        initialDate = startDate.add(Duration(days: 0));
                                       }
-                                      DateTime? pickedDate =
-                                          await showDatePicker(
-                                        context: context,
-                                        initialDate:
-                                            startDate.add(Duration(days: 0)),
-                                        // ensure it's after start date
-                                        firstDate:
-                                            startDate.add(Duration(days: 0)),
-                                        // user must pick after start date
-                                        lastDate:
-                                            startDate.add(Duration(days: 14)),
-                                      );
-                                      String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate!);
-                                      setState(() => endDateController.text =
-                                          formattedDate);
-                                    }),
-                              ),
-                            ),
+                                    } else {
+                                      initialDate = startDate.add(Duration(days: 0));
+                                    }
+
+                                    // Show date picker
+                                    DateTime? pickedDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: initialDate,
+                                      firstDate: startDate.add(Duration(days: 0)),
+                                      lastDate: startDate.add(Duration(days: 14)),
+                                    );
+
+                                    if (pickedDate != null) {
+                                      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                                      setState(() => endDateController.text = formattedDate);
+                                    }
+                                  },
+                                ),
+                              )
+
                           ),
                         ],
                       ),
@@ -728,6 +748,14 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               ),
                             ),
                             readOnly: true,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value == 'Select Company') {
+                                return 'Please select Company';
+                              }
+                              return null;
+                            },
                             onTap: () async => _showSelectionBottomSheet(
                               title: "Company",
                               fetchData: () async => companyList,
