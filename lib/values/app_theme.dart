@@ -144,8 +144,15 @@ class AppTheme {
     );
   }
 
+  static const TextStyle appbarTextStyle = TextStyle(
+    color: Colors.black54,
+    letterSpacing: 0.5,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
+
   static const TextStyle linkText = TextStyle(
-    color: Colors.blue,
+    color: AppColors.primaryColor,
     fontSize: 14,
     letterSpacing: 0.5,
     fontWeight: FontWeight.w500,
@@ -171,30 +178,28 @@ class AppTheme {
     color: Colors.grey,
     letterSpacing: 0.5,
   );
-  static const TextStyle primaryHeadingDrawer = TextStyle(
-    color: Colors.white,
-    letterSpacing: 0.5,
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
-  );
-  static const TextStyle primaryColorTExtStyle = TextStyle(
+
+  static const TextStyle primaryColorTextStyle = TextStyle(
     color: AppColors.primaryColor,
     letterSpacing: 0.5,
     fontSize: 16,
     fontWeight: FontWeight.w700,
   );
+
   static const TextStyle debitedText = TextStyle(
     color: Colors.red,
     letterSpacing: 0.5,
     fontSize: 14,
     fontWeight: FontWeight.w700,
   );
+
   static const TextStyle creditedText = TextStyle(
     color: Colors.green,
     letterSpacing: 0.5,
     fontSize: 14,
     fontWeight: FontWeight.w700,
   );
+
   static const TextStyle secondaryHeadingDrawer = TextStyle(
     color: Colors.grey,
     letterSpacing: 0.5,

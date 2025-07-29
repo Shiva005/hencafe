@@ -50,8 +50,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Registration Check: ${jsonDecode(response.body)}');
-    return RegistrationCheckModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Registration Check: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return RegistrationCheckModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<OtpGenerateModel> otpGenerate(
@@ -73,8 +73,8 @@ class AuthServices {
     );
 
     logger.d('TAG OTP Generate: $payload');
-    logger.d('TAG OTP Generate: ${jsonDecode(response.body)}');
-    return OtpGenerateModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG OTP Generate: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return OtpGenerateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ValidateOtpModel> otpValidate(
@@ -97,8 +97,8 @@ class AuthServices {
     );
 
     logger.d('TAG OTP Validate: $payload');
-    logger.d('TAG OTP Validate: ${jsonDecode(response.body)}');
-    return ValidateOtpModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG OTP Validate: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return ValidateOtpModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateMobileNumber(
@@ -128,8 +128,8 @@ class AuthServices {
     );
 
     logger.d('TAG Change Number: $payload');
-    logger.d('TAG Change Number: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Change Number: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<LoginPinCheckModel> loginPinCheck(
@@ -158,8 +158,8 @@ class AuthServices {
     );
 
     logger.d('TAG Login: $payload');
-    logger.d('TAG Login: ${jsonDecode(response.body)}');
-    return LoginPinCheckModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Login: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return LoginPinCheckModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<StateModel> getStates(BuildContext context) async {
@@ -175,8 +175,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG State List: ${jsonDecode(response.body)}');
-    return StateModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG State List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return StateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<CityListModel> getCityList(
@@ -193,8 +193,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG City List: ${jsonDecode(response.body)}');
-    return CityListModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG City List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return CityListModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<RegistrationCreateModel> registrationCreate(
@@ -234,8 +234,8 @@ class AuthServices {
     );
 
     logger.d('TAG Register: $payload');
-    logger.d('TAG Register: ${jsonDecode(response.body)}');
-    return RegistrationCreateModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Register: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return RegistrationCreateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateBasicDetails(
@@ -271,8 +271,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Details: $payload');
-    logger.d('TAG Update Details: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteProfile(
@@ -308,8 +308,8 @@ class AuthServices {
       body: jsonEncode(payload),
     );
 
-    logger.d('TAG Delete Profile: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Profile: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updatePassword(
@@ -340,8 +340,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Details: $payload');
-    logger.d('TAG Update Details: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ProfileModel?> getProfile(
@@ -363,7 +363,7 @@ class AuthServices {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       logger.d('Response Body: ${response.body}');
-      return ProfileModel.fromJson(jsonDecode(response.body));
+      return ProfileModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     } else {
       StatusCodeHandler.handleStatusCode(
           context, response.statusCode, response.body);
@@ -389,7 +389,7 @@ class AuthServices {
     );
 
     logger.d('TAG Get Users List: ${response.body}');
-    return ProfileModel.fromJson(jsonDecode(response.body));
+    return ProfileModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuppliesModel> getSupplies(BuildContext context) async {
@@ -407,8 +407,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Supplies: ${jsonDecode(response.body)}');
-    return SuppliesModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Supplies: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuppliesModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateFavState(
@@ -434,8 +434,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update State: $payload');
-    logger.d('TAG Update State: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update State: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSupplies(
@@ -459,8 +459,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Supplies: $payload');
-    logger.d('TAG Update Supplies: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Supplies: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createAddress(
@@ -501,8 +501,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Address: $payload');
-    logger.d('TAG Create Address: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateAddress(
@@ -544,8 +544,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Address: $payload');
-    logger.d('TAG Update Address: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellEgg(
@@ -595,8 +595,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellEgg(
@@ -648,8 +648,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellChick(
@@ -701,8 +701,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Sell Chick: $payload');
-    logger.d('TAG Create Sell Chick: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createLiftingSell(
@@ -752,8 +752,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Lifting Sale: $payload');
-    logger.d('TAG Create Lifting Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createContactSupport(
@@ -791,8 +791,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Support: $payload');
-    logger.d('TAG Create Support: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Support: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateLiftingSell(
@@ -844,8 +844,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Lifting Sale: $payload');
-    logger.d('TAG Update Lifting Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellChick(
@@ -899,8 +899,8 @@ class AuthServices {
     );
 
     logger.d('TAG Update Sell Chick: $payload');
-    logger.d('TAG Update Sell Chick: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Update Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellChicken(
@@ -951,8 +951,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Sell Chicken: $payload');
-    logger.d('TAG Create Sell Chicken: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Sell Chicken: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellChicken(
@@ -1005,8 +1005,8 @@ class AuthServices {
     );
 
     logger.d('TAG Create Sell Egg: $payload');
-    logger.d('TAG Create Sell Egg: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<UserFavouriteStateModel> getFavouriteStateList(
@@ -1026,8 +1026,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Fav State: ${jsonDecode(response.body)}');
-    return UserFavouriteStateModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Fav State: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return UserFavouriteStateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ContactHistoryModel> getContactHistory(BuildContext context,
@@ -1047,10 +1047,10 @@ class AuthServices {
       },
     );
 
-    logger.w('TAG Get Contact History: ${jsonDecode(response.body)}');
+    logger.w('TAG Get Contact History: ${json.decode(utf8.decode(response.bodyBytes))}');
     logger.w(
         'TAG Get Contact History: ${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID');
-    return ContactHistoryModel.fromJson(jsonDecode(response.body));
+    return ContactHistoryModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<BirdBreedModel> getBirdList(BuildContext context) async {
@@ -1068,8 +1068,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Bird Breed: ${jsonDecode(response.body)}');
-    return BirdBreedModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Bird Breed: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return BirdBreedModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<CompanyListModel> getCompanyList(BuildContext context) async {
@@ -1087,8 +1087,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Company List: ${jsonDecode(response.body)}');
-    return CompanyListModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Company List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return CompanyListModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<CompanyProvidersModel> getCompanyProvidersList(
@@ -1108,8 +1108,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
-    return CompanyProvidersModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return CompanyProvidersModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ReferralModel> getReferralsList(BuildContext context) async {
@@ -1128,8 +1128,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
-    return ReferralModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return ReferralModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<MedicineModel> getMedicine(
@@ -1148,8 +1148,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Company providers List: ${jsonDecode(response.body)}');
-    return MedicineModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return MedicineModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
@@ -1169,8 +1169,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Egg Price List: ${jsonDecode(response.body)}');
-    return EggPriceModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return EggPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<AddressModel> getAddressList(BuildContext context,
@@ -1190,8 +1190,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Egg Price List: ${jsonDecode(response.body)}');
-    return AddressModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return AddressModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ChickPriceModel> getChickPriceList(BuildContext context,
@@ -1211,8 +1211,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Chick Price List: ${jsonDecode(response.body)}');
-    return ChickPriceModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Chick Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return ChickPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ChickenPriceModel> getChickenPriceList(BuildContext context,
@@ -1232,8 +1232,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Chicken Price List: ${jsonDecode(response.body)}');
-    return ChickenPriceModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Chicken Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return ChickenPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<LiftingPriceModel> getLiftingPriceList(BuildContext context,
@@ -1253,8 +1253,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
-    return LiftingPriceModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return LiftingPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteAddress(
@@ -1273,8 +1273,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Delete Address: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteContactRecord(
@@ -1293,8 +1293,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Get Lifting Price List: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteEggSaleRecord(
@@ -1313,8 +1313,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Delete Egg Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Egg Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteChickSaleRecord(
@@ -1333,8 +1333,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Delete Chick Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Chick Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteChickenSaleRecord(
@@ -1353,8 +1353,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Delete Chicken Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Chicken Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteLiftingSaleRecord(
@@ -1373,8 +1373,8 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG Delete Lifting Sale: ${jsonDecode(response.body)}');
-    return SuccessModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Delete Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ForgetPinModel> forgetPin(
@@ -1396,8 +1396,8 @@ class AuthServices {
     );
 
     logger.d('TAG Forget Pin: $payload');
-    logger.d('TAG Forget Pin: ${jsonDecode(response.body)}');
-    return ForgetPinModel.fromJson(jsonDecode(response.body));
+    logger.d('TAG Forget Pin: ${json.decode(utf8.decode(response.bodyBytes))}');
+    return ForgetPinModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> attachmentDelete(
@@ -1431,7 +1431,7 @@ class AuthServices {
       logger.d('Request Data: ${request.fields}');
       logger.d('Response: ${response.statusCode}');
       logger.d('Response Body: ${response.body}');
-      return SuccessModel.fromJson(jsonDecode(response.body));
+      return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     } catch (e) {
       logger.e('Exception during attachment delete: $e');
       rethrow;

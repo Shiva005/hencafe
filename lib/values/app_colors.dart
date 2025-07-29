@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   const AppColors._();
 
-  static const Color primaryColor = Color(0xff5F259F);
+  static const Color primaryColor = Color(0xff4F49A3);
   static const Color primaryColor100 = Color(0xffe2c4ff);
   static const Color primaryColor700 = Color(0xff9e38fb);
   static const Color lightBlue = Color(0xff0055bb);
@@ -18,8 +18,9 @@ class AppColors {
   static const Color endColor = Color(0xff04CFDC);
   static const Color nextStartColor = Color(0xffFDA95A);
   static const Color nextEndColor = Color(0xffFF5E76);
-  static Color backgroundColor = Colors.grey.shade100;
   static const Color pink = Color(0xffDF1BB1);
+  static Color backgroundColor = Colors.grey.shade200;
+  static Color statusBarColor = Colors.grey.shade200;
 
   //static Color backgroundColor = Colors.blue.shade500;
 

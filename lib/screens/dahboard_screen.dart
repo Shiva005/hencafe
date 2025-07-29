@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/screens/fragments/home_fragment2.dart';
+import 'package:hencafe/screens/fragments/home_fragment.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,7 +11,6 @@ import '../services/services.dart';
 import '../utils/utils.dart';
 import '../values/app_colors.dart';
 import '../values/app_routes.dart';
-
 import '../values/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -63,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           AppStrings.prefLastName, getProfileRes.apiResponse![0].userLastName);
       prefs.setString(AppStrings.prefIsUserVerified,
           getProfileRes.apiResponse![0].userIsVerfied);
-      prefs.setInt(
+      prefs.setString(
           AppStrings.prefFavStateMaxCount,
           getProfileRes
               .apiResponse![0].userMembershipInfo[0].userFavStateMaxCount);
@@ -89,29 +88,21 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey.shade100,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: AppColors.primaryColor,
-          elevation: 1.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(18),
-            ),
-          ),
+          backgroundColor: Colors.white,
           title: Text(
             prefs != null
                 ? '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}'
                 : "",
-            style: AppTheme.primaryHeadingDrawer,
+            style: AppTheme.appbarTextStyle,
           ),
           centerTitle: false,
           leading: IconButton(
             icon: const Icon(
               Icons.format_align_left,
-              color: Colors.white,
+              color: Colors.black54,
             ),
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer();
@@ -121,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             IconButton(
               icon: const Icon(
                 Icons.notifications_active_outlined,
-                color: Colors.white,
+                color: Colors.black54,
               ),
               onPressed: () {
                 NavigationHelper.pushNamed(
@@ -169,7 +160,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 children: [
                                   Text(
                                     '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}',
-                                    style: AppTheme.primaryColorTExtStyle,
+                                    style: AppTheme.primaryColorTextStyle,
                                   ),
                                   const SizedBox(
                                     height: 5,
@@ -438,7 +429,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           },
         ),
       ),
-      body: HomeFragment2(),
+      body: HomeFragment(),
     );
   }
 

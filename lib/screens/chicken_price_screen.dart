@@ -226,7 +226,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: NavigationHelper.pop,
           ),
-          title: Text('Chicken Price', style: AppTheme.primaryHeadingDrawer),
+          title: Text('Chicken Price', style: AppTheme.appbarTextStyle),
           actions: [
             GestureDetector(
               onTap: () async {

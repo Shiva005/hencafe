@@ -40,8 +40,7 @@ class _MyAppBarState extends State<MyAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: true,
-      backgroundColor: AppColors.primaryColor,
-      elevation: 1.0,
+      backgroundColor: AppColors.statusBarColor,
       leading: IconButton(
         onPressed: () {
           NavigationHelper.pop();
@@ -49,11 +48,6 @@ class _MyAppBarState extends State<MyAppBar> {
         icon: const Icon(
           Icons.keyboard_backspace,
           color: Colors.white,
-        ),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(20),
         ),
       ),
       centerTitle: widget.centerTitle,

@@ -8,13 +8,13 @@ import 'package:hencafe/screens/chick_sell_create_screen.dart';
 import 'package:hencafe/screens/chicken_price_screen.dart';
 import 'package:hencafe/screens/chicken_sell_create_screen.dart';
 import 'package:hencafe/screens/company_details_screen.dart';
-import 'package:hencafe/screens/company_list%20screen.dart';
 import 'package:hencafe/screens/contact_us_screen.dart';
 import 'package:hencafe/screens/create_address_screen.dart';
 import 'package:hencafe/screens/dahboard_screen.dart';
 import 'package:hencafe/screens/delete_account_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
+import 'package:hencafe/screens/fragments/company_list_fragment.dart';
 import 'package:hencafe/screens/lifting_price_screen.dart';
 import 'package:hencafe/screens/lifting_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
@@ -135,9 +135,9 @@ class Routes {
       case AppRoutes.companyListScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile: const CompanyListScreen(),
-            tablet: CompanyListScreen(),
-            desktop: CompanyListScreen(),
+            mobile: const CompanyListFragment(),
+            tablet: CompanyListFragment(),
+            desktop: CompanyListFragment(),
           ),
         );
       case AppRoutes.companyDetailsScreen:

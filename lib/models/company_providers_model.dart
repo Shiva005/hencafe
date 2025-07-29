@@ -49,6 +49,7 @@ class ApiResponse {
     this.companyName,
     this.companyNameLanguage,
     this.companyDetails,
+    this.companyWebsite,
     this.companyContactUserName,
     this.companyContactUserMobile,
     this.companyContactUserEmail,
@@ -56,6 +57,7 @@ class ApiResponse {
     this.userBasicInfo,
     this.attachmentInfo,
     this.attachmentLogoInfo,
+    this.attachmentBannerInfo,
     this.addressDetails,
   });
 
@@ -65,6 +67,7 @@ class ApiResponse {
     companyName = json['company_name'];
     companyNameLanguage = json['company_name_language'];
     companyDetails = json['company_details'];
+    companyWebsite = json['company_website'];
     companyContactUserName = json['company_contact_user_name'];
     companyContactUserMobile = json['company_contact_user_mobile'];
     companyContactUserEmail = json['company_contact_user_email'];
@@ -89,7 +92,13 @@ class ApiResponse {
     if (json['attachment_logo_info'] != null) {
       attachmentLogoInfo = [];
       json['attachment_logo_info'].forEach((v) {
-        attachmentLogoInfo?.add(AttachmentInfo.fromJson(v));
+        attachmentLogoInfo?.add(AttachmentLogoInfo.fromJson(v));
+      });
+    }
+    if (json['attachment_banner_info'] != null) {
+      attachmentBannerInfo = [];
+      json['attachment_banner_info'].forEach((v) {
+        attachmentBannerInfo?.add(AttachmentBannerInfo.fromJson(v));
       });
     }
     if (json['address_details'] != null) {
@@ -105,13 +114,15 @@ class ApiResponse {
   String? companyName;
   String? companyNameLanguage;
   String? companyDetails;
+  String? companyWebsite;
   String? companyContactUserName;
   String? companyContactUserMobile;
   String? companyContactUserEmail;
   List<SupplyInfo>? supplyInfo;
   List<UserBasicInfo>? userBasicInfo;
   List<AttachmentInfo>? attachmentInfo;
-  List<dynamic>? attachmentLogoInfo;
+  List<AttachmentLogoInfo>? attachmentLogoInfo;
+  List<AttachmentBannerInfo>? attachmentBannerInfo;
   List<AddressDetails>? addressDetails;
 
   Map<String, dynamic> toJson() {
@@ -121,6 +132,7 @@ class ApiResponse {
     map['company_name'] = companyName;
     map['company_name_language'] = companyNameLanguage;
     map['company_details'] = companyDetails;
+    map['company_website'] = companyWebsite;
     map['company_contact_user_name'] = companyContactUserName;
     map['company_contact_user_mobile'] = companyContactUserMobile;
     map['company_contact_user_email'] = companyContactUserEmail;
@@ -136,6 +148,10 @@ class ApiResponse {
     if (attachmentLogoInfo != null) {
       map['attachment_logo_info'] =
           attachmentLogoInfo?.map((v) => v.toJson()).toList();
+    }
+    if (attachmentBannerInfo != null) {
+      map['attachment_banner_info'] =
+          attachmentBannerInfo?.map((v) => v.toJson()).toList();
     }
     if (addressDetails != null) {
       map['address_details'] = addressDetails?.map((v) => v.toJson()).toList();
@@ -377,6 +393,98 @@ class LocationInfo {
   }
 }
 
+class AttachmentBannerInfo {
+  AttachmentBannerInfo({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentType,
+    this.attachmentName,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
+
+  AttachmentBannerInfo.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
+  }
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
+    return map;
+  }
+}
+
+class AttachmentLogoInfo {
+  AttachmentLogoInfo({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentType,
+    this.attachmentName,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
+
+  AttachmentLogoInfo.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
+  }
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
+    return map;
+  }
+}
+
 class SupplyInfo {
   SupplyInfo({
     this.userCompanySupplytypeId,
@@ -399,7 +507,7 @@ class SupplyInfo {
   String? userCompanySupplytypeId;
   String? supplyReferenceFrom;
   String? supplyReferenceUuid;
-  int? supplytypeId;
+  String? supplytypeId;
   String? supplytypeName;
   String? supplytypeNameLanguage;
 

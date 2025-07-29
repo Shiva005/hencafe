@@ -53,6 +53,7 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^24.2.4
   path: ^1.9.0
   share_plus: ^11.0.0
+  persistent_bottom_nav_bar_v2: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,25 @@ package_rename_config:
 
 flutter:
   uses-material-design: true
+
   assets:
     - assets/icons/
     - assets/gifs/
+    - assets/fonts/
+
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-Regular.ttf
+
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+
+    - family: NotoSansTelugu
+      fonts:
+        - asset: assets/fonts/NotoSansTelugu-Regular.ttf
+
+    - family: NotoSansTamil
+      fonts:
+        - asset: assets/fonts/NotoSansTamil-Regular.ttf

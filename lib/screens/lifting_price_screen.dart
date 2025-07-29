@@ -221,7 +221,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: NavigationHelper.pop,
           ),
-          title: Text('Lifting Sale', style: AppTheme.primaryHeadingDrawer),
+          title: Text('Lifting Sale', style: AppTheme.appbarTextStyle),
           actions: [
             GestureDetector(
               onTap: () async {

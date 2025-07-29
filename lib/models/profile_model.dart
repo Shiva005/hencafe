@@ -321,7 +321,7 @@ class SupplyInfo {
   String? userCompanySupplytypeId;
   String? supplyReferenceFrom;
   String? supplyReferenceUuid;
-  int? supplytypeId;
+  String? supplytypeId;
   String? supplytypeName;
   String? supplytypeNameLanguage;
 
@@ -407,7 +407,7 @@ class UserMembershipInfo {
   String? userMembershipId;
   String? userUuid;
   UserMembershipType? userMembershipType;
-  int? userFavStateMaxCount;
+  String? userFavStateMaxCount;
   String? userMembershipValidFrom;
   String? userMembershipValidTo;
 

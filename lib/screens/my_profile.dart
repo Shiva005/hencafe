@@ -165,7 +165,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             userID == prefs.getString(AppStrings.prefUserID)
                 ? "My Profile"
                 : "Seller Details",
-            style: AppTheme.primaryHeadingDrawer,
+            style: AppTheme.appbarTextStyle,
           ),
           centerTitle: false,
         ),

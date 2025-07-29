@@ -2,34 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/navigation_helper.dart';
-import '../models/company_providers_model.dart';
-import '../services/services.dart';
-import '../utils/appbar_widget.dart';
-import '../values/app_colors.dart';
-import '../values/app_routes.dart';
-import 'image_preview_screen.dart';
+import '../../models/profile_model.dart';
+import '../../services/services.dart';
+import '../../values/app_colors.dart';
+import '../image_preview_screen.dart';
 
-class CompanyListScreen extends StatefulWidget {
-  const CompanyListScreen({super.key});
+class SellerListFragment extends StatefulWidget {
+  const SellerListFragment({super.key});
 
   @override
-  State<CompanyListScreen> createState() => _CompanyListScreenState();
+  State<SellerListFragment> createState() => _SellerListFragmentState();
 }
 
-class _CompanyListScreenState extends State<CompanyListScreen> {
+class _SellerListFragmentState extends State<SellerListFragment> {
   late SharedPreferences prefs;
-  late Future<CompanyProvidersModel> companyListData;
+  late Future<ProfileModel?> profileListData;
 
   @override
   void initState() {
     super.initState();
-    companyListData = _fetchData();
+    profileListData = _fetchData();
   }
 
-  Future<CompanyProvidersModel> _fetchData() async {
+  Future<ProfileModel?> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getCompanyProvidersList(context, '', '');
+    return await AuthServices().getUsers(context, 'true');
   }
 
   Color _getRandomColor(String key) {
@@ -50,17 +47,13 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: MyAppBar(title: 'Company List'),
-      ),
+      backgroundColor: Colors.grey.shade200,
       body: RefreshIndicator(
         onRefresh: () {
           return _fetchData();
         },
-        child: FutureBuilder<CompanyProvidersModel>(
-          future: companyListData,
+        child: FutureBuilder<ProfileModel?>(
+          future: profileListData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -69,21 +62,14 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
               return Center(child: Text("Error: ${snapshot.error}"));
             }
 
-            final companies = snapshot.data?.apiResponse ?? [];
-            return companies.isNotEmpty
+            final profiles = snapshot.data?.apiResponse ?? [];
+            return profiles.isNotEmpty
                 ? ListView.builder(
-                    itemCount: companies.length,
+                    itemCount: profiles.length,
                     itemBuilder: (context, index) {
-                      final company = companies[index];
+                      final profile = profiles[index];
                       return GestureDetector(
-                        onTap: () {
-                          NavigationHelper.pushNamed(
-                              AppRoutes.companyDetailsScreen,
-                              arguments: {
-                                'companyUUID': company.companyUuid,
-                                'companyPromotionStatus': 'true'
-                              });
-                        },
+                        onTap: () {},
                         child: Card(
                           elevation: 0.0,
                           color: Colors.white,
@@ -103,25 +89,25 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    if (company.attachmentLogoInfo![0]
+                                    if (profile.attachmentInfo![0]
                                         .attachmentPath!.isNotEmpty) {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => ImagePreviewScreen(
-                                                imageUrl: company
-                                                    .attachmentLogoInfo![0]
+                                                imageUrl: profile
+                                                    .attachmentInfo![0]
                                                     .attachmentPath!),
                                           ));
                                     }
                                   },
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: company.attachmentLogoInfo != null &&
-                                            company
-                                                .attachmentLogoInfo!.isNotEmpty
+                                    child: profile.attachmentInfo != null &&
+                                            profile
+                                                .attachmentInfo!.isNotEmpty
                                         ? Image.network(
-                                            company.attachmentLogoInfo![0]
+                                            profile.attachmentInfo![0]
                                                 .attachmentPath!,
                                             width: 70,
                                             height: 70,
@@ -143,43 +129,23 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        company.companyName ?? 'No Name',
+                                        profile.userFirstName ?? 'No Name',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.business_center_outlined,
-                                              color: Colors.grey.shade600,
-                                              size: 18),
-                                          SizedBox(width: 5.0),
-                                          Text(company.companyDetails ??
-                                              'No Details'),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.perm_phone_msg_outlined,
-                                              color: Colors.grey.shade600,
-                                              size: 18),
-                                          SizedBox(width: 5.0),
-                                          Text(company
-                                                  .companyContactUserMobile ??
-                                              'No Contact'),
-                                        ],
-                                      ),
+
                                       SizedBox(height: 5),
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          if (company.supplyInfo != null &&
-                                              company.supplyInfo!.isNotEmpty)
+                                          if (profile.supplyInfo != null &&
+                                              profile.supplyInfo!.isNotEmpty)
                                             Expanded(
                                               child: Wrap(
                                                 spacing: 8.0,
                                                 runSpacing: 6.0,
-                                                children: company.supplyInfo!
+                                                children: profile.supplyInfo!
                                                     .map((e) =>
                                                         e.supplytypeNameLanguage ??
                                                         '')

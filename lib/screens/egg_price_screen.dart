@@ -56,7 +56,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   }
 
   Future<void> getFavouriteStateData() async {
-    final res = await AuthServices().getFavouriteStateList(context, prefs.getString(AppStrings.prefUserID)!);
+    final res = await AuthServices().getFavouriteStateList(
+        context, prefs.getString(AppStrings.prefUserID)!);
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!
@@ -231,7 +232,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: NavigationHelper.pop,
           ),
-          title: Text('Egg Price', style: AppTheme.primaryHeadingDrawer),
+          title: Text('Egg Price', style: AppTheme.appbarTextStyle),
           actions: [
             GestureDetector(
               onTap: () async {
@@ -426,6 +427,12 @@ class EggPriceCard extends StatelessWidget {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryColor,
+                                fontFamily: 'NotoSans',
+                                fontFamilyFallback: [
+                                  'NotoSansDevanagari',
+                                  'NotoSansTamil',
+                                  'NotoSansTelugu',
+                                ],
                               ),
                             ),
                           ],
@@ -446,7 +453,8 @@ class EggPriceCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                                "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
+                              "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}",
+                            )
                           ],
                         ),
                         Row(
