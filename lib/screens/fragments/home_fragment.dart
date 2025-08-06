@@ -69,34 +69,8 @@ class _HomeFragmentState extends State<Home>
   late Future<CompanyProvidersModel> companyListData;
   late Future<ProfileModel?> profileListData;
 
-  Future<CompanyProvidersModel> _fetchCompanyData() async {
-    prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getCompanyProvidersList(context, '', 'true');
-  }
-
-  Future<ProfileModel?> _fetchProfileData() async {
-    prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getUsers(context, 'true');
-  }
-
-  Color _getRandomColor(String key) {
-    final colors = [
-      Colors.teal,
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-      Colors.blue,
-      Colors.purple,
-      Colors.brown,
-    ];
-    int index = key.hashCode % colors.length;
-    return colors[index];
-  }
-
   @override
   void initState() {
-    companyListData = _fetchCompanyData();
-    profileListData = _fetchProfileData();
     super.initState();
   }
 

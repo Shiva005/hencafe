@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,5 +39,29 @@ class Utils {
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }
+  }
+
+  static void openExternalApp(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+
+  static Color getRandomColor(String key) {
+    final colors = [
+      Colors.teal,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.blue,
+      Colors.purple,
+      Colors.brown,
+    ];
+    int index = key.hashCode % colors.length;
+    return colors[index];
   }
 }

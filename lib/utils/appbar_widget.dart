@@ -40,14 +40,14 @@ class _MyAppBarState extends State<MyAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: true,
-      backgroundColor: AppColors.statusBarColor,
+      backgroundColor: Colors.white,
       leading: IconButton(
         onPressed: () {
           NavigationHelper.pop();
         },
         icon: const Icon(
           Icons.keyboard_backspace,
-          color: Colors.white,
+          color: Colors.black54,
         ),
       ),
       centerTitle: widget.centerTitle,
@@ -58,12 +58,12 @@ class _MyAppBarState extends State<MyAppBar> {
                   : const Alignment(-1.1, 0),
               child: Text(
                 widget.title.toString(),
-                style: AppTheme.textFormFieldTitle,
+                style: AppTheme.appbarTextStyle,
                 maxLines: 1,
               ))
           : Text(
               widget.title.toString(),
-              style: AppTheme.textFormFieldTitle,
+              style: AppTheme.appbarTextStyle,
               maxLines: 1,
             ),
     );

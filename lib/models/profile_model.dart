@@ -61,6 +61,8 @@ class ApiResponse {
     this.userFavouriteStateInfo,
     this.userMembershipInfo,
     this.attachmentInfo,
+    this.userProfileImg,
+    this.userBannerImg,
     this.supplyInfo,
     this.addressDetails,
   });
@@ -100,6 +102,18 @@ class ApiResponse {
         attachmentInfo?.add(AttachmentInfo.fromJson(v));
       });
     }
+    if (json['user_profile_img'] != null) {
+      userProfileImg = [];
+      json['user_profile_img'].forEach((v) {
+        userProfileImg?.add(UserProfileImg.fromJson(v));
+      });
+    }
+    if (json['user_banner_img'] != null) {
+      userBannerImg = [];
+      json['user_banner_img'].forEach((v) {
+        userBannerImg?.add(UserBannerImg.fromJson(v));
+      });
+    }
     if (json['supply_info'] != null) {
       supplyInfo = [];
       json['supply_info'].forEach((v) {
@@ -131,6 +145,8 @@ class ApiResponse {
   List<UserFavouriteStateInfo>? userFavouriteStateInfo;
   List<UserMembershipInfo>? userMembershipInfo;
   List<AttachmentInfo>? attachmentInfo;
+  List<UserProfileImg>? userProfileImg;
+  List<UserBannerImg>? userBannerImg;
   List<SupplyInfo>? supplyInfo;
   List<AddressDetails>? addressDetails;
 
@@ -163,6 +179,12 @@ class ApiResponse {
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
     }
+    if (userProfileImg != null) {
+      map['user_profile_img'] = userProfileImg?.map((v) => v.toJson()).toList();
+    }
+    if (userBannerImg != null) {
+      map['user_banner_img'] = userBannerImg?.map((v) => v.toJson()).toList();
+    }
     if (supplyInfo != null) {
       map['supply_info'] = supplyInfo?.map((v) => v.toJson()).toList();
     }
@@ -187,6 +209,7 @@ class AddressDetails {
     this.addressStatus,
     this.locationInfo,
     this.attachmentInfo,
+    this.userBasicInfo,
   });
 
   AddressDetails.fromJson(dynamic json) {
@@ -209,7 +232,13 @@ class AddressDetails {
     if (json['attachment_info'] != null) {
       attachmentInfo = [];
       json['attachment_info'].forEach((v) {
-        attachmentInfo?.add(AddressDetails.fromJson(v));
+        attachmentInfo?.add(AttachmentInfo.fromJson(v));
+      });
+    }
+    if (json['user_basic_info'] != null) {
+      userBasicInfo = [];
+      json['user_basic_info'].forEach((v) {
+        userBasicInfo?.add(UserBasicInfo.fromJson(v));
       });
     }
   }
@@ -225,7 +254,8 @@ class AddressDetails {
   String? addressGeoAddress;
   String? addressStatus;
   List<LocationInfo>? locationInfo;
-  List<dynamic>? attachmentInfo;
+  List<AttachmentInfo>? attachmentInfo;
+  List<UserBasicInfo>? userBasicInfo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -245,6 +275,105 @@ class AddressDetails {
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
     }
+    if (userBasicInfo != null) {
+      map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class UserBasicInfo {
+  UserBasicInfo({
+    this.userId,
+    this.userUuid,
+    this.userFirstName,
+    this.userLastName,
+    this.userMobile,
+    this.userEmail,
+    this.userRoleType,
+    this.userWorkType,
+    this.userIsVerfied,
+  });
+
+  UserBasicInfo.fromJson(dynamic json) {
+    userId = json['user_id'];
+    userUuid = json['user_uuid'];
+    userFirstName = json['user_first_name'];
+    userLastName = json['user_last_name'];
+    userMobile = json['user_mobile'];
+    userEmail = json['user_email'];
+    userRoleType = json['user_role_type'];
+    userWorkType = json['user_work_type'];
+    userIsVerfied = json['user_is_verfied'];
+  }
+
+  String? userId;
+  String? userUuid;
+  String? userFirstName;
+  String? userLastName;
+  String? userMobile;
+  String? userEmail;
+  String? userRoleType;
+  String? userWorkType;
+  String? userIsVerfied;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['user_id'] = userId;
+    map['user_uuid'] = userUuid;
+    map['user_first_name'] = userFirstName;
+    map['user_last_name'] = userLastName;
+    map['user_mobile'] = userMobile;
+    map['user_email'] = userEmail;
+    map['user_role_type'] = userRoleType;
+    map['user_work_type'] = userWorkType;
+    map['user_is_verfied'] = userIsVerfied;
+    return map;
+  }
+}
+
+class AttachmentInfo {
+  AttachmentInfo({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentType,
+    this.attachmentName,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
+
+  AttachmentInfo.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
+  }
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
     return map;
   }
 }
@@ -337,8 +466,8 @@ class SupplyInfo {
   }
 }
 
-class AttachmentInfo {
-  AttachmentInfo({
+class UserBannerImg {
+  UserBannerImg({
     this.attachmentId,
     this.attachmentReferenceCode,
     this.attachmentReferenceUuid,
@@ -349,7 +478,53 @@ class AttachmentInfo {
     this.attachmentCreatedon,
   });
 
-  AttachmentInfo.fromJson(dynamic json) {
+  UserBannerImg.fromJson(dynamic json) {
+    attachmentId = json['attachment_id'];
+    attachmentReferenceCode = json['attachment_reference_code'];
+    attachmentReferenceUuid = json['attachment_reference_uuid'];
+    attachmentPath = json['attachment_path'];
+    attachmentType = json['attachment_type'];
+    attachmentName = json['attachment_name'];
+    attachmentStatus = json['attachment_status'];
+    attachmentCreatedon = json['attachment_createdon'];
+  }
+
+  String? attachmentId;
+  String? attachmentReferenceCode;
+  String? attachmentReferenceUuid;
+  String? attachmentPath;
+  String? attachmentType;
+  String? attachmentName;
+  String? attachmentStatus;
+  String? attachmentCreatedon;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['attachment_id'] = attachmentId;
+    map['attachment_reference_code'] = attachmentReferenceCode;
+    map['attachment_reference_uuid'] = attachmentReferenceUuid;
+    map['attachment_path'] = attachmentPath;
+    map['attachment_type'] = attachmentType;
+    map['attachment_name'] = attachmentName;
+    map['attachment_status'] = attachmentStatus;
+    map['attachment_createdon'] = attachmentCreatedon;
+    return map;
+  }
+}
+
+class UserProfileImg {
+  UserProfileImg({
+    this.attachmentId,
+    this.attachmentReferenceCode,
+    this.attachmentReferenceUuid,
+    this.attachmentPath,
+    this.attachmentType,
+    this.attachmentName,
+    this.attachmentStatus,
+    this.attachmentCreatedon,
+  });
+
+  UserProfileImg.fromJson(dynamic json) {
     attachmentId = json['attachment_id'];
     attachmentReferenceCode = json['attachment_reference_code'];
     attachmentReferenceUuid = json['attachment_reference_uuid'];

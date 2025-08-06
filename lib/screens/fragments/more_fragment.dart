@@ -41,10 +41,8 @@ class _MoreFragmentState extends State<MoreFragment>
                         "Everything Your Chickens Need, All in One Place.")),
                 SizedBox(width: 20),
                 Expanded(
-                    child: _buildDashboardCard(
-                        AppIconsData.colorSellers,
-                        "Sellers",
-                        "Start and grow your farm easily with us!")),
+                    child: _buildDashboardCard(AppIconsData.colorSellers,
+                        "Sellers", "Start and grow your farm easily with us!")),
               ],
             ),
             SizedBox(height: 20),

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../helpers/navigation_helper.dart';
 import '../../models/company_providers_model.dart';
 import '../../services/services.dart';
+import '../../values/app_icons.dart';
 import '../../values/app_routes.dart';
 import '../image_preview_screen.dart';
 
@@ -26,7 +27,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
 
   Future<CompanyProvidersModel> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getCompanyProvidersList(context, '', '');
+    return await AuthServices().getCompanyProvidersList(context, '', 'true');
   }
 
   Color _getColor(String key) {
@@ -88,7 +89,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          elevation: 1,
+                          elevation: 0.2,
                           color: Colors.white,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +101,9 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                     height: 100,
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                          width: 3, color: Colors.white),
                                     ),
                                     alignment: Alignment.center,
                                     child:
@@ -112,7 +115,11 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                     .attachmentPath!,
                                                 fit: BoxFit.fitWidth,
                                               )
-                                            : const Text("No Banner Image"),
+                                            : Image.asset(
+                                                width: 70,
+                                                height: 70,
+                                                fit: BoxFit.cover,
+                                                AppIconsData.noImage),
                                   ),
                                   if (company.attachmentLogoInfo != null &&
                                       company.attachmentLogoInfo!.isNotEmpty)
@@ -189,19 +196,25 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                             .map((name) {
                                           final color = _getColor(name);
                                           return Padding(
-                                            padding: const EdgeInsets.only(left: 5.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 5.0),
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12, vertical: 4),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: Colors.transparent,
-                                                border: Border.all(color: color),
+                                                border:
+                                                    Border.all(color: color),
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                               ),
                                               child: Text(
                                                 name,
-                                                style: TextStyle(color: Colors.black54,fontSize: 14.0),
+                                                style: TextStyle(
+                                                    color: Colors.black54,
+                                                    fontSize: 14.0),
                                               ),
                                             ),
                                           );
@@ -260,7 +273,8 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                   addressText.isNotEmpty
                                                       ? addressText
                                                       : 'No Address',
-                                                  style: TextStyle(color: Colors.black54),
+                                                  style: TextStyle(
+                                                      color: Colors.black54),
                                                 ),
                                               ],
                                             ),
