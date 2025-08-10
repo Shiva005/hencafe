@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/models/attachment_model.dart';
 import 'package:hencafe/screens/fragments/company_list_fragment.dart';
 import 'package:hencafe/screens/fragments/more_fragment.dart';
 import 'package:hencafe/screens/fragments/sale_fragment.dart';
 import 'package:hencafe/screens/fragments/sellers_list_fragment.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../models/company_providers_model.dart';
 import '../../services/services.dart';
+import '../../values/app_strings.dart';
+import '../../widget/attachment_widget.dart';
 
 class HomeFragment extends StatelessWidget {
   const HomeFragment({super.key});
@@ -62,23 +65,24 @@ class Home extends StatefulWidget {
 class _HomeFragmentState extends State<Home>
     with SingleTickerProviderStateMixin {
   late SharedPreferences prefs;
-  late Future<CompanyProvidersModel> companyListData;
   bool isLoading = true;
-
+  late List<AttachmentInfo> attachments=[];
+  late final contactData;
   @override
   void initState() {
     super.initState();
-    fetchContactHistory();
+    fetchStatusHistory();
   }
 
-  Future<void> fetchContactHistory() async {
+  Future<void> fetchStatusHistory() async {
     prefs = await SharedPreferences.getInstance();
     setState(() => isLoading = true);
-    final contactData =
+    contactData =
         await AuthServices().getContactHistory(context, "APP_STATUS", "");
 
     setState(() {
-      //attachments = contactData.apiResponse![0].attachmentInfo ?? [];
+      attachments = contactData.apiResponse![0].attachmentInfo ?? [];
+
       isLoading = false;
     });
   }
@@ -88,7 +92,7 @@ class _HomeFragmentState extends State<Home>
     return Scaffold(
       backgroundColor: Colors.white,
       body: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Column(
           children: [
             const TabBar(
@@ -97,30 +101,23 @@ class _HomeFragmentState extends State<Home>
               tabs: [
                 Tab(text: 'Company'),
                 Tab(text: 'Sellers'),
-                //Tab(text: 'Status'),
+                Tab(text: 'Status'),
               ],
             ),
             Expanded(
               child: TabBarView(
                 children: [
-                  CompanyListFragment(),
-                  SellerListFragment(),
-                  /*AttachmentWidget(
+                  CompanyListFragment(pageType: "HomeFragment"),
+                  SellerListFragment(pageType: "SellerFragment"),
+                  attachments.isEmpty
+                      ? Center(child: Text("No attachments found"))
+                      : AttachmentWidget(
                     attachments: attachments,
-                    userId: "1",
+                    userId: '-1',
                     currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                    onDelete: (index) {
-                      */ /*showDeleteAttachmentDialog(
-                        context: context,
-                        index: index,
-                        attachment: attachments[index],
-                        attachments: attachments,
-
-                        onUpdate: () => setState(() {}),
-                      );*/ /*
-                    },
+                    onDelete: (index) {},
                     index: 0,
-                  ),*/
+                  ),
                 ],
               ),
             ),

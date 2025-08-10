@@ -82,13 +82,15 @@ class _MoreFragmentState extends State<MoreFragment>
               _animationController.reverse();
             }
             if (label == 'Companies') {
-              NavigationHelper.pushNamed(
-                AppRoutes.companyListScreen,
-              );
+              NavigationHelper.pushNamed(AppRoutes.companyListScreen,
+                  arguments: {
+                    'pageType': "MoreFragment",
+                  });
             } else if (label == 'Sellers') {
-              NavigationHelper.pushNamed(
-                AppRoutes.medicineScreen,
-              );
+              NavigationHelper.pushNamed(AppRoutes.sellersListScreen,
+                  arguments: {
+                    'pageType': "MoreFragment",
+                  });
             } else if (label == 'FAQ\'s') {
               NavigationHelper.pushNamed(
                 AppRoutes.medicineScreen,

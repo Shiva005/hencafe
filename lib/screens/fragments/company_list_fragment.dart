@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/utils/appbar_widget.dart';
+import 'package:hencafe/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/navigation_helper.dart';
@@ -9,7 +11,10 @@ import '../../values/app_routes.dart';
 import '../image_preview_screen.dart';
 
 class CompanyListFragment extends StatefulWidget {
-  const CompanyListFragment({super.key});
+  final String pageType;
+
+  const CompanyListFragment({Key? key, required this.pageType})
+      : super(key: key);
 
   @override
   State<CompanyListFragment> createState() => _CompanyListFragmentState();
@@ -27,27 +32,20 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
 
   Future<CompanyProvidersModel> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getCompanyProvidersList(context, '', 'true');
-  }
-
-  Color _getColor(String key) {
-    final colors = [
-      Colors.teal,
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-      Colors.blue,
-      Colors.purple,
-      Colors.brown,
-    ];
-    int index = key.hashCode % colors.length;
-    return colors[index];
+    if (widget.pageType == AppRoutes.companyListScreen) {
+      return await AuthServices().getCompanyProvidersList(context, '', 'false');
+    } else {
+      return await AuthServices().getCompanyProvidersList(context, '', 'true');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
+      appBar: widget.pageType == AppRoutes.companyListScreen
+          ? MyAppBar(title: "Companies")
+          : null,
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -195,7 +193,8 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                 e.supplytypeNameLanguage ?? '')
                                             .where((name) => name.isNotEmpty)
                                             .map((name) {
-                                          final color = _getColor(name);
+                                          final color =
+                                              Utils.getRandomColor(name);
                                           return Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 5.0),

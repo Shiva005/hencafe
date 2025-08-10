@@ -13,6 +13,7 @@ class AppRoutes {
   static const String chickenPriceScreen = 'chicken_price_screen';
   static const String liftingPriceScreen = 'lifting_price_screen';
   static const String companyListScreen = 'company_list_Screen';
+  static const String sellersListScreen = 'sellers_list_Screen';
   static const String companyDetailsScreen = 'lifting_details_screen';
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';

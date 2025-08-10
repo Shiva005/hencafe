@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/attachment_model.dart';
 import '../models/company_providers_model.dart';
 import '../services/services.dart';
 import '../values/app_strings.dart';

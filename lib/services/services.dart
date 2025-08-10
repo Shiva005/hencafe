@@ -12,7 +12,7 @@ import 'package:hencafe/models/company_providers_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
-import 'package:hencafe/models/medicine_mode.dart';
+import 'package:hencafe/models/faq_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
 import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/referral_model.dart';

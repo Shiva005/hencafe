@@ -1,10 +1,10 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/company_providers_model.dart';
 import 'package:hencafe/widget/docs_preview_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../models/attachment_model.dart';
 import '../screens/image_preview_screen.dart';
 import '../screens/video_player_screen.dart';
 import '../values/app_colors.dart';

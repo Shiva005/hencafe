@@ -5,12 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../helpers/navigation_helper.dart';
 import '../../models/profile_model.dart';
 import '../../services/services.dart';
+import '../../utils/appbar_widget.dart';
 import '../../utils/utils.dart';
 import '../../values/app_routes.dart';
 import '../image_preview_screen.dart';
 
 class SellerListFragment extends StatefulWidget {
-  const SellerListFragment({super.key});
+  final String pageType;
+
+  const SellerListFragment({Key? key, required this.pageType})
+      : super(key: key);
 
   @override
   State<SellerListFragment> createState() => _SellerListFragmentState();
@@ -28,13 +32,20 @@ class _SellerListFragmentState extends State<SellerListFragment> {
 
   Future<ProfileModel?> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices().getUsers(context, 'true');
+    if (widget.pageType == AppRoutes.sellersListScreen) {
+      return await AuthServices().getUsers(context, 'false');
+    } else {
+      return await AuthServices().getUsers(context, 'true');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
+      appBar: widget.pageType == AppRoutes.sellersListScreen
+          ? MyAppBar(title: "Sellers")
+          : null,
       body: RefreshIndicator(
         onRefresh: () {
           return _fetchData();
@@ -132,13 +143,24 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                                           null &&
                                                       seller.userProfileImg!
                                                           .isNotEmpty)
-                                                  ? Image.network(
-                                                      seller.attachmentInfo![0]
-                                                          .attachmentPath!,
-                                                      width: 70,
-                                                      height: 70,
-                                                      fit: BoxFit.cover,
-                                                    )
+                                                  ? (seller.attachmentInfo !=
+                                                              null &&
+                                                          seller.attachmentInfo!
+                                                              .isNotEmpty)
+                                                      ? Image.network(
+                                                          seller
+                                                              .attachmentInfo![
+                                                                  0]
+                                                              .attachmentPath!,
+                                                          width: 70,
+                                                          height: 70,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.asset(
+                                                          width: 70,
+                                                          height: 70,
+                                                          fit: BoxFit.cover,
+                                                          AppIconsData.noImage)
                                                   : Image.asset(
                                                       width: 70,
                                                       height: 70,
@@ -194,7 +216,8 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                                 e.supplytypeNameLanguage ?? '')
                                             .where((name) => name.isNotEmpty)
                                             .map((name) {
-                                          final color = Utils.getRandomColor(name);
+                                          final color =
+                                              Utils.getRandomColor(name);
                                           return Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 5.0),

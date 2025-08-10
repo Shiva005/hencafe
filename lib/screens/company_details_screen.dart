@@ -6,6 +6,7 @@ import 'package:hencafe/widget/details_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/attachment_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';

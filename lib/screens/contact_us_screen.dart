@@ -26,21 +26,22 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: MyAppBar(
-        title: 'Contact Us',
-      ),
+      backgroundColor: Colors.grey.shade200,
+      appBar: MyAppBar(title: 'Contact Us'),
       body: DefaultTabController(
         length: 2,
         child: Column(
           children: [
-            const TabBar(
-              labelColor: AppColors.primaryColor,
-              indicatorColor: AppColors.primaryColor,
-              tabs: [
-                Tab(text: 'Create Request'),
-                Tab(text: 'History'),
-              ],
+            Container(
+              color: Colors.white,
+              child: const TabBar(
+                labelColor: AppColors.primaryColor,
+                indicatorColor: AppColors.primaryColor,
+                tabs: [
+                  Tab(text: 'Create Request'),
+                  Tab(text: 'History'),
+                ],
+              ),
             ),
             Expanded(
               child: TabBarView(

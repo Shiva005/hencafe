@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/medicine_mode.dart';
+import 'package:hencafe/models/faq_model.dart';
+import 'package:hencafe/values/app_theme.dart';
+import 'package:hencafe/widget/attachment_widget.dart';
 
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
 
-class MedicineScreen extends StatefulWidget {
-  const MedicineScreen({super.key});
+class FaqScreen extends StatefulWidget {
+  const FaqScreen({super.key});
 
   @override
-  State<MedicineScreen> createState() => _MedicineScreenState();
+  State<FaqScreen> createState() => _FaqScreenState();
 }
 
-class _MedicineScreenState extends State<MedicineScreen> {
+class _FaqScreenState extends State<FaqScreen> {
   List<ApiResponse> faqList = [];
   List<ApiResponse> filteredList = [];
   bool isLoading = true;
@@ -45,7 +47,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(title: "FAQ's"),
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.grey.shade200,
       body: RefreshIndicator(
         onRefresh: () => fetchMedicineData(),
         child: Column(
@@ -131,69 +133,65 @@ class FaqDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: MyAppBar(title: "Details"),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return DefaultTabController(
+      length: 2, // Two tabs
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: const Text("Details", style: AppTheme.appbarTextStyle),
+          bottom: const TabBar(
+            labelColor: AppColors.primaryColor,
+            indicatorColor: AppColors.primaryColor,
+            tabs: [
+              Tab(text: "Details"),
+              Tab(text: "Attachments"),
+            ],
+          ),
+        ),
+        body: TabBarView(
           children: [
-            _buildCard(
-              icon: Icons.message_outlined,
-              title: "Subject",
-              contentText: data.subjectLanguage ?? 'No Details',
-            ),
-
-            const SizedBox(height: 10),
-
-            // 🔶 Details Section
-            _buildCard(
-              icon: Icons.description_outlined,
-              title: "Details",
-              contentText: data.detailsLanguage ?? 'No Details',
-            ),
-
-            const SizedBox(height: 10),
-
-            // ⚠️ Usage & Precautions Section
-            _buildCard(
-              icon: Icons.info_outline,
-              title: "More Info",
-              contentText: data.usageLanguage ?? 'No Usage Info',
-            ),
-
-            const SizedBox(height: 10),
-
-            // 📎 Attachments
-            if (data.attachmentInfo != null &&
-                data.attachmentInfo!.isNotEmpty) ...[
-              const Text(
-                "References",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            // Details tab
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  _buildCard(
+                    icon: Icons.message_outlined,
+                    title: "Subject",
+                    contentText: data.subjectLanguage ?? 'No Details',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildCard(
+                    icon: Icons.description_outlined,
+                    title: "Details",
+                    contentText: data.detailsLanguage ?? 'No Details',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildCard(
+                    icon: Icons.info_outline,
+                    title: "More Info",
+                    contentText: data.usageLanguage ?? 'No Usage Info',
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              GridView.builder(
-                itemCount: data.attachmentInfo!.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1,
-                ),
-                itemBuilder: (context, index) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      data.attachmentInfo![index].attachmentPath!,
-                      fit: BoxFit.cover,
+            ),
+
+            // Attachments tab
+            data.attachmentInfo != null && data.attachmentInfo!.isNotEmpty
+                ? AttachmentWidget(
+                    attachments: data.attachmentInfo!,
+                    userId: '-1',
+                    currentUserId: '-2',
+                    onDelete: (index) {},
+                    index: 0,
+                  )
+                : Center(
+                    child: Text(
+                      "No attachments available",
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
-                  );
-                },
-              ),
-            ]
+                  ),
           ],
         ),
       ),

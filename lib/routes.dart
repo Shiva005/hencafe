@@ -15,12 +15,13 @@ import 'package:hencafe/screens/delete_account_screen.dart';
 import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
 import 'package:hencafe/screens/fragments/company_list_fragment.dart';
+import 'package:hencafe/screens/fragments/sellers_list_fragment.dart';
 import 'package:hencafe/screens/lifting_price_screen.dart';
 import 'package:hencafe/screens/lifting_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
 import 'package:hencafe/screens/login_screen_otp.dart';
 import 'package:hencafe/screens/login_screen_pin.dart';
-import 'package:hencafe/screens/medicine_screen.dart';
+import 'package:hencafe/screens/faq_screen.dart';
 import 'package:hencafe/screens/my_profile.dart';
 import 'package:hencafe/screens/notifiaction_screen.dart';
 import 'package:hencafe/screens/referral_bonus_screen.dart';
@@ -135,9 +136,19 @@ class Routes {
       case AppRoutes.companyListScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile: const CompanyListFragment(),
-            tablet: CompanyListFragment(),
-            desktop: CompanyListFragment(),
+            mobile: const CompanyListFragment(
+                pageType: AppRoutes.companyListScreen),
+            tablet: CompanyListFragment(pageType: AppRoutes.companyListScreen),
+            desktop: CompanyListFragment(pageType: AppRoutes.companyListScreen),
+          ),
+        );
+      case AppRoutes.sellersListScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: const SellerListFragment(
+                pageType: AppRoutes.sellersListScreen),
+            tablet: SellerListFragment(pageType: AppRoutes.sellersListScreen),
+            desktop: SellerListFragment(pageType: AppRoutes.sellersListScreen),
           ),
         );
       case AppRoutes.companyDetailsScreen:
@@ -247,9 +258,9 @@ class Routes {
       case AppRoutes.medicineScreen:
         return getRoute(
           widget: ResponsiveScaffold(
-            mobile: MedicineScreen(),
-            tablet: MedicineScreen(),
-            desktop: MedicineScreen(),
+            mobile: FaqScreen(),
+            tablet: FaqScreen(),
+            desktop: FaqScreen(),
           ),
         );
       case AppRoutes.notificationsScreen:
