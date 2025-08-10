@@ -87,6 +87,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                           margin: const EdgeInsets.symmetric(
                               horizontal: 12.0, vertical: 8),
                           shape: RoundedRectangleBorder(
+                            //side: BorderSide(color: AppColors.primaryColor),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 0.2,

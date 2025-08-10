@@ -64,4 +64,17 @@ class Utils {
     int index = key.hashCode % colors.length;
     return colors[index];
   }
+
+  static String getUserRoleName(String? userRoleType) {
+    switch (userRoleType) {
+      case 'U':
+        return "User";
+      case 'A':
+        return "Admin";
+      case 'S':
+        return "Super Admin";
+      default:
+        return "Unknown";
+    }
+  }
 }

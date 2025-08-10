@@ -52,7 +52,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 330,
+      width: 370,
       child: Card(
         color: Colors.white,
         elevation: 0.5,
@@ -60,7 +60,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
           side: BorderSide(color: Colors.grey.shade400),
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             const SizedBox(height: 10),
@@ -68,9 +68,9 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             const SizedBox(height: 10),
             selectedTab == 0
                 ? Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: _buildAddressCard(widget.address),
-                  )
+              padding: const EdgeInsets.all(12.0),
+              child: _buildAddressCard(widget.address),
+            )
                 : _buildAttachmentsSection(widget.address),
           ],
         ),
@@ -99,7 +99,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
           backgroundColor: isSelected ? Colors.indigo : Colors.grey.shade300,
           foregroundColor: isSelected ? Colors.white : Colors.black,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
         child: Text(title),
       ),
@@ -185,8 +185,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
                     index: index,
                     attachment: attachments[index],
                     attachments: attachments,
-                    onUpdate: () =>
-                        setState(() {}),
+                    onUpdate: () => setState(() {}),
                   );
                 },
                 index: index,

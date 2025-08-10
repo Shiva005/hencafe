@@ -102,25 +102,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         dob = getProfileRes.apiResponse![0].userDob ?? "";
         phone = getProfileRes.apiResponse![0].userMobile ?? "";
         userVerified = getProfileRes.apiResponse![0].userIsVerfied ?? "";
-        if (getProfileRes.apiResponse![0].userRoleType == 'U') {
-          role = "User";
-        } else if (getProfileRes.apiResponse![0].userRoleType == 'A') {
-          role = "Admin";
-        } else if (getProfileRes.apiResponse![0].userRoleType == 'S') {
-          role = "Super Admin";
-        }
+        role =
+            Utils.getUserRoleName(getProfileRes.apiResponse![0].userRoleType);
         if (getProfileRes.apiResponse![0].userMembershipInfo!.length != 0) {
           memberShipValidFrom = getProfileRes.apiResponse![0]
-              .userMembershipInfo![0].userMembershipValidFrom ??
+                  .userMembershipInfo![0].userMembershipValidFrom ??
               "";
           maxFavState = getProfileRes
               .apiResponse![0].userMembershipInfo![0].userFavStateMaxCount
               .toString();
-          memberShipValidTo = getProfileRes
-              .apiResponse![0].userMembershipInfo![0].userMembershipValidTo ??
+          memberShipValidTo = getProfileRes.apiResponse![0]
+                  .userMembershipInfo![0].userMembershipValidTo ??
               "";
           memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
-              .userMembershipType.value ??
+                  .userMembershipType.value ??
               "";
         }
         workType = getProfileRes.apiResponse![0].userWorkType.value ?? "";

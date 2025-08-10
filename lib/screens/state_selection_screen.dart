@@ -1,5 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,7 +27,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   TextEditingController _searchController = TextEditingController();
   List<ApiResponse> _allStates = [];
   List<ApiResponse> _filteredStates = [];
-  int? maxSelections = 0;
+  String? maxSelections = "0";
 
   @override
   void initState() {
@@ -36,10 +37,11 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
   }
 
   Future<List<ApiResponse>> _fetchStates() async {
-    prefs = await SharedPreferences.getInstance();
-    maxSelections = prefs.getInt(AppStrings.prefFavStateMaxCount);
-    final stateRes = await AuthServices().getStates(context);
 
+    prefs = await SharedPreferences.getInstance();
+    maxSelections = prefs.getString(AppStrings.prefFavStateMaxCount);
+    logger.w(maxSelections);
+    final stateRes = await AuthServices().getStates(context);
     if (stateRes.errorCount == 0 && stateRes.apiResponse != null) {
       setState(() {
         _allStates = stateRes.apiResponse!;
@@ -187,7 +189,7 @@ class _StateSelectionPageState extends State<StateSelectionPage> {
 
                                 if (isChecked == true) {
                                   if (_selectedStateID.length <
-                                      maxSelections!) {
+                                      int.parse(maxSelections!)) {
                                     _selectedStateID.add(stateId);
                                   } else {
                                     showDialog(

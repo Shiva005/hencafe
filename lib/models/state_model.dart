@@ -44,9 +44,6 @@ class StateModel {
 
 class ApiResponse {
   ApiResponse({
-    this.countryId,
-    this.countryCode,
-    this.countryName,
     this.stateId,
     this.stateCode,
     this.stateName,
@@ -54,18 +51,12 @@ class ApiResponse {
   });
 
   ApiResponse.fromJson(dynamic json) {
-    countryId = json['country_id'];
-    countryCode = json['country_code'];
-    countryName = json['country_name'];
     stateId = json['state_id'];
     stateCode = json['state_code'];
     stateName = json['state_name'];
     stateNameLanguage = json['state_name_language'];
   }
 
-  String? countryId;
-  String? countryCode;
-  String? countryName;
   String? stateId;
   String? stateCode;
   String? stateName;
@@ -73,9 +64,6 @@ class ApiResponse {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['country_id'] = countryId;
-    map['country_code'] = countryCode;
-    map['country_name'] = countryName;
     map['state_id'] = stateId;
     map['state_code'] = stateCode;
     map['state_name'] = stateName;

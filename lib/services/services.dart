@@ -183,7 +183,7 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG State List: ${json.decode(utf8.decode(response.bodyBytes))}');
+    logger.d('TAG State List: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states');
     return StateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1053,7 +1053,7 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Fav State: ${json.decode(utf8.decode(response.bodyBytes))}');
+        'TAG Get Fav State: ${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID');
     return UserFavouriteStateModel.fromJson(
         json.decode(utf8.decode(response.bodyBytes)));
   }

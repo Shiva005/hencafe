@@ -1,8 +1,16 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
@@ -28,6 +36,35 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
   List<String> birdBreedList = [];
   List<String> favouriteStateList = [];
   DateTime selectedDate = DateTime.now();
+  String _packageName = '';
+  final ScreenshotController screenshotController = ScreenshotController();
+
+  Future<void> captureAndShare() async {
+    try {
+      Uint8List? imageBytes = await screenshotController.capture();
+
+      if (imageBytes != null) {
+        final directory = await getTemporaryDirectory();
+        final imagePath = '${directory.path}/screenshot.png';
+        File imageFile = File(imagePath);
+        await imageFile.writeAsBytes(imageBytes);
+
+        await Share.shareXFiles(
+          [XFile(imagePath)],
+          text: '${AppStrings.shareText}$_packageName}',
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to capture screenshot')),
+        );
+      }
+    } catch (e) {
+      print("Error capturing or sharing: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -44,6 +81,8 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
   }
 
   Future<void> getBirdBreedData() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    _packageName = packageInfo.packageName;
     final res = await AuthServices().getBirdList(context);
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
@@ -56,7 +95,9 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
   }
 
   Future<void> getFavouriteStateData() async {
-    final res = await AuthServices().getFavouriteStateList(context,prefs.getString(AppStrings.prefUserID)!);
+    prefs = await SharedPreferences.getInstance();
+    final res = await AuthServices().getFavouriteStateList(
+        context, prefs.getString(AppStrings.prefUserID)!);
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!
@@ -211,145 +252,208 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: AppColors.primaryColor,
-          elevation: 1.0,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: NavigationHelper.pop,
-          ),
-          title: Text('Chicken Price', style: AppTheme.appbarTextStyle),
-          actions: [
-            GestureDetector(
-              onTap: () async {
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2040),
-                );
-                if (pickedDate != null) {
-                  final formattedDate =
-                      DateFormat('yyyy-MM-dd').format(pickedDate);
-                  setState(() {
-                    selectedDate = pickedDate;
-                    chickPriceData = _fetchData(formattedDate);
-                  });
-                }
-              },
-              child: Chip(
-                label: Row(
-                  children: [
-                    const Icon(Icons.calendar_month,
-                        color: AppColors.primaryColor, size: 16),
-                    const SizedBox(width: 5),
-                    Text(
-                      Utils.threeLetterDateFormatted(selectedDate.toString()),
-                      style: const TextStyle(
-                          color: AppColors.primaryColor, fontSize: 11),
-                    ),
-                  ],
-                ),
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.grey.shade400, width: 1.5),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-              ),
+    return Screenshot(
+      controller: screenshotController,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: AppBar(
+            automaticallyImplyLeading: true,
+            elevation: 0,
+            backgroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black54),
+              onPressed: NavigationHelper.pop,
             ),
-            IconButton(
-              onPressed: () => setState(() => cardVisibility = !cardVisibility),
-              icon: const Icon(Icons.filter_list_alt, color: Colors.white),
-            ),
-            IconButton(
-              onPressed: () => NavigationHelper.pushReplacementNamed(
-                  AppRoutes.chickenPriceScreen),
-              icon: const Icon(Icons.refresh, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          if (cardVisibility)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 4),
-                    child: Wrap(
-                      spacing: 7.0,
+            title: Text('Chicken Price', style: AppTheme.appbarTextStyle),
+            actions: [
+              GestureDetector(
+                onTap: () async {
+                  if (prefs.getString(AppStrings.prefRole) != "U") {
+                    NavigationHelper.pushNamed(
+                      AppRoutes.sellChickenScreen,
+                      arguments: {
+                        'pageType': AppRoutes.chickenPriceScreen,
+                      },
+                    );
+                  } else {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.bottomSlide,
+                      dialogType: DialogType.warning,
+                      dialogBackgroundColor: Colors.white,
+                      titleTextStyle: AppTheme.appBarText,
+                      title:
+                          'Your role (${Utils.getUserRoleName(prefs.getString(AppStrings.prefRole))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
+                      btnOkOnPress: () async {},
+                      btnOkText: 'OK',
+                      btnOkColor: Colors.yellow.shade700,
+                    ).show();
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 15.0),
+                  child: Chip(
+                    label: Row(
                       children: [
-                        for (final filter in [
-                          "Special Sale",
-                          "State",
-                          "Chicks",
-                          "My Data Only"
-                        ])
-                          FilterChipWidget(
-                            label: filter,
-                            onPressed: () => _showBottomSheet(context, filter),
-                            isSelected: selectedFilters.containsKey(filter),
-                          ),
+                        const Icon(Icons.add_circle_outline,
+                            color: AppColors.primaryColor, size: 16),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Create chicken sale",
+                          style: const TextStyle(
+                              color: AppColors.primaryColor, fontSize: 11),
+                        ),
                       ],
+                    ),
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                      borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
                 ),
               ),
-            ),
-          Expanded(
-            child: FutureBuilder<ChickenPriceModel>(
-              future: chickPriceData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                }
-                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
-                  return const Center(child: Text("No data available"));
-                }
-
-                final filteredItems = applyLocalFilters(
-                  snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
-                  selectedFilters,
-                );
-
-                logger.d(selectedFilters);
-                logger.d(filteredItems);
-
-                return filteredItems.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: filteredItems.length,
-                        itemBuilder: (context, index) {
-                          final filteredIndex = snapshot.data!.apiResponse!
-                              .indexWhere((e) =>
-                                  e.toJson().toString() ==
-                                  filteredItems[index].toString());
-                          return EggPriceCard(
-                            chickenPriceModel: snapshot.data!,
-                            index: filteredIndex,
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Text("No matching data for selected filters"));
-              },
-            ),
+            ],
           ),
-        ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2040),
+                      );
+                      if (pickedDate != null) {
+                        final formattedDate =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        setState(() {
+                          selectedDate = pickedDate;
+                          chickPriceData = _fetchData(formattedDate);
+                        });
+                      }
+                    },
+                    child: Chip(
+                      label: Row(
+                        children: [
+                          const Icon(Icons.calendar_month,
+                              color: AppColors.primaryColor, size: 16),
+                          const SizedBox(width: 5),
+                          Text(
+                            Utils.threeLetterDateFormatted(
+                                selectedDate.toString()),
+                            style: const TextStyle(
+                                color: AppColors.primaryColor, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                      shape: RoundedRectangleBorder(
+                        side:
+                            BorderSide(color: Colors.grey.shade400, width: 1.5),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () =>
+                        setState(() => cardVisibility = !cardVisibility),
+                    icon: const Icon(Icons.filter_list_alt,
+                        color: Colors.black54),
+                  ),
+                  IconButton(
+                    onPressed: () => NavigationHelper.pushReplacementNamed(
+                        AppRoutes.liftingPriceScreen),
+                    icon: const Icon(Icons.refresh, color: Colors.black54),
+                  ),
+                  IconButton(
+                    onPressed: captureAndShare,
+                    icon: const Icon(Icons.share, color: Colors.black54),
+                  ),
+                ],
+              ),
+            ),
+            if (cardVisibility)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4),
+                      child: Wrap(
+                        spacing: 7.0,
+                        children: [
+                          for (final filter in [
+                            "Special Sale",
+                            "State",
+                            "Chicks",
+                            "My Data Only"
+                          ])
+                            FilterChipWidget(
+                              label: filter,
+                              onPressed: () =>
+                                  _showBottomSheet(context, filter),
+                              isSelected: selectedFilters.containsKey(filter),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            Expanded(
+              child: FutureBuilder<ChickenPriceModel>(
+                future: chickPriceData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
+                    return const Center(child: Text("No data available"));
+                  }
+
+                  final filteredItems = applyLocalFilters(
+                    snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
+                    selectedFilters,
+                  );
+
+                  logger.d(selectedFilters);
+                  logger.d(filteredItems);
+
+                  return filteredItems.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final filteredIndex = snapshot.data!.apiResponse!
+                                .indexWhere((e) =>
+                                    e.toJson().toString() ==
+                                    filteredItems[index].toString());
+                            return EggPriceCard(
+                              chickenPriceModel: snapshot.data!,
+                              index: filteredIndex,
+                            );
+                          },
+                        )
+                      : const Center(
+                          child: Text("No matching data for selected filters"));
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -410,7 +514,8 @@ class EggPriceCard extends StatelessWidget {
                           children: [
                             const Text(
                               'Rs/Chick',
-                              style: TextStyle(fontSize: 10, color: Colors.grey),
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.grey),
                             ),
                             Text(
                               chickenPriceModel
@@ -477,9 +582,9 @@ class EggPriceCard extends StatelessWidget {
                   Column(
                     children: [
                       Visibility(
-                        visible:
-                            chickenPriceModel.apiResponse![index].isSpecialSale ==
-                                "Y",
+                        visible: chickenPriceModel
+                                .apiResponse![index].isSpecialSale ==
+                            "Y",
                         child: Icon(Icons.card_giftcard,
                             color: AppColors.primaryColor, size: 20.0),
                       ),
@@ -493,11 +598,12 @@ class EggPriceCard extends StatelessWidget {
                 children: [
                   Text(
                       'Start: ${Utils.threeLetterDateFormatted(chickenPriceModel.apiResponse![index].chickensaleEffectFrom.toString())}',
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.green.shade700)),
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.green.shade700)),
                   Text(
                       'End: ${Utils.threeLetterDateFormatted(chickenPriceModel.apiResponse![index].chickensaleEffectTo.toString())}',
-                      style: TextStyle(fontSize: 12, color: Colors.red.shade700)),
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.red.shade700)),
                   Row(
                     children: [
                       Text(
