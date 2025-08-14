@@ -188,7 +188,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (_) => ImagePreviewScreen(
-                                            imageUrl: userImage),
+                                            imageUrl: userImage, pageType: AppRoutes.myProfileScreen,),
                                       ));
                                 },
                                 child: CircleAvatar(

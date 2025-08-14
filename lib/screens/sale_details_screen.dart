@@ -824,7 +824,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                 MaterialPageRoute(
                                                   builder: (_) =>
                                                       ImagePreviewScreen(
-                                                          imageUrl: path),
+                                                          imageUrl: path, pageType: AppRoutes.saleDetailsScreen,),
                                                 ));
                                           } else if (attType == 'video') {
                                             Navigator.push(
@@ -832,7 +832,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                 MaterialPageRoute(
                                                   builder: (_) =>
                                                       VideoPlayerScreen(
-                                                          videoUrl: path),
+                                                          videoUrl: path, pageType: AppRoutes.saleDetailsScreen,),
                                                 ));
                                           } else if (attType == 'pdf') {
                                             _openExternalApp(path);

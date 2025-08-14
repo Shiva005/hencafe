@@ -125,6 +125,7 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                                 imageUrl: seller
                                                     .userProfileImg![0]
                                                     .attachmentPath!,
+                                                pageType: 'SellerListFragment',
                                               ),
                                             ),
                                           );

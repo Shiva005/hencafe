@@ -137,6 +137,8 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                   imageUrl: company
                                                       .attachmentLogoInfo![0]
                                                       .attachmentPath!,
+                                                  pageType:
+                                                      'CompanyListFragment',
                                                 ),
                                               ),
                                             );

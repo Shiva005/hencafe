@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/services.dart';
 import '../../values/app_strings.dart';
 import '../../widget/attachment_widget.dart';
+import 'app_status_fragment.dart';
 
 class HomeFragment extends StatelessWidget {
   const HomeFragment({super.key});
@@ -109,7 +110,8 @@ class _HomeFragmentState extends State<Home>
                 children: [
                   CompanyListFragment(pageType: "HomeFragment"),
                   SellerListFragment(pageType: "SellerFragment"),
-                  attachments.isEmpty
+                  AppStatusScreen(),
+                  /*attachments.isEmpty
                       ? Center(child: Text("No attachments found"))
                       : AttachmentWidget(
                     attachments: attachments,
@@ -117,7 +119,7 @@ class _HomeFragmentState extends State<Home>
                     currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
                     onDelete: (index) {},
                     index: 0,
-                  ),
+                  ),*/
                 ],
               ),
             ),

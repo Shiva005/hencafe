@@ -8,8 +8,10 @@ import '../values/app_strings.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
+  final String pageType;
 
-  const VideoPlayerScreen({super.key, required this.videoUrl});
+  const VideoPlayerScreen(
+      {super.key, required this.videoUrl, required this.pageType});
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
@@ -58,10 +60,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: MyAppBar(title: AppStrings.videoPreview),
-      ),
+      appBar: widget.pageType == "AppStatus"
+          ? null
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(60.0),
+              child: MyAppBar(title: AppStrings.videoPreview),
+            ),
       body: Center(
         child: _chewieController != null &&
                 _chewieController!.videoPlayerController.value.isInitialized

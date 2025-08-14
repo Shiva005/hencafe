@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/company_providers_model.dart';
+import 'package:hencafe/values/app_routes.dart';
 import 'package:hencafe/widget/address_widget.dart';
 import 'package:hencafe/widget/details_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
@@ -144,7 +145,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                             builder: (_) => ImagePreviewScreen(
                                               imageUrl: company
                                                   .attachmentLogoInfo![0]
-                                                  .attachmentPath!,
+                                                  .attachmentPath!, pageType: AppRoutes.companyDetailsScreen,
                                             ),
                                           ),
                                         );

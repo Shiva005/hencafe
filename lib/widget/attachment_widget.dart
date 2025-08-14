@@ -186,19 +186,25 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ImagePreviewScreen(imageUrl: path),
+                    builder: (_) => ImagePreviewScreen(
+                      imageUrl: path,
+                      pageType: "AttachmentWidget",
+                    ),
                   ));
             } else if (att.attachmentType == 'video') {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => VideoPlayerScreen(videoUrl: path),
+                    builder: (_) => VideoPlayerScreen(
+                      videoUrl: path,
+                      pageType: "AttachmentWidget",
+                    ),
                   ));
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => DocumentPreviewScreen(url: path),
+                  builder: (_) => DocumentPreviewScreen(url: path,pageType: "AttachmentWidget"),
                 ),
               );
             } else {

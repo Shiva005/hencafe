@@ -6,16 +6,20 @@ import '../values/app_strings.dart';
 
 class ImagePreviewScreen extends StatelessWidget {
   final String imageUrl;
+  final String pageType;
 
-  const ImagePreviewScreen({super.key, required this.imageUrl});
+  const ImagePreviewScreen(
+      {super.key, required this.imageUrl, required this.pageType});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: MyAppBar(title: AppStrings.imagePreview),
-      ),
+      appBar: pageType == "AppStatus"
+          ? null
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(60.0),
+              child: MyAppBar(title: AppStrings.imagePreview),
+            ),
       body: Center(
         child: PhotoView(
           imageProvider: NetworkImage(imageUrl),

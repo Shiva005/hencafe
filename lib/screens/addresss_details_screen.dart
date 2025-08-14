@@ -401,7 +401,7 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                     MaterialPageRoute(
                                                       builder: (_) =>
                                                           ImagePreviewScreen(
-                                                              imageUrl: path),
+                                                              imageUrl: path, pageType: AppRoutes.addressDetailsScreen,),
                                                     ));
                                               } else if (attType == 'video') {
                                                 Navigator.push(
@@ -409,7 +409,7 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                     MaterialPageRoute(
                                                       builder: (_) =>
                                                           VideoPlayerScreen(
-                                                              videoUrl: path),
+                                                              videoUrl: path, pageType: AppRoutes.addressDetailsScreen,),
                                                     ));
                                               } else if (attType == 'pdf') {
                                                 _openExternalApp(path);

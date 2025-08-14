@@ -4,8 +4,10 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class DocumentPreviewScreen extends StatefulWidget {
   final String url;
+  final String pageType;
 
-  const DocumentPreviewScreen({super.key, required this.url});
+  const DocumentPreviewScreen(
+      {super.key, required this.url, required this.pageType});
 
   @override
   State<DocumentPreviewScreen> createState() => _DocumentPreviewScreenState();
@@ -35,14 +37,17 @@ class _DocumentPreviewScreenState extends State<DocumentPreviewScreen> {
         ),
       )
       ..loadRequest(
-        Uri.parse("https://docs.google.com/gview?embedded=true&url=${widget.url}"),
+        Uri.parse(
+            "https://docs.google.com/gview?embedded=true&url=${widget.url}"),
       );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(title: "Document Preview"),
+      appBar: widget.pageType == "AppStatus"
+          ? null
+          : MyAppBar(title: "Document Preview"),
       body: Stack(
         children: [
           if (_isLoading)
