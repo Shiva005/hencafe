@@ -247,102 +247,57 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black54),
-            onPressed: NavigationHelper.pop,
-          ),
-          title: Text('Lifting Sale', style: AppTheme.appbarTextStyle),
-          actions: [
-            GestureDetector(
-              onTap: () async {
-                if (prefs.getString(AppStrings.prefRole) != "U") {
-                  NavigationHelper.pushNamed(
-                    AppRoutes.sellLiftingScreen,
-                    arguments: {
-                      'pageType': AppRoutes.liftingPriceScreen,
-                    },
-                  );
-                } else {
-                  AwesomeDialog(
-                    context: context,
-                    animType: AnimType.bottomSlide,
-                    dialogType: DialogType.warning,
-                    dialogBackgroundColor: Colors.white,
-                    titleTextStyle: AppTheme.appBarText,
-                    title:
-                        'Your role (${Utils.getUserRoleName(prefs.getString(AppStrings.prefRole))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
-                    btnOkOnPress: () async {},
-                    btnOkText: 'OK',
-                    btnOkColor: Colors.yellow.shade700,
-                  ).show();
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(right: 15.0),
-                child: Chip(
-                  label: Row(
-                    children: [
-                      const Icon(Icons.add_circle_outline,
-                          color: AppColors.primaryColor, size: 16),
-                      const SizedBox(width: 5),
-                      Text(
-                        "Create Lifting sale",
-                        style: const TextStyle(
-                            color: AppColors.primaryColor, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.grey.shade400, width: 1.5),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              ),
+    return Screenshot(
+      controller: screenshotController,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade200,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: AppBar(
+            automaticallyImplyLeading: true,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black54),
+              onPressed: NavigationHelper.pop,
             ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2040),
+            title: Text('Lifting Sale', style: AppTheme.appbarTextStyle),
+            actions: [
+              GestureDetector(
+                onTap: () async {
+                  if (prefs.getString(AppStrings.prefRole) != "U") {
+                    NavigationHelper.pushNamed(
+                      AppRoutes.sellLiftingScreen,
+                      arguments: {
+                        'pageType': AppRoutes.liftingPriceScreen,
+                      },
                     );
-                    if (pickedDate != null) {
-                      final formattedDate =
-                          DateFormat('yyyy-MM-dd').format(pickedDate);
-                      setState(() {
-                        selectedDate = pickedDate;
-                        liftingPriceData = _fetchData(formattedDate);
-                      });
-                    }
-                  },
+                  } else {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.bottomSlide,
+                      dialogType: DialogType.warning,
+                      dialogBackgroundColor: Colors.white,
+                      titleTextStyle: AppTheme.appBarText,
+                      title:
+                          'Your role (${Utils.getUserRoleName(prefs.getString(AppStrings.prefRole))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
+                      btnOkOnPress: () async {},
+                      btnOkText: 'OK',
+                      btnOkColor: Colors.yellow.shade700,
+                    ).show();
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 15.0),
                   child: Chip(
+                    backgroundColor: Colors.white,
                     label: Row(
                       children: [
-                        const Icon(Icons.calendar_month,
+                        const Icon(Icons.add_circle_outline,
                             color: AppColors.primaryColor, size: 16),
                         const SizedBox(width: 5),
                         Text(
-                          Utils.threeLetterDateFormatted(
-                              selectedDate.toString()),
+                          "Create Lifting sale",
                           style: const TextStyle(
                               color: AppColors.primaryColor, fontSize: 11),
                         ),
@@ -354,95 +309,145 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () =>
-                      setState(() => cardVisibility = !cardVisibility),
-                  icon:
-                      const Icon(Icons.filter_list_alt, color: Colors.black54),
-                ),
-                IconButton(
-                  onPressed: () => NavigationHelper.pushReplacementNamed(
-                      AppRoutes.chickenPriceScreen),
-                  icon: const Icon(Icons.refresh, color: Colors.black54),
-                ),
-                IconButton(
-                  onPressed: captureAndShare,
-                  icon: const Icon(Icons.share, color: Colors.black54),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          if (cardVisibility)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 4),
-                    child: Wrap(
-                      spacing: 7.0,
-                      children: [
-                        for (final filter in [
-                          "State",
-                          "Bird Type",
-                          "My Data Only"
-                        ])
-                          FilterChipWidget(
-                            label: filter,
-                            onPressed: () => _showBottomSheet(context, filter),
-                            isSelected: selectedFilters.containsKey(filter),
+        ),
+        body: Column(
+          children: [
+            Container(
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2040),
+                      );
+                      if (pickedDate != null) {
+                        final formattedDate =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        setState(() {
+                          selectedDate = pickedDate;
+                          liftingPriceData = _fetchData(formattedDate);
+                        });
+                      }
+                    },
+                    child: Chip(
+                      backgroundColor: Colors.white,
+                      label: Row(
+                        children: [
+                          const Icon(Icons.calendar_month,
+                              color: AppColors.primaryColor, size: 16),
+                          const SizedBox(width: 5),
+                          Text(
+                            Utils.threeLetterDateFormatted(
+                                selectedDate.toString()),
+                            style: const TextStyle(
+                                color: AppColors.primaryColor, fontSize: 11),
                           ),
-                      ],
+                        ],
+                      ),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () =>
+                        setState(() => cardVisibility = !cardVisibility),
+                    icon:
+                        const Icon(Icons.filter_list_alt, color: Colors.black54),
+                  ),
+                  IconButton(
+                    onPressed: () => NavigationHelper.pushReplacementNamed(
+                        AppRoutes.chickenPriceScreen),
+                    icon: const Icon(Icons.refresh, color: Colors.black54),
+                  ),
+                  IconButton(
+                    onPressed: captureAndShare,
+                    icon: const Icon(Icons.share, color: Colors.black54),
+                  ),
+                ],
+              ),
+            ),
+            if (cardVisibility)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4),
+                      child: Wrap(
+                        spacing: 7.0,
+                        children: [
+                          for (final filter in [
+                            "State",
+                            "Bird Type",
+                            "My Data Only"
+                          ])
+                            FilterChipWidget(
+                              label: filter,
+                              onPressed: () => _showBottomSheet(context, filter),
+                              isSelected: selectedFilters.containsKey(filter),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
+            Expanded(
+              child: FutureBuilder<LiftingPriceModel>(
+                future: liftingPriceData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
+                    return const Center(child: Text("No data available"));
+                  }
+
+                  final filteredItems = applyLocalFilters(
+                    snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
+                    selectedFilters,
+                  );
+
+                  logger.d(selectedFilters);
+                  logger.d(filteredItems);
+
+                  return filteredItems.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final filteredIndex = snapshot.data!.apiResponse!
+                                .indexWhere((e) =>
+                                    e.toJson().toString() ==
+                                    filteredItems[index].toString());
+                            return EggPriceCard(
+                              liftingPriceModel: snapshot.data!,
+                              index: filteredIndex,
+                            );
+                          },
+                        )
+                      : const Center(
+                          child: Text("No matching data for selected filters"));
+                },
+              ),
             ),
-          Expanded(
-            child: FutureBuilder<LiftingPriceModel>(
-              future: liftingPriceData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                }
-                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
-                  return const Center(child: Text("No data available"));
-                }
-
-                final filteredItems = applyLocalFilters(
-                  snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
-                  selectedFilters,
-                );
-
-                logger.d(selectedFilters);
-                logger.d(filteredItems);
-
-                return filteredItems.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: filteredItems.length,
-                        itemBuilder: (context, index) {
-                          final filteredIndex = snapshot.data!.apiResponse!
-                              .indexWhere((e) =>
-                                  e.toJson().toString() ==
-                                  filteredItems[index].toString());
-                          return EggPriceCard(
-                            liftingPriceModel: snapshot.data!,
-                            index: filteredIndex,
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Text("No matching data for selected filters"));
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -660,11 +665,11 @@ class FilterChipWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Chip(
+        backgroundColor: Colors.white,
         label: Text(label,
             style: TextStyle(
                 color: isSelected ? AppColors.primaryColor : Colors.black54,
                 fontSize: 11)),
-        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(
               color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,

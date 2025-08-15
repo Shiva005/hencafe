@@ -58,7 +58,7 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                       final item = complaintList[index];
                       final isExpanded = isExpandedList[index];
                       final fullText = item.subjectLanguage ?? "No Subject";
-                      final isLongText = fullText.length > 80;
+                      final isLongText = fullText.length > 160;
 
                       return Container(
                         width: double.maxFinite,
@@ -76,7 +76,7 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                             Text(
                               isExpanded || !isLongText
                                   ? fullText
-                                  : "${fullText.substring(0, 80)}...",
+                                  : "${fullText.substring(0, 160)}...",
                               style: const TextStyle(fontSize: 16),
                             ),
                             if (isLongText) ...[

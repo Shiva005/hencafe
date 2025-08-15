@@ -46,16 +46,28 @@ class _ChangeMobileScreenState extends State<ChangeMobileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       appBar: MyAppBar(
         title: "Change Mobile Number",
       ),
-      body: SingleChildScrollView(
+      body: Form(
+        key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+          padding: const EdgeInsets.all(24.0),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                )
+              ],
+            ),
+            child: ListView(
               children: [
                 Image.asset(AppIconsData.changeMobileIcon, height: 160),
                 const SizedBox(height: 40),
@@ -79,8 +91,9 @@ class _ChangeMobileScreenState extends State<ChangeMobileScreen> {
                   maxLength: 4,
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
-                    icon: Icon(
-                        _obscureOld ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(_obscureOld
+                        ? Icons.visibility_off
+                        : Icons.visibility),
                     onPressed: () {
                       setState(() {
                         _obscureOld = !_obscureOld;
@@ -142,16 +155,14 @@ class _ChangeMobileScreenState extends State<ChangeMobileScreen> {
                     },
                   ),
                 ],
-
                 const SizedBox(height: 20),
-
                 // Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     RoundedLoadingButton(
                       width: MediaQuery.of(context).size.width * 0.4,
-                      height: 40.0,
+                      height: 50.0,
                       controller: _btnVerifyPinController,
                       onPressed: () async {
                         if (_formKey.currentState?.validate() ?? false) {
@@ -165,19 +176,22 @@ class _ChangeMobileScreenState extends State<ChangeMobileScreen> {
                               "password",
                               "false",
                             );
-                            if (loginCheckRes.apiResponse![0].responseStatus ==
+                            if (loginCheckRes
+                                    .apiResponse![0].responseStatus ==
                                 true) {
                               setState(() {
                                 _isPinVerified = true;
                               });
                             } else {
                               SnackbarHelper.showSnackBar(
-                                loginCheckRes.apiResponse![0].responseDetails!,
+                                loginCheckRes
+                                    .apiResponse![0].responseDetails!,
                               );
                             }
                           } else {
                             var registrationCheckRes = await AuthServices()
-                                .userExists(context, newMobileController.text);
+                                .userExists(
+                                    context, newMobileController.text);
 
                             if (registrationCheckRes
                                     .apiResponse![0].registrationStatus ==

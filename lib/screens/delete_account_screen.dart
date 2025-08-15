@@ -40,6 +40,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     return Column(
       children: [
         RadioListTile<String>(
+          contentPadding: EdgeInsets.zero,
+          visualDensity: VisualDensity(vertical: -3),
           title: Text(reason),
           value: reason,
           groupValue: selectedReason,
@@ -56,74 +58,90 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey.shade200,
       appBar: MyAppBar(title: 'Delete Account'),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 15.0),
-            child: Text(
-              'Please, Provide a reason for account deletion.',
-              style: TextStyle(color: Colors.black54),
-            ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              )
+            ],
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: reasons.length,
-              itemBuilder: (_, index) => _buildReasonTile(reasons[index]),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: AppTextFormField(
-              controller: otherReasonController,
-              enabled: true,
-              maxLines: 4,
-              minLines: 4,
-              labelText: 'Type message here...',
-              textInputAction: TextInputAction.done,
-              keyboardType: TextInputType.text,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                onPressed: () {
-                  if (selectedReason != null &&
-                      otherReasonController.text.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AppPasswordScreen(
-                                reason: selectedReason!,
-                                comment: otherReasonController.text,
-                              )),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text('Please select a reason & Type message')),
-                    );
-                  }
-                },
-                child: const Text(
-                  'Delete',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+          child: Column(
+            children: [
+              Text(
+                'Please, Provide a reason for account deletion.',
+                style: TextStyle(color: Colors.black54),
+              ),
+              SizedBox(height: 15),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: reasons.length,
+                  itemBuilder: (_, index) => _buildReasonTile(reasons[index]),
                 ),
               ),
-            ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                child: AppTextFormField(
+                  controller: otherReasonController,
+                  enabled: true,
+                  maxLines: 4,
+                  minLines: 4,
+                  labelText: 'Type reason here...',
+                  textInputAction: TextInputAction.done,
+                  keyboardType: TextInputType.text,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (selectedReason != null &&
+                          otherReasonController.text.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AppPasswordScreen(
+                                    reason: selectedReason!,
+                                    comment: otherReasonController.text,
+                                  )),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Please select a reason & Type message')),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

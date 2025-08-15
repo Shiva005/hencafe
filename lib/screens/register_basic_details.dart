@@ -514,7 +514,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your mobile number';
                           }
-                          if (value.length!=10) {
+                          if (value.length != 10) {
                             return 'Mobile number must be exact 10 character';
                           }
                           return null;
@@ -522,7 +522,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                       ),
                       AppTextFormField(
                         controller: emailController,
-                        labelText: AppStrings.email,
+                        labelText: '${AppStrings.email}*',
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         enabled: true,
@@ -782,14 +782,14 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                                 } else {
                                   var updateDetailsRes = await AuthServices()
                                       .updateBasicDetails(
-                                      context,
-                                      firstNameController.text,
-                                      lastNameController.text,
-                                      emailController.text,
-                                      dateController.text,
-                                      _selectedWorkType!);
+                                          context,
+                                          firstNameController.text,
+                                          lastNameController.text,
+                                          emailController.text,
+                                          dateController.text,
+                                          _selectedWorkType!);
                                   if (updateDetailsRes
-                                      .apiResponse![0].responseStatus ==
+                                          .apiResponse![0].responseStatus ==
                                       true) {
                                     NavigationHelper.pop(context);
                                   }

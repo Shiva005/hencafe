@@ -158,9 +158,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}',
-                                    style: AppTheme.primaryColorTextStyle,
+                                  Wrap(
+                                    children: [
+                                      Text(/*${prefs.getString(AppStrings.prefLastName)} \n*/
+                                        '${prefs.getString(AppStrings.prefFirstName)}',
+                                        style: AppTheme.primaryColorTextStyle,
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(
                                     height: 5,

@@ -8,6 +8,7 @@ class AppStrings {
   static const String logout = 'Logout';
   static const String loginWithOtp = 'Login with OTP';
   static const String continueNext = 'Continue';
+  static const String changePassword = 'Change Password';
   static const String forgotPassword = 'Forget Password';
   static const String mobile = 'Mobile Number';
   static const String pin = '4 Digit Pin Number';
@@ -26,7 +27,8 @@ class AppStrings {
   static const String verify = 'Verify';
   static const String forgetPin = 'Forget Pin?';
   static const String privacyPolicy = 'Privacy Policy';
-  static const String privacyPolicyLink = 'https://svpfarms.in/privacy_policy.html';
+  static const String privacyPolicyLink =
+      'https://svpfarms.in/privacy_policy.html';
   static const String shareText =
       'Please, Check out HenCafe App for price details & more https://play.google.com/store/apps/details?';
   static const String playStoreLink =

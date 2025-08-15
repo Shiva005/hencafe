@@ -295,6 +295,7 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 15.0),
                   child: Chip(
+                    backgroundColor: Colors.white,
                     label: Row(
                       children: [
                         const Icon(Icons.add_circle_outline,
@@ -342,6 +343,7 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                       }
                     },
                     child: Chip(
+                      backgroundColor: Colors.white,
                       label: Row(
                         children: [
                           const Icon(Icons.calendar_month,
@@ -356,7 +358,8 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                         ],
                       ),
                       shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                        side:
+                            BorderSide(color: Colors.grey.shade400, width: 1.5),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
@@ -364,8 +367,8 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                   IconButton(
                     onPressed: () =>
                         setState(() => cardVisibility = !cardVisibility),
-                    icon:
-                        const Icon(Icons.filter_list_alt, color: Colors.black54),
+                    icon: const Icon(Icons.filter_list_alt,
+                        color: Colors.black54),
                   ),
                   IconButton(
                     onPressed: () => NavigationHelper.pushReplacementNamed(
@@ -400,7 +403,8 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                           ])
                             FilterChipWidget(
                               label: filter,
-                              onPressed: () => _showBottomSheet(context, filter),
+                              onPressed: () =>
+                                  _showBottomSheet(context, filter),
                               isSelected: selectedFilters.containsKey(filter),
                             ),
                         ],
@@ -676,11 +680,11 @@ class FilterChipWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Chip(
+        backgroundColor: Colors.white,
         label: Text(label,
             style: TextStyle(
                 color: isSelected ? AppColors.primaryColor : Colors.black54,
                 fontSize: 11)),
-        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(
               color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,

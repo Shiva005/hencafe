@@ -127,228 +127,248 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
     final String referralCode = args?['referralCode'] ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade200,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
           child: MyAppBar(title: AppStrings.verifyOtp)),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              const SizedBox(height: 30),
-              Image.asset(
-                AppIconsData.otpHeader,
-                height: 120,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "OTP Verification",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                )
+              ],
+            ),
+            child: ListView(
+              children: [
+                const SizedBox(height: 30),
+                Image.asset(
+                  AppIconsData.otpHeader,
+                  height: 120,
                 ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Enter the OTP sent to ",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                const SizedBox(height: 20),
+                const Text(
+                  "OTP Verification",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Text(
-                    mobileNumber,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              AppTextFormField(
-                controller: otpController,
-                labelText: AppStrings.otp,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                enabled: true,
-                maxLength: 4,
-                prefixIcon: Icon(Icons.pin),
-                validator: _validateOtp, // Added validator for OTP field
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Don't receive the OTP ?",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _isResendEnabled
-                        ? () async {
-                            await _resendOTP(mobileNumber);
-                          }
-                        : null, // Set to null when button is disabled
-                    child: Text(
-                      _isResendEnabled ? " RESEND OTP" : "$_start s",
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Enter the OTP sent to ",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              RoundedLoadingButton(
-                width: MediaQuery.of(context).size.width,
-                height: 40.0,
-                controller: _btnVerifyController,
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    if (pageType == AppRoutes.registerBasicDetails) {
-                      var validateOtpRes = await AuthServices().otpValidate(
-                          context, mobileNumber, otpController.text);
-                      if (validateOtpRes.apiResponse![0].responseStatus ==
-                          true) {
-                        NavigationHelper.pushNamed(
-                          AppRoutes.registerCreatePin,
-                          arguments: {
-                            'pageType': AppRoutes.registerBasicDetails,
-                            'firstName': firstName,
-                            'lastName': lastName,
-                            'mobileNumber': mobileNumber,
-                            'email': email,
-                            'cityID': cityID,
-                            'address': address,
-                            'stateID': stateID,
-                            'referralCode': referralCode,
-                          },
-                        );
-                      } else {
-                        SnackbarHelper.showSnackBar(
-                            validateOtpRes.apiResponse![0].responseDetails!);
-                      }
-                    } else if (pageType == AppRoutes.loginPin) {
-                      var validateOtpRes = await AuthServices().otpValidate(
-                          context, mobileNumber, otpController.text);
-                      if (validateOtpRes.errorCount == 0) {
-                        var forgetPinRes = await AuthServices().forgetPin(
+                    Text(
+                      mobileNumber,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                AppTextFormField(
+                  controller: otpController,
+                  labelText: AppStrings.otp,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.done,
+                  enabled: true,
+                  maxLength: 4,
+                  prefixIcon: Icon(Icons.pin),
+                  validator: _validateOtp, // Added validator for OTP field
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't receive the OTP ?",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _isResendEnabled
+                          ? () async {
+                              await _resendOTP(mobileNumber);
+                            }
+                          : null, // Set to null when button is disabled
+                      child: Text(
+                        _isResendEnabled ? " RESEND OTP" : "$_start s",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                RoundedLoadingButton(
+                  width: double.infinity,
+                  height: 50.0,
+                  controller: _btnVerifyController,
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      if (pageType == AppRoutes.registerBasicDetails) {
+                        var validateOtpRes = await AuthServices().otpValidate(
                             context, mobileNumber, otpController.text);
-                        if (forgetPinRes.errorCount == 0) {
+                        if (validateOtpRes.apiResponse![0].responseStatus ==
+                            true) {
+                          NavigationHelper.pushNamed(
+                            AppRoutes.registerCreatePin,
+                            arguments: {
+                              'pageType': AppRoutes.registerBasicDetails,
+                              'firstName': firstName,
+                              'lastName': lastName,
+                              'mobileNumber': mobileNumber,
+                              'email': email,
+                              'cityID': cityID,
+                              'address': address,
+                              'stateID': stateID,
+                              'referralCode': referralCode,
+                            },
+                          );
+                        } else {
+                          SnackbarHelper.showSnackBar(
+                              validateOtpRes.apiResponse![0].responseDetails!);
+                        }
+                      } else if (pageType == AppRoutes.loginPin) {
+                        var validateOtpRes = await AuthServices().otpValidate(
+                            context, mobileNumber, otpController.text);
+                        if (validateOtpRes.errorCount == 0) {
+                          var forgetPinRes = await AuthServices().forgetPin(
+                              context, mobileNumber, otpController.text);
+                          if (forgetPinRes.errorCount == 0) {
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.bottomSlide,
+                              dialogType: DialogType.success,
+                              dialogBackgroundColor: Colors.white,
+                              title:
+                                  forgetPinRes.apiResponse![0].responseDetails,
+                              titleTextStyle: AppTheme.appBarText,
+                              descTextStyle: AppTheme.appBarText,
+                              btnOkOnPress: () {
+                                NavigationHelper.pushReplacementNamedUntil(
+                                  AppRoutes.loginPin,
+                                  arguments: {'mobileNumber': mobileNumber},
+                                );
+                              },
+                              btnOkText: 'OK',
+                              btnOkColor: Colors.greenAccent.shade700,
+                            ).show();
+                          }
+                        }
+                      } else if (pageType == 'LoginWithOtp') {
+                        var loginPinRes = await AuthServices().loginPinCheck(
+                            context,
+                            mobileNumber,
+                            otpController.text,
+                            "otp",
+                            "true");
+                        if (loginPinRes.apiResponse?[0].responseStatus ==
+                            true) {
+                          var prefs = await SharedPreferences.getInstance();
+                          prefs.setString(
+                              AppStrings.prefUserID,
+                              loginPinRes
+                                  .apiResponse![0].userLoginInfo!.userId!);
+                          prefs.setString(
+                              AppStrings.prefUserUUID,
+                              loginPinRes
+                                  .apiResponse![0].userLoginInfo!.userUuid!);
+                          prefs.setString(
+                              AppStrings.prefRole,
+                              loginPinRes.apiResponse![0].userLoginInfo!
+                                  .userRoleType!);
+                          prefs.setString(
+                              AppStrings.prefAuthID,
+                              loginPinRes
+                                  .apiResponse![0].userLoginInfo!.authUuid!);
+                          NavigationHelper.pushReplacementNamedUntil(
+                            AppRoutes.dashboardScreen,
+                            arguments: {'mobileNumber': mobileNumber},
+                          );
+                        } else {
+                          SnackbarHelper.showSnackBar(
+                              loginPinRes.apiResponse![0].responseDetails!);
+                        }
+                      } else if (pageType == AppRoutes.changeMobileScreen) {
+                        var loginPinRes = await AuthServices()
+                            .updateMobileNumber(
+                                context, mobileNumber, otpController.text);
+                        if (loginPinRes.apiResponse?[0].responseStatus ==
+                            true) {
                           AwesomeDialog(
                             context: context,
                             animType: AnimType.bottomSlide,
                             dialogType: DialogType.success,
                             dialogBackgroundColor: Colors.white,
-                            title: forgetPinRes.apiResponse![0].responseDetails,
                             titleTextStyle: AppTheme.appBarText,
-                            descTextStyle: AppTheme.appBarText,
-                            btnOkOnPress: () {
+                            dismissOnTouchOutside: false,
+                            dismissOnBackKeyPress: false,
+                            title: loginPinRes.apiResponse![0].responseDetails!,
+                            btnOkOnPress: () async {
+                              var prefs = await SharedPreferences.getInstance();
+                              var mb =
+                                  prefs.getString(AppStrings.prefMobileNumber);
+                              var language =
+                                  prefs.getString(AppStrings.prefLanguage);
+                              var countryCode =
+                                  prefs.getString(AppStrings.prefCountryCode);
+                              var sessionID =
+                                  prefs.getString(AppStrings.prefSessionID);
+                              prefs.clear();
+                              prefs.setString(
+                                  AppStrings.prefLanguage, language!);
+                              prefs.setString(AppStrings.prefMobileNumber, mb!);
+                              prefs.setString(
+                                  AppStrings.prefCountryCode, countryCode!);
+                              prefs.setString(
+                                  AppStrings.prefSessionID, sessionID!);
                               NavigationHelper.pushReplacementNamedUntil(
-                                AppRoutes.loginPin,
-                                arguments: {'mobileNumber': mobileNumber},
-                              );
+                                  AppRoutes.loginMobile);
+                              SnackbarHelper.showSnackBar(
+                                  loginPinRes.apiResponse![0].responseDetails!);
                             },
                             btnOkText: 'OK',
                             btnOkColor: Colors.greenAccent.shade700,
                           ).show();
                         }
                       }
-                    } else if (pageType == 'LoginWithOtp') {
-                      var loginPinRes = await AuthServices().loginPinCheck(
-                          context,
-                          mobileNumber,
-                          otpController.text,
-                          "otp",
-                          "true");
-                      if (loginPinRes.apiResponse?[0].responseStatus == true) {
-                        var prefs = await SharedPreferences.getInstance();
-                        prefs.setString(AppStrings.prefUserID,
-                            loginPinRes.apiResponse![0].userLoginInfo!.userId!);
-                        prefs.setString(
-                            AppStrings.prefUserUUID,
-                            loginPinRes
-                                .apiResponse![0].userLoginInfo!.userUuid!);
-                        prefs.setString(
-                            AppStrings.prefRole,
-                            loginPinRes
-                                .apiResponse![0].userLoginInfo!.userRoleType!);
-                        prefs.setString(
-                            AppStrings.prefAuthID,
-                            loginPinRes
-                                .apiResponse![0].userLoginInfo!.authUuid!);
-                        NavigationHelper.pushReplacementNamedUntil(
-                          AppRoutes.dashboardScreen,
-                          arguments: {'mobileNumber': mobileNumber},
-                        );
-                      } else {
-                        SnackbarHelper.showSnackBar(
-                            loginPinRes.apiResponse![0].responseDetails!);
-                      }
-                    } else if (pageType == AppRoutes.changeMobileScreen) {
-                      var loginPinRes = await AuthServices().updateMobileNumber(
-                          context, mobileNumber, otpController.text);
-                      if (loginPinRes.apiResponse?[0].responseStatus == true) {
-                        AwesomeDialog(
-                          context: context,
-                          animType: AnimType.bottomSlide,
-                          dialogType: DialogType.success,
-                          dialogBackgroundColor: Colors.white,
-                          titleTextStyle: AppTheme.appBarText,
-                          dismissOnTouchOutside: false,
-                          dismissOnBackKeyPress: false,
-                          title: loginPinRes.apiResponse![0].responseDetails!,
-                          btnOkOnPress: () async {
-                            var prefs = await SharedPreferences.getInstance();
-                            var mb =
-                                prefs.getString(AppStrings.prefMobileNumber);
-                            var language =
-                                prefs.getString(AppStrings.prefLanguage);
-                            var countryCode =
-                                prefs.getString(AppStrings.prefCountryCode);
-                            var sessionID =
-                                prefs.getString(AppStrings.prefSessionID);
-                            prefs.clear();
-                            prefs.setString(AppStrings.prefLanguage, language!);
-                            prefs.setString(AppStrings.prefMobileNumber, mb!);
-                            prefs.setString(
-                                AppStrings.prefCountryCode, countryCode!);
-                            prefs.setString(
-                                AppStrings.prefSessionID, sessionID!);
-                            NavigationHelper.pushReplacementNamedUntil(
-                                AppRoutes.loginMobile);
-                            SnackbarHelper.showSnackBar(
-                                loginPinRes.apiResponse![0].responseDetails!);
-                          },
-                          btnOkText: 'OK',
-                          btnOkColor: Colors.greenAccent.shade700,
-                        ).show();
-                      }
                     }
-                  }
-                  _btnVerifyController.reset();
-                },
-                color: AppColors.primaryColor,
-                child: Text(
-                  AppStrings.verify,
-                  style: TextStyle(color: Colors.white),
+                    _btnVerifyController.reset();
+                  },
+                  color: AppColors.primaryColor,
+                  child: Text(
+                    AppStrings.verify,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-            ],
+              ],
+            ),
           ),
         ),
       ),

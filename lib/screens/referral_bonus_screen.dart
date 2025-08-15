@@ -33,6 +33,7 @@ class _ReferralBonusScreenState extends State<ReferralBonusScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       appBar: MyAppBar(title: 'Referral Info'),
       body: FutureBuilder<ReferralModel>(
         future: referralModel,
@@ -52,6 +53,7 @@ class _ReferralBonusScreenState extends State<ReferralBonusScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(height: 10),
                 Text('Referral Code',
                     style: TextStyle(color: Colors.grey.shade800)),
                 Text(
@@ -101,8 +103,6 @@ class _ReferralBonusScreenState extends State<ReferralBonusScreen> {
                       return Card(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                              color: AppColors.primaryColor, width: 1),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: Padding(

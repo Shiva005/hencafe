@@ -300,6 +300,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 15.0),
                   child: Chip(
+                    backgroundColor: Colors.white,
                     label: Row(
                       children: [
                         const Icon(Icons.add_circle_outline,
@@ -347,6 +348,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       }
                     },
                     child: Chip(
+                      backgroundColor: Colors.white,
                       label: Row(
                         children: [
                           const Icon(Icons.calendar_month,
@@ -676,11 +678,11 @@ class FilterChipWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Chip(
+        backgroundColor: Colors.white,
         label: Text(label,
             style: TextStyle(
                 color: isSelected ? AppColors.primaryColor : Colors.black54,
                 fontSize: 11)),
-        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(
               color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,

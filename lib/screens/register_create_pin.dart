@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/values/app_icons.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
@@ -11,6 +12,7 @@ import '../values/app_colors.dart';
 import '../values/app_regex.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
+import '../values/app_theme.dart';
 
 class RegisterCreatePin extends StatefulWidget {
   const RegisterCreatePin({super.key});
@@ -89,156 +91,163 @@ class _RegisterCreatePinState extends State<RegisterCreatePin> {
           preferredSize: Size.fromHeight(60.0),
           child: MyAppBar(title: AppStrings.createPinNumber)),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: ListView(
-          children: [
-            SizedBox(height: 20),
-            Image.asset(AppIconsData.createPin, height: 180),
-            Form(
-              key: _formKey,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 50, bottom: 20),
-                child: Column(
-                  children: [
-                    ValueListenableBuilder(
-                      valueListenable: pinNotifier,
-                      builder: (_, passwordObscure, __) {
-                        return AppTextFormField(
-                          obscureText: passwordObscure,
-                          controller: pinController,
-                          labelText: AppStrings.pin,
-                          maxLength: 4,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.number,
-                          enabled: true,
-                          prefixIcon: Icon(Icons.pin),
-                          suffixIcon: IconButton(
-                            onPressed: () =>
-                                pinNotifier.value = !passwordObscure,
-                            style: IconButton.styleFrom(
-                              minimumSize: const Size.square(48),
-                            ),
-                            icon: Icon(
-                              passwordObscure
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 24,
-                              color: Colors.black,
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your pin';
-                            }
-                            if (value.length < 4) {
-                              return 'Pin must be 4 digits';
-                            }
-                            return null;
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    ValueListenableBuilder(
-                      valueListenable: confirmPinNotifier,
-                      builder: (_, passwordObscure, __) {
-                        return AppTextFormField(
-                          obscureText: passwordObscure,
-                          controller: confirmPinController,
-                          labelText: AppStrings.reEnterPin,
-                          maxLength: 4,
-                          textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.number,
-                          enabled: true,
-                          prefixIcon: Icon(Icons.pin),
-                          suffixIcon: IconButton(
-                            onPressed: () =>
-                                confirmPinNotifier.value = !passwordObscure,
-                            style: IconButton.styleFrom(
-                              minimumSize: const Size.square(48),
-                            ),
-                            icon: Icon(
-                              passwordObscure
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 24,
-                              color: Colors.black,
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please confirm your pin';
-                            }
-                            if (value != pinController.text) {
-                              return 'Pins do not match';
-                            }
-                            return null;
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        RoundedLoadingButton(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          controller: _btnController,
-                          height: 40.0,
-                          onPressed: () async {
-                            var prefs = await SharedPreferences.getInstance();
-                            if (_formKey.currentState?.validate() ?? false) {
-                              var registrationCreateRes = await AuthServices()
-                                  .registrationCreate(
-                                      context,
-                                      firstName,
-                                      lastName,
-                                      mobileNumber,
-                                      email,
-                                      cityID,
-                                      pinController.text,
-                                      address,
-                                      stateID,
-                                      referralCode);
-                              if (registrationCreateRes.errorCount == 0) {
-                                prefs.setString(AppStrings.prefUserID,
-                                    registrationCreateRes.regUserInfo!.userId!);
-                                prefs.setString(
-                                    AppStrings.prefUserUUID,
-                                    registrationCreateRes
-                                        .regUserInfo!.userUuid!);
-                                prefs.setString(
-                                    AppStrings.prefRole,
-                                    registrationCreateRes
-                                        .regUserInfo!.userRoleType!);
-                                prefs.setString(
-                                    AppStrings.prefAuthID,
-                                    registrationCreateRes
-                                        .regUserInfo!.authUuid!);
-                                NavigationHelper.pushReplacementNamedUntil(
-                                  AppRoutes.dashboardScreen,
-                                  arguments: {
-                                    'mobileNumber': mobileNumber,
-                                  },
-                                );
-                              }
-                            }
-                            _btnController.reset();
-                          },
-                          color: AppColors.primaryColor,
-                          child: Text(
-                            AppStrings.finish,
-                            style: TextStyle(color: Colors.white),
-                          ),
+        padding: const EdgeInsets.all(24.0),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              )
+            ],
+          ),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                SizedBox(height: 20),
+                Image.asset(AppIconsData.createPin, height: 180),
+                SizedBox(height: 40),
+                ValueListenableBuilder(
+                  valueListenable: pinNotifier,
+                  builder: (_, passwordObscure, __) {
+                    return AppTextFormField(
+                      obscureText: passwordObscure,
+                      controller: pinController,
+                      labelText: AppStrings.pin,
+                      maxLength: 4,
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.number,
+                      enabled: true,
+                      prefixIcon: Icon(Icons.pin),
+                      suffixIcon: IconButton(
+                        onPressed: () => pinNotifier.value = !passwordObscure,
+                        style: IconButton.styleFrom(
+                          minimumSize: const Size.square(48),
                         ),
-                      ],
-                    ),
-                  ],
+                        icon: Icon(
+                          passwordObscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 24,
+                          color: Colors.black,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your pin';
+                        }
+                        if (value.length < 4) {
+                          return 'Pin must be 4 digits';
+                        }
+                        return null;
+                      },
+                    );
+                  },
                 ),
-              ),
+                const SizedBox(height: 10),
+                ValueListenableBuilder(
+                  valueListenable: confirmPinNotifier,
+                  builder: (_, passwordObscure, __) {
+                    return AppTextFormField(
+                      obscureText: passwordObscure,
+                      controller: confirmPinController,
+                      labelText: AppStrings.reEnterPin,
+                      maxLength: 4,
+                      textInputAction: TextInputAction.done,
+                      keyboardType: TextInputType.number,
+                      enabled: true,
+                      prefixIcon: Icon(Icons.pin),
+                      suffixIcon: IconButton(
+                        onPressed: () =>
+                            confirmPinNotifier.value = !passwordObscure,
+                        style: IconButton.styleFrom(
+                          minimumSize: const Size.square(48),
+                        ),
+                        icon: Icon(
+                          passwordObscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 24,
+                          color: Colors.black,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your pin';
+                        }
+                        if (value != pinController.text) {
+                          return 'Pins do not match';
+                        }
+                        return null;
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                RoundedLoadingButton(
+                  controller: _btnController,
+                  height: 50.0,
+                  onPressed: () async {
+                    var prefs = await SharedPreferences.getInstance();
+                    if (_formKey.currentState?.validate() ?? false) {
+                      var registrationCreateRes = await AuthServices()
+                          .registrationCreate(
+                              context,
+                              firstName,
+                              lastName,
+                              mobileNumber,
+                              email,
+                              cityID,
+                              pinController.text,
+                              address,
+                              stateID,
+                              referralCode);
+                      if (registrationCreateRes.errorCount == 0) {
+                        prefs.setString(AppStrings.prefUserID,
+                            registrationCreateRes.regUserInfo!.userId!);
+                        prefs.setString(AppStrings.prefUserUUID,
+                            registrationCreateRes.regUserInfo!.userUuid!);
+                        prefs.setString(AppStrings.prefRole,
+                            registrationCreateRes.regUserInfo!.userRoleType!);
+                        prefs.setString(AppStrings.prefAuthID,
+                            registrationCreateRes.regUserInfo!.authUuid!);
+                        AwesomeDialog(
+                          context: context,
+                          animType: AnimType.bottomSlide,
+                          dialogType: DialogType.success,
+                          dialogBackgroundColor: Colors.white,
+                          titleTextStyle: AppTheme.appBarText,
+                          title: registrationCreateRes
+                              .apiResponse![0].responseDetails,
+                          btnOkOnPress: () async {
+                            NavigationHelper.pushReplacementNamedUntil(
+                              AppRoutes.dashboardScreen,
+                              arguments: {
+                                'mobileNumber': mobileNumber,
+                              },
+                            );
+                          },
+                          btnOkText: 'OK',
+                          btnOkColor: Colors.greenAccent.shade700,
+                        ).show();
+                      }
+                    }
+                    _btnController.reset();
+                  },
+                  color: AppColors.primaryColor,
+                  child: Text(
+                    AppStrings.finish,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
