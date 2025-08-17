@@ -6,12 +6,12 @@ import '../values/app_colors.dart';
 import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 
-class DetailsWidget extends StatelessWidget {
+class CompanyDetailsWidget extends StatelessWidget {
   final dynamic detailsModel;
   final List<dynamic> userInfo;
   final dynamic prefs;
 
-  const DetailsWidget({
+  const CompanyDetailsWidget({
     super.key,
     required this.detailsModel,
     required this.userInfo,
@@ -30,7 +30,7 @@ class DetailsWidget extends StatelessWidget {
         side: BorderSide(color: Colors.grey.shade400, width: 1),
         borderRadius: BorderRadius.circular(10.0),
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: ListView(
@@ -38,10 +38,6 @@ class DetailsWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Company Information',
-                  style: TextStyle(fontSize: 18, color: Colors.black),
-                ),
                 if (isOwner)
                   Visibility(
                     visible: false, // set to true if needed
@@ -109,7 +105,7 @@ class DetailsWidget extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                   ),
@@ -129,7 +125,7 @@ class DetailsWidget extends StatelessWidget {
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 35),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(30),
                             ),
                           ),
                         ),
@@ -148,14 +144,14 @@ class DetailsWidget extends StatelessWidget {
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 35),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(30),
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   // Change Banner Image
                   ElevatedButton.icon(
                     onPressed: () {},
@@ -167,7 +163,7 @@ class DetailsWidget extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                   ),
@@ -183,11 +179,11 @@ class DetailsWidget extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   // Update button with arrow
                   ElevatedButton(
@@ -197,7 +193,7 @@ class DetailsWidget extends StatelessWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Row(

@@ -2,8 +2,8 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/address_details_model.dart';
 import '../models/attachment_model.dart';
-import '../models/company_providers_model.dart';
 import '../services/services.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
@@ -69,9 +69,9 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             const SizedBox(height: 10),
             selectedTab == 0
                 ? Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: _buildAddressCard(widget.address),
-            )
+                    padding: const EdgeInsets.all(12.0),
+                    child: _buildAddressCard(widget.address),
+                  )
                 : _buildAttachmentsSection(widget.address),
           ],
         ),
@@ -100,7 +100,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
           backgroundColor: isSelected ? Colors.indigo : Colors.grey.shade300,
           foregroundColor: isSelected ? Colors.white : Colors.black,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
         child: Text(title),
       ),
@@ -122,7 +122,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             address.locationInfo?.first.stateNameLanguage ?? "-"),
         const SizedBox(height: 8),
         buildRow(Icons.pin_drop, "Pincode", address.addressZipcode ?? "-"),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
@@ -130,15 +130,15 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 35),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(30),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Text("Update"),
+              Text("Edit Address"),
               SizedBox(width: 8),
-              Icon(Icons.double_arrow_rounded, color: Colors.white),
+              Icon(Icons.arrow_right_alt, color: Colors.white),
             ],
           ),
         ),
@@ -149,7 +149,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 35),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(30),
             ),
           ),
           child: Row(
@@ -233,29 +233,26 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
 }
 
 Widget buildRow(IconData icon, String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 18, color: Colors.grey.shade600),
-            const SizedBox(width: 5),
-            Text(
-              "$label:",
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: const TextStyle(fontSize: 15, color: Colors.black),
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.grey.shade600),
+          const SizedBox(width: 5),
+          Text(
+            "$label:",
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
           ),
+        ],
+      ),
+      Expanded(
+        child: Text(
+          value,
+          textAlign: TextAlign.end,
+          style: const TextStyle(fontSize: 15, color: Colors.black),
         ),
-      ],
-    ),
+      ),
+    ],
   );
 }

@@ -1,9 +1,10 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/company_providers_model.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_routes.dart';
 import 'package:hencafe/widget/address_widget.dart';
-import 'package:hencafe/widget/details_widget.dart';
+import 'package:hencafe/widget/company_details_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -91,12 +92,12 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                 // Your header card inside a sliver
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: 180,
+                    height: 160,
                     child: Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 8),
+                      margin:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                       elevation: 0.2,
                       color: Colors.white,
@@ -212,7 +213,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
               ],
               body: TabBarView(
                 children: [
-                  DetailsWidget(
+                  CompanyDetailsWidget(
                     detailsModel: detailsModel,
                     userInfo: userInfo,
                     prefs: prefs,

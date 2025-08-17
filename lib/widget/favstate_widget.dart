@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:hencafe/models/supply_model.dart';
+import 'package:hencafe/models/user_fav_state_info.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:hencafe/values/app_colors.dart';
 
-class SuppliesWidget extends StatelessWidget {
-  final List<SupplyInfo> supplyList;
+class FavouriteStateWidget extends StatelessWidget {
+  final List<UserFavouriteStateInfo> favStateList;
 
-  const SuppliesWidget({
+  const FavouriteStateWidget({
     super.key,
-    required this.supplyList,
+    required this.favStateList,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (supplyList.isEmpty) return const SizedBox();
-
+    if (favStateList.isEmpty) return const SizedBox();
+    logger.w(favStateList);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5.0),
       color: Colors.white,
@@ -31,9 +32,9 @@ class SuppliesWidget extends StatelessWidget {
               scrollDirection: Axis.vertical,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: supplyList
-                    .map((e) => e.supplytypeNameLanguage ?? '')
-                    .where((name) => name.isNotEmpty)
+                children: favStateList
+                    .map((e) => e.stateInfo![0].stateNameLanguage ?? '')
+                    .where((name) => name.isNotEmpty) // filter null/empty names
                     .map((name) {
                   final color = Utils.getRandomColor(name);
                   return Padding(
@@ -74,7 +75,7 @@ class SuppliesWidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text("Edit Supplies"),
+                  Text("Edit Favourite State"),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_right_alt, color: Colors.white),
                 ],

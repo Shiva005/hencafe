@@ -1,17 +1,21 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/helpers/snackbar_helper.dart';
-import 'package:hencafe/utils/loading_dialog_helper.dart';
-import 'package:hencafe/utils/utils.dart';
+import 'package:hencafe/models/attachment_model.dart';
+import 'package:hencafe/services/services.dart';
+import 'package:hencafe/utils/appbar_widget.dart';
+import 'package:hencafe/values/app_colors.dart';
+import 'package:hencafe/values/app_icons.dart';
+import 'package:hencafe/values/app_routes.dart';
+import 'package:hencafe/values/app_strings.dart';
+import 'package:hencafe/values/app_theme.dart';
+import 'package:hencafe/widget/address_widget.dart';
+import 'package:hencafe/widget/attachment_widget.dart';
+import 'package:hencafe/widget/favstate_widget.dart';
+import 'package:hencafe/widget/membership_widget.dart';
+import 'package:hencafe/widget/supplies_widget.dart';
+import 'package:hencafe/widget/user_details_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/navigation_helper.dart';
-import '../models/supplies_model.dart';
-import '../services/services.dart';
-import '../utils/my_logger.dart';
-import '../values/app_colors.dart';
-import '../values/app_routes.dart';
-import '../values/app_strings.dart';
-import '../values/app_theme.dart';
 import 'image_preview_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -22,783 +26,272 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  var getProfileRes, getSuppliesRes;
-  var prefs;
-  var name = "",
-      email = "",
-      phone = "",
-      userImage = "",
-      userVerified = "",
-      role = "",
-      maxFavState = "",
-      dob = "",
-      memberShipValidFrom = Utils.formatDate(DateTime.now()),
-      memberShipValidTo = Utils.formatDate(DateTime.now()),
-      memberShipType = "",
-      workType = "";
-
-  var selectedIds = '';
-  var favStateList = [];
-  var suppliesList = [];
-  List<ApiResponse> _allSupplies = [];
-  List<ApiResponse> _filteredSupplies = [];
-  List<String> _selectedSupplyIDs = [];
-  String pageType = '';
+  late SharedPreferences prefs;
+  late Future<dynamic> profileData;
   String userID = '';
-  bool _isInit = true;
+  String pageType = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_isInit) {
+    if (userID.isEmpty) {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-
       pageType = args['pageType'] ?? '';
 
-      SharedPreferences.getInstance().then((sharedPrefs) {
-        prefs = sharedPrefs;
-
+      SharedPreferences.getInstance().then((sp) {
+        prefs = sp;
         if (pageType == AppRoutes.dashboardScreen) {
           userID = prefs.getString(AppStrings.prefUserID) ?? '';
         } else if (pageType == AppRoutes.saleDetailsScreen) {
           userID = args['userID'] ?? '';
-
-          logger.w(userID);
         }
-
-        loadProfile();
-        _fetchSupplies();
+        setState(() {
+          profileData = _fetchProfile(userID);
+        });
       });
-
-      _isInit = false;
     }
   }
 
-  Future<List<ApiResponse>> _fetchSupplies() async {
-    final res = await AuthServices()
-        .getSupplies(context); // Replace with your actual call
-    if (res.errorCount == 0 && res.apiResponse != null) {
-      setState(() {
-        _allSupplies = res.apiResponse!;
-        _filteredSupplies = _allSupplies;
-      });
-      return _allSupplies;
-    }
-    return [];
-  }
-
-  Future<void> loadProfile() async {
-    prefs = await SharedPreferences.getInstance();
-    LoadingDialogHelper.showLoadingDialog(context);
-    getProfileRes = await AuthServices().getProfile(context, userID);
-    getSuppliesRes = await AuthServices().getSupplies(context);
-    if (getProfileRes.errorCount == 0) {
-      LoadingDialogHelper.dismissLoadingDialog(context);
-      setState(() {
-        name =
-            '${getProfileRes.apiResponse![0].userFirstName} ${getProfileRes.apiResponse![0].userLastName}';
-        email = getProfileRes.apiResponse![0].userEmail ?? "";
-        dob = getProfileRes.apiResponse![0].userDob ?? "";
-        phone = getProfileRes.apiResponse![0].userMobile ?? "";
-        userVerified = getProfileRes.apiResponse![0].userIsVerfied ?? "";
-        role =
-            Utils.getUserRoleName(getProfileRes.apiResponse![0].userRoleType);
-        if (getProfileRes.apiResponse![0].userMembershipInfo!.length != 0) {
-          memberShipValidFrom = getProfileRes.apiResponse![0]
-                  .userMembershipInfo![0].userMembershipValidFrom ??
-              "";
-          maxFavState = getProfileRes
-              .apiResponse![0].userMembershipInfo![0].userFavStateMaxCount
-              .toString();
-          memberShipValidTo = getProfileRes.apiResponse![0]
-                  .userMembershipInfo![0].userMembershipValidTo ??
-              "";
-          memberShipType = getProfileRes.apiResponse![0].userMembershipInfo![0]
-                  .userMembershipType.value ??
-              "";
-        }
-        workType = getProfileRes.apiResponse![0].userWorkType.value ?? "";
-        if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
-          userImage =
-              getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath ??
-                  "";
-        }
-        for (int i = 0;
-            i < getProfileRes.apiResponse![0].userFavouriteStateInfo!.length;
-            i++) {
-          favStateList.add(getProfileRes.apiResponse![0]
-              .userFavouriteStateInfo![i].stateInfo![0].stateNameLanguage);
-        }
-        for (int i = 0;
-            i < getProfileRes.apiResponse![0].supplyInfo.length;
-            i++) {
-          suppliesList.add(getProfileRes
-              .apiResponse![0].supplyInfo![i].supplytypeNameLanguage);
-        }
-      });
-    }
+  Future<dynamic> _fetchProfile(String userId) async {
+    return await AuthServices().getProfile(context, userId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          iconTheme: const IconThemeData(color: Colors.white),
-          backgroundColor: AppColors.primaryColor,
-          elevation: 1.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-          ),
-          title: Text(
-            userID == prefs.getString(AppStrings.prefUserID)
-                ? "My Profile"
-                : "Seller Details",
-            style: AppTheme.appbarTextStyle,
-          ),
-          centerTitle: false,
+        preferredSize: const Size.fromHeight(60.0),
+        child: MyAppBar(
+          title: userID == prefs.getString(AppStrings.prefUserID)
+              ? "My Profile"
+              : "Seller Details",
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Profile header
-              _card(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ImagePreviewScreen(
-                                            imageUrl: userImage, pageType: AppRoutes.myProfileScreen,),
-                                      ));
-                                },
-                                child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: NetworkImage(userImage),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0.0,
-                              left: 0.0,
-                              right: 0.0,
-                              child: Icon(
-                                userVerified == "Y"
-                                    ? Icons.verified_sharp
-                                    : Icons.not_interested_outlined,
-                                color: userVerified == "Y"
-                                    ? Colors.green.shade600
-                                    : Colors.red.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          userVerified == "Y" ? "VERIFIED" : "NOT VERIFIED",
-                          style: TextStyle(
-                              color: userVerified == "Y"
-                                  ? Colors.green.shade600
-                                  : Colors.red.shade600,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.0),
-                        ),
-                        SizedBox(height: 5),
-                        if (userID == prefs.getString(AppStrings.prefUserID))
-                          Text(
-                            'Change Photo',
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              decoration: TextDecoration.underline,
-                            ),
-                          )
-                      ],
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
+      body: FutureBuilder<dynamic>(
+        future: profileData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('No data found.'));
+          }
+
+          final detailsModel = snapshot.data!;
+          final user = detailsModel.apiResponse!.first;
+
+          List<AttachmentInfo> attachments = user.attachmentInfo ?? [];
+
+          return DefaultTabController(
+            length: 6,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                /// Profile header
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 160,
+                    child: Card(
+                      margin: EdgeInsets.zero,
+                      elevation: 0.2,
+                      color: Colors.white,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.person_outlined, size: 18),
-                                        SizedBox(width: 5),
-                                        Text(name),
-                                      ],
-                                    ),
-                                    SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.phone, size: 16),
-                                        SizedBox(width: 5),
-                                        Text(phone),
-                                      ],
-                                    ),
-                                    SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.email_outlined, size: 16),
-                                        SizedBox(width: 5),
-                                        Text(email),
-                                      ],
-                                    ),
-                                    SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.cake_outlined, size: 16),
-                                        SizedBox(width: 5),
-                                        Text(Utils.threeLetterDateFormatted(
-                                            dob)),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                  ],
-                                ),
-                              ),
-                              if (userID ==
-                                  prefs.getString(AppStrings.prefUserID))
-                                IconButton(
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: AppColors.primaryColor,
-                                    ),
-                                    onPressed: () {
-                                      NavigationHelper.pushNamed(
-                                          AppRoutes.registerBasicDetails,
-                                          arguments: {
-                                            'pageType':
-                                                AppRoutes.myProfileScreen,
-                                            'mobileNumber': phone,
-                                            'profileModel':
-                                                getProfileRes.apiResponse![0],
-                                          })?.then((value) {
-                                        loadProfile();
-                                        favStateList.clear();
-                                        suppliesList.clear();
-                                      });
-                                    }),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Stack(
+                            clipBehavior: Clip.none,
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 3),
+                                height: 100,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: Colors.grey.shade300,
                                   border:
-                                      Border.all(color: Colors.grey.shade400),
-                                  borderRadius: BorderRadius.circular(20),
+                                      Border.all(width: 3, color: Colors.white),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Text('Role: '),
-                                    Text(
-                                      role,
-                                      style: TextStyle(
-                                          color: AppColors.primaryColor),
-                                    ),
-                                  ],
-                                ),
+                                alignment: Alignment.center,
+                                child: (user.userBannerImg != null &&
+                                        user.userBannerImg!.isNotEmpty)
+                                    ? Image.network(
+                                        user.userBannerImg![0].attachmentPath!,
+                                        fit: BoxFit.fitWidth,
+                                      )
+                                    : Image.asset(
+                                        AppIconsData.noImage,
+                                        width: 70,
+                                        height: 70,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  border:
-                                      Border.all(color: Colors.grey.shade400),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text('Work: '),
-                                    Text(
-                                      workType,
-                                      style: TextStyle(
-                                          color: AppColors.primaryColor),
+                              if (user.userProfileImg != null &&
+                                  user.userProfileImg!.isNotEmpty)
+                                Positioned(
+                                  left: 16,
+                                  bottom: -50,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ImagePreviewScreen(
+                                            imageUrl: user.userProfileImg![0]
+                                                .attachmentPath!,
+                                            pageType: AppRoutes.myProfileScreen,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Card(
+                                          elevation: 3.0,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                            child: Image.network(
+                                              user.userProfileImg![0]
+                                                  .attachmentPath!,
+                                              width: 70,
+                                              height: 70,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 5.0, bottom: 15),
+                                          child: Text(
+                                            user.userFirstName ?? 'No Name',
+                                            style:
+                                                const TextStyle(fontSize: 18),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
+
+                /// Tabs
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SliverAppBarDelegate(
+                    const TabBar(
+                      isScrollable: true,
+                      labelColor: AppColors.primaryColor,
+                      indicatorColor: AppColors.primaryColor,
+                      labelPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                      tabs: [
+                        Tab(text: 'Details'),
+                        Tab(text: 'Membership'),
+                        Tab(text: 'Supplies'),
+                        Tab(text: 'Fav States'),
+                        Tab(text: 'Addresses'),
+                        Tab(text: 'Attachments'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              body: TabBarView(
+                children: [
+                  UserDetailsWidget(),
+                  MembershipWidget(
+                    membershipList: user.userMembershipInfo ?? [],
+                  ),
+                  SuppliesWidget(
+                    supplyList: user.supplyInfo ?? [],
+                  ),
+                  FavouriteStateWidget(
+                    favStateList: user.userFavouriteStateInfo ?? [],
+                  ),
+                  AddressWidget(
+                    addressList: user.addressDetails ?? [],
+                  ),
+                  AttachmentWidget(
+                    attachments: attachments,
+                    userId: user.userId ?? '',
+                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
+                    onDelete: (index) {
+                      showDeleteAttachmentDialog(
+                        context: context,
+                        index: index,
+                        attachment: attachments[index],
+                        attachments: attachments,
+                        onUpdate: () => setState(() {}),
+                      );
+                    },
+                    index: 0,
+                  ),
+                ],
               ),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-                const SizedBox(height: 10),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-                _card(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                    child: Column(
-                      children: [
-                        _sectionHeader("Favorite states", onEdit: () {
-                          NavigationHelper.pushNamed(
-                            AppRoutes.stateSelection,
-                          )?.then((value) {
-                            favStateList.clear();
-                            suppliesList.clear();
-                            loadProfile();
-                          });
-                        }),
-                        SizedBox(height: 7),
-                        SizedBox(
-                          height: 25,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: favStateList.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: _buildChip(favStateList[index]),
-                              );
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-                const SizedBox(height: 10),
-              if (userID == prefs.getString(AppStrings.prefUserID))
-                _card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 10.0, top: 5.0, bottom: 10.0),
-                        child: Text(
-                          "Membership Details",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Membership Type : ",
-                                style: TextStyle(color: Colors.grey.shade700)),
-                            Text(memberShipType),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Maximum Favourite State : ",
-                                style: TextStyle(color: Colors.grey.shade700)),
-                            Text(maxFavState),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Start Date :",
-                                style: TextStyle(color: Colors.grey.shade700)),
-                            Text(Utils.threeLetterDateFormatted(
-                                memberShipValidFrom)),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("End Date :",
-                                style: TextStyle(color: Colors.grey.shade700)),
-                            Text(Utils.threeLetterDateFormatted(
-                                memberShipValidTo)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              const SizedBox(height: 10),
-              // Supplies
-              Visibility(
-                visible: suppliesList.isNotEmpty,
-                child: _card(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                    child: Column(
-                      children: [
-                        _sectionHeader("Supplies", onEdit: () {
-                          _selectedSupplyIDs = _filteredSupplies
-                              .where((supply) =>
-                                  suppliesList.contains(supply.supplytypeName))
-                              .map((supply) => supply.supplytypeId.toString())
-                              .toList();
-
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20)),
-                            ),
-                            builder: (context) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom,
-                                  top: 20,
-                                  left: 16,
-                                  right: 16,
-                                ),
-                                child: StatefulBuilder(
-                                  builder: (BuildContext context,
-                                      StateSetter setModalState) {
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text(
-                                          "Select Supply Types",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        ListView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          itemCount: _filteredSupplies.length,
-                                          itemBuilder: (context, index) {
-                                            final supply =
-                                                _filteredSupplies[index];
-                                            final supplyId =
-                                                supply.supplytypeId.toString();
-
-                                            return CheckboxListTile(
-                                              title: Text(
-                                                  supply.supplytypeName ?? ''),
-                                              value: _selectedSupplyIDs
-                                                  .contains(supplyId),
-                                              activeColor:
-                                                  AppColors.primaryColor,
-                                              onChanged: (checked) {
-                                                setModalState(() {
-                                                  if (checked == true) {
-                                                    _selectedSupplyIDs
-                                                        .add(supplyId);
-                                                  } else {
-                                                    _selectedSupplyIDs
-                                                        .remove(supplyId);
-                                                  }
-                                                });
-                                              },
-                                            );
-                                          },
-                                        ),
-                                        const SizedBox(height: 10),
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            var updateSupplyRes =
-                                                await AuthServices()
-                                                    .updateSupplies(
-                                                        context,
-                                                        'USER',
-                                                        _selectedSupplyIDs
-                                                            .join(","));
-                                            Navigator.pop(context);
-                                            SnackbarHelper.showSnackBar(
-                                                updateSupplyRes.apiResponse![0]
-                                                    .responseDetails);
-                                            loadProfile();
-                                            suppliesList.clear();
-                                            favStateList.clear();
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.primaryColor,
-                                          ),
-                                          child: const Text(
-                                            "Save",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          );
-                        }),
-                        SizedBox(height: 7),
-                        SizedBox(
-                          height: 25,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: suppliesList.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: _buildChip(suppliesList[index]),
-                              );
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Saved Addresses",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                        if (userID == prefs.getString(AppStrings.prefUserID))
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              border: Border.all(color: AppColors.primaryColor),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                NavigationHelper.pushNamed(
-                                    AppRoutes.createAddressScreen,
-                                    arguments: {
-                                      'pageType': AppRoutes.createAddressScreen
-                                    })?.then((value) {
-                                  loadProfile();
-                                  favStateList.clear();
-                                  suppliesList.clear();
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Add Address',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 13),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Icon(
-                                    Icons.add_circle_outline,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 135,
-                      child: getProfileRes != null &&
-                              getProfileRes!.apiResponse != null &&
-                              getProfileRes!.apiResponse!.isNotEmpty &&
-                              getProfileRes!.apiResponse![0].addressDetails !=
-                                  null &&
-                              getProfileRes!
-                                  .apiResponse![0].addressDetails!.isNotEmpty
-                          ? ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: getProfileRes!
-                                  .apiResponse![0].addressDetails.length,
-                              itemBuilder: (context, index) {
-                                final address = getProfileRes!
-                                    .apiResponse![0].addressDetails;
-                                return Wrap(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        /*SnackbarHelper.showSnackBar( getProfileRes!
-                                            .apiResponse![0]
-                                            .addressDetails![index].addressReferenceUuid);*/
-                                        NavigationHelper.pushNamed(
-                                            AppRoutes.addressDetailsScreen,
-                                            arguments: {
-                                              'pageType':
-                                                  AppRoutes.myProfileScreen,
-                                              'referenceFrom': getProfileRes!
-                                                  .apiResponse![0]
-                                                  .addressDetails![index]
-                                                  .addressReferenceFrom,
-                                              'referenceUUID': getProfileRes!
-                                                  .apiResponse![0]
-                                                  .addressDetails![index]
-                                                  .addressReferenceUuid,
-                                              'addressID': getProfileRes!
-                                                  .apiResponse![0]
-                                                  .addressDetails![index]
-                                                  .addressId,
-                                            })?.then((value) {
-                                          loadProfile();
-                                          favStateList.clear();
-                                          suppliesList.clear();
-                                        });
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.only(right: 8),
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                              color: AppColors.primaryColor),
-                                        ),
-                                        width: 220,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                _buildChip(address[index]
-                                                        .addressType ??
-                                                    "Other"),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_right_alt_outlined,
-                                                  color: AppColors.primaryColor,
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                                address[index].addressAddress ??
-                                                    "No Address"),
-                                            Text(
-                                              "${address[index].locationInfo?[0].cityNameLanguage ?? "City"}, "
-                                              "${address[index].locationInfo?[0].stateNameLanguage ?? "State"}, "
-                                              "${address[index].locationInfo?[0].countryNameLanguage ?? "Country"} - "
-                                              "${address[index].addressZipcode ?? "Zipcode"}",
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            )
-                          : Center(
-                              child: Text(
-                              'No Saved Address found!!',
-                              style: TextStyle(color: Colors.grey),
-                            )),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildChip(String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.black, fontSize: 12),
-      ),
-    );
+  void showDeleteAttachmentDialog({
+    required BuildContext context,
+    required int index,
+    required AttachmentInfo attachment,
+    required List<AttachmentInfo> attachments,
+    required VoidCallback onUpdate,
+  }) {
+    AwesomeDialog(
+      context: context,
+      animType: AnimType.bottomSlide,
+      dialogType: DialogType.warning,
+      dialogBackgroundColor: Colors.white,
+      titleTextStyle: AppTheme.appBarText,
+      title: 'Are you sure you want to delete this file?',
+      btnCancelOnPress: () {},
+      btnCancelText: 'Cancel',
+      btnOkOnPress: () async {
+        var res = await AuthServices().attachmentDelete(
+          context,
+          attachment.attachmentId!,
+          attachment.attachmentPath!,
+        );
+        if (res.apiResponse![0].responseStatus == true) {
+          attachments.removeAt(index);
+          onUpdate();
+        }
+      },
+      btnOkText: 'Yes',
+      btnOkColor: Colors.yellow.shade700,
+    ).show();
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(color: Colors.white, child: _tabBar);
   }
 
-  Widget _sectionHeader(String title, {VoidCallback? onEdit}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        if (onEdit != null && userID == prefs.getString(AppStrings.prefUserID))
-          IconButton(
-              icon: const Icon(Icons.edit, color: AppColors.primaryColor),
-              onPressed: onEdit),
-      ],
-    );
-  }
-
-  Widget _card({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 3,
-              offset: const Offset(0, 2))
-        ],
-      ),
-      child: child,
-    );
-  }
+  @override
+  bool shouldRebuild(covariant _SliverAppBarDelegate oldDelegate) => false;
 }

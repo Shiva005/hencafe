@@ -1,3 +1,12 @@
+import 'package:hencafe/models/state_model.dart';
+import 'package:hencafe/models/user_fav_state_info.dart';
+import 'package:hencafe/models/user_favourite_state_model.dart';
+
+import 'address_details_model.dart';
+import 'attachment_model.dart';
+import 'membership_model.dart';
+import 'supply_model.dart';
+
 class ProfileModel {
   ProfileModel({
     this.apiCode,
@@ -195,93 +204,6 @@ class ApiResponse {
   }
 }
 
-class AddressDetails {
-  AddressDetails({
-    this.addressId,
-    this.addressUuid,
-    this.addressReferenceFrom,
-    this.addressReferenceUuid,
-    this.addressType,
-    this.addressAddress,
-    this.addressZipcode,
-    this.addressGeoCode,
-    this.addressGeoAddress,
-    this.addressStatus,
-    this.locationInfo,
-    this.attachmentInfo,
-    this.userBasicInfo,
-  });
-
-  AddressDetails.fromJson(dynamic json) {
-    addressId = json['address_id'];
-    addressUuid = json['address_uuid'];
-    addressReferenceFrom = json['address_reference_from'];
-    addressReferenceUuid = json['address_reference_uuid'];
-    addressType = json['address_type'];
-    addressAddress = json['address_address'];
-    addressZipcode = json['address_zipcode'];
-    addressGeoCode = json['address_geo_code'];
-    addressGeoAddress = json['address_geo_address'];
-    addressStatus = json['address_status'];
-    if (json['location_info'] != null) {
-      locationInfo = [];
-      json['location_info'].forEach((v) {
-        locationInfo?.add(LocationInfo.fromJson(v));
-      });
-    }
-    if (json['attachment_info'] != null) {
-      attachmentInfo = [];
-      json['attachment_info'].forEach((v) {
-        attachmentInfo?.add(AttachmentInfo.fromJson(v));
-      });
-    }
-    if (json['user_basic_info'] != null) {
-      userBasicInfo = [];
-      json['user_basic_info'].forEach((v) {
-        userBasicInfo?.add(UserBasicInfo.fromJson(v));
-      });
-    }
-  }
-
-  String? addressId;
-  String? addressUuid;
-  String? addressReferenceFrom;
-  String? addressReferenceUuid;
-  String? addressType;
-  String? addressAddress;
-  String? addressZipcode;
-  String? addressGeoCode;
-  String? addressGeoAddress;
-  String? addressStatus;
-  List<LocationInfo>? locationInfo;
-  List<AttachmentInfo>? attachmentInfo;
-  List<UserBasicInfo>? userBasicInfo;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['address_id'] = addressId;
-    map['address_uuid'] = addressUuid;
-    map['address_reference_from'] = addressReferenceFrom;
-    map['address_reference_uuid'] = addressReferenceUuid;
-    map['address_type'] = addressType;
-    map['address_address'] = addressAddress;
-    map['address_zipcode'] = addressZipcode;
-    map['address_geo_code'] = addressGeoCode;
-    map['address_geo_address'] = addressGeoAddress;
-    map['address_status'] = addressStatus;
-    if (locationInfo != null) {
-      map['location_info'] = locationInfo?.map((v) => v.toJson()).toList();
-    }
-    if (attachmentInfo != null) {
-      map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
-    }
-    if (userBasicInfo != null) {
-      map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
-    }
-    return map;
-  }
-}
-
 class UserBasicInfo {
   UserBasicInfo({
     this.userId,
@@ -332,52 +254,6 @@ class UserBasicInfo {
   }
 }
 
-class AttachmentInfo {
-  AttachmentInfo({
-    this.attachmentId,
-    this.attachmentReferenceCode,
-    this.attachmentReferenceUuid,
-    this.attachmentPath,
-    this.attachmentType,
-    this.attachmentName,
-    this.attachmentStatus,
-    this.attachmentCreatedon,
-  });
-
-  AttachmentInfo.fromJson(dynamic json) {
-    attachmentId = json['attachment_id'];
-    attachmentReferenceCode = json['attachment_reference_code'];
-    attachmentReferenceUuid = json['attachment_reference_uuid'];
-    attachmentPath = json['attachment_path'];
-    attachmentType = json['attachment_type'];
-    attachmentName = json['attachment_name'];
-    attachmentStatus = json['attachment_status'];
-    attachmentCreatedon = json['attachment_createdon'];
-  }
-
-  String? attachmentId;
-  String? attachmentReferenceCode;
-  String? attachmentReferenceUuid;
-  String? attachmentPath;
-  String? attachmentType;
-  String? attachmentName;
-  String? attachmentStatus;
-  String? attachmentCreatedon;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['attachment_id'] = attachmentId;
-    map['attachment_reference_code'] = attachmentReferenceCode;
-    map['attachment_reference_uuid'] = attachmentReferenceUuid;
-    map['attachment_path'] = attachmentPath;
-    map['attachment_type'] = attachmentType;
-    map['attachment_name'] = attachmentName;
-    map['attachment_status'] = attachmentStatus;
-    map['attachment_createdon'] = attachmentCreatedon;
-    return map;
-  }
-}
-
 class LocationInfo {
   LocationInfo({
     this.countryId,
@@ -424,44 +300,6 @@ class LocationInfo {
     map['city_id'] = cityId;
     map['city_name'] = cityName;
     map['city_name_language'] = cityNameLanguage;
-    return map;
-  }
-}
-
-class SupplyInfo {
-  SupplyInfo({
-    this.userCompanySupplytypeId,
-    this.supplyReferenceFrom,
-    this.supplyReferenceUuid,
-    this.supplytypeId,
-    this.supplytypeName,
-    this.supplytypeNameLanguage,
-  });
-
-  SupplyInfo.fromJson(dynamic json) {
-    userCompanySupplytypeId = json['user_company_supplytype_id'];
-    supplyReferenceFrom = json['supply_reference_from'];
-    supplyReferenceUuid = json['supply_reference_uuid'];
-    supplytypeId = json['supplytype_id'];
-    supplytypeName = json['supplytype_name'];
-    supplytypeNameLanguage = json['supplytype_name_language'];
-  }
-
-  String? userCompanySupplytypeId;
-  String? supplyReferenceFrom;
-  String? supplyReferenceUuid;
-  String? supplytypeId;
-  String? supplytypeName;
-  String? supplytypeNameLanguage;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['user_company_supplytype_id'] = userCompanySupplytypeId;
-    map['supply_reference_from'] = supplyReferenceFrom;
-    map['supply_reference_uuid'] = supplyReferenceUuid;
-    map['supplytype_id'] = supplytypeId;
-    map['supplytype_name'] = supplytypeName;
-    map['supplytype_name_language'] = supplytypeNameLanguage;
     return map;
   }
 }
@@ -554,129 +392,6 @@ class UserProfileImg {
     map['attachment_name'] = attachmentName;
     map['attachment_status'] = attachmentStatus;
     map['attachment_createdon'] = attachmentCreatedon;
-    return map;
-  }
-}
-
-class UserMembershipInfo {
-  UserMembershipInfo({
-    this.userMembershipId,
-    this.userUuid,
-    this.userMembershipType,
-    this.userFavStateMaxCount,
-    this.userMembershipValidFrom,
-    this.userMembershipValidTo,
-  });
-
-  UserMembershipInfo.fromJson(dynamic json) {
-    userMembershipId = json['user_membership_id'];
-    userUuid = json['user_uuid'];
-    userMembershipType = json['user_membership_type'] != null
-        ? UserMembershipType.fromJson(json['user_membership_type'])
-        : null;
-    userFavStateMaxCount = json['user_fav_state_max_count'];
-    userMembershipValidFrom = json['user_membership_valid_from'];
-    userMembershipValidTo = json['user_membership_valid_to'];
-  }
-
-  String? userMembershipId;
-  String? userUuid;
-  UserMembershipType? userMembershipType;
-  String? userFavStateMaxCount;
-  String? userMembershipValidFrom;
-  String? userMembershipValidTo;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['user_membership_id'] = userMembershipId;
-    map['user_uuid'] = userUuid;
-    if (userMembershipType != null) {
-      map['user_membership_type'] = userMembershipType?.toJson();
-    }
-    map['user_fav_state_max_count'] = userFavStateMaxCount;
-    map['user_membership_valid_from'] = userMembershipValidFrom;
-    map['user_membership_valid_to'] = userMembershipValidTo;
-    return map;
-  }
-}
-
-class UserMembershipType {
-  UserMembershipType({
-    this.code,
-    this.value,
-  });
-
-  UserMembershipType.fromJson(dynamic json) {
-    code = json['code'];
-    value = json['value'];
-  }
-
-  String? code;
-  String? value;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['code'] = code;
-    map['value'] = value;
-    return map;
-  }
-}
-
-class UserFavouriteStateInfo {
-  UserFavouriteStateInfo({
-    this.favouriteId,
-    this.userUuid,
-    this.stateInfo,
-  });
-
-  UserFavouriteStateInfo.fromJson(dynamic json) {
-    favouriteId = json['favourite_id'];
-    userUuid = json['user_uuid'];
-    if (json['state_info'] != null) {
-      stateInfo = [];
-      json['state_info'].forEach((v) {
-        stateInfo?.add(StateInfo.fromJson(v));
-      });
-    }
-  }
-
-  String? favouriteId;
-  String? userUuid;
-  List<StateInfo>? stateInfo;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['favourite_id'] = favouriteId;
-    map['user_uuid'] = userUuid;
-    if (stateInfo != null) {
-      map['state_info'] = stateInfo?.map((v) => v.toJson()).toList();
-    }
-    return map;
-  }
-}
-
-class StateInfo {
-  StateInfo({
-    this.stateId,
-    this.stateName,
-    this.stateNameLanguage,
-  });
-
-  StateInfo.fromJson(dynamic json) {
-    stateId = json['state_id'];
-    stateName = json['state_name'];
-    stateNameLanguage = json['state_name_language'];
-  }
-
-  String? stateId;
-  String? stateName;
-  String? stateNameLanguage;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['state_id'] = stateId;
-    map['state_name'] = stateName;
-    map['state_name_language'] = stateNameLanguage;
     return map;
   }
 }

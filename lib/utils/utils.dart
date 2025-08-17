@@ -50,6 +50,23 @@ class Utils {
     }
   }
 
+  static int calculateAge(String dob) {
+    DateTime birthDate = DateTime.parse(dob); // parse "1998-05-12"
+    DateTime today = DateTime.now();
+    int age = today.year - birthDate.year;
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+  static int calculateTotalDays(String endDate) {
+    DateTime fromDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+    DateTime toDate = DateTime.parse(endDate);
+
+    int totalDays = toDate.difference(fromDate).inDays;
+    return totalDays;
+  }
 
   static Color getRandomColor(String key) {
     final colors = [
@@ -75,6 +92,17 @@ class Utils {
         return "Super Admin";
       default:
         return "Unknown";
+    }
+  }
+
+  static String getVerifiedEnum(String? isVerified) {
+    switch (isVerified) {
+      case 'Y':
+        return "Yes";
+      case 'N':
+        return "No";
+      default:
+        return "No";
     }
   }
 }

@@ -1,3 +1,6 @@
+import 'package:hencafe/models/supply_model.dart';
+
+import 'address_details_model.dart';
 import 'attachment_model.dart';
 
 class CompanyProvidersModel {
@@ -157,93 +160,6 @@ class ApiResponse {
     }
     if (addressDetails != null) {
       map['address_details'] = addressDetails?.map((v) => v.toJson()).toList();
-    }
-    return map;
-  }
-}
-
-class AddressDetails {
-  AddressDetails({
-    this.addressId,
-    this.addressUuid,
-    this.addressReferenceFrom,
-    this.addressReferenceUuid,
-    this.addressType,
-    this.addressAddress,
-    this.addressZipcode,
-    this.addressGeoCode,
-    this.addressGeoAddress,
-    this.addressStatus,
-    this.locationInfo,
-    this.attachmentInfo,
-    this.userBasicInfo,
-  });
-
-  AddressDetails.fromJson(dynamic json) {
-    addressId = json['address_id'];
-    addressUuid = json['address_uuid'];
-    addressReferenceFrom = json['address_reference_from'];
-    addressReferenceUuid = json['address_reference_uuid'];
-    addressType = json['address_type'];
-    addressAddress = json['address_address'];
-    addressZipcode = json['address_zipcode'];
-    addressGeoCode = json['address_geo_code'];
-    addressGeoAddress = json['address_geo_address'];
-    addressStatus = json['address_status'];
-    if (json['location_info'] != null) {
-      locationInfo = [];
-      json['location_info'].forEach((v) {
-        locationInfo?.add(LocationInfo.fromJson(v));
-      });
-    }
-    if (json['attachment_info'] != null) {
-      attachmentInfo = [];
-      json['attachment_info'].forEach((v) {
-        attachmentInfo?.add(AttachmentInfo.fromJson(v));
-      });
-    }
-    if (json['user_basic_info'] != null) {
-      userBasicInfo = [];
-      json['user_basic_info'].forEach((v) {
-        userBasicInfo?.add(UserBasicInfo.fromJson(v));
-      });
-    }
-  }
-
-  String? addressId;
-  String? addressUuid;
-  String? addressReferenceFrom;
-  String? addressReferenceUuid;
-  String? addressType;
-  String? addressAddress;
-  String? addressZipcode;
-  String? addressGeoCode;
-  String? addressGeoAddress;
-  String? addressStatus;
-  List<LocationInfo>? locationInfo;
-  List<AttachmentInfo>? attachmentInfo;
-  List<UserBasicInfo>? userBasicInfo;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['address_id'] = addressId;
-    map['address_uuid'] = addressUuid;
-    map['address_reference_from'] = addressReferenceFrom;
-    map['address_reference_uuid'] = addressReferenceUuid;
-    map['address_type'] = addressType;
-    map['address_address'] = addressAddress;
-    map['address_zipcode'] = addressZipcode;
-    map['address_geo_code'] = addressGeoCode;
-    map['address_geo_address'] = addressGeoAddress;
-    map['address_status'] = addressStatus;
-    if (locationInfo != null) {
-      map['location_info'] = locationInfo?.map((v) => v.toJson()).toList();
-    }
-    if (attachmentInfo != null) {
-      map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
-    }
-    if (userBasicInfo != null) {
-      map['user_basic_info'] = userBasicInfo?.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -437,44 +353,6 @@ class AttachmentLogoInfo {
     map['attachment_name'] = attachmentName;
     map['attachment_status'] = attachmentStatus;
     map['attachment_createdon'] = attachmentCreatedon;
-    return map;
-  }
-}
-
-class SupplyInfo {
-  SupplyInfo({
-    this.userCompanySupplytypeId,
-    this.supplyReferenceFrom,
-    this.supplyReferenceUuid,
-    this.supplytypeId,
-    this.supplytypeName,
-    this.supplytypeNameLanguage,
-  });
-
-  SupplyInfo.fromJson(dynamic json) {
-    userCompanySupplytypeId = json['user_company_supplytype_id'];
-    supplyReferenceFrom = json['supply_reference_from'];
-    supplyReferenceUuid = json['supply_reference_uuid'];
-    supplytypeId = json['supplytype_id'];
-    supplytypeName = json['supplytype_name'];
-    supplytypeNameLanguage = json['supplytype_name_language'];
-  }
-
-  String? userCompanySupplytypeId;
-  String? supplyReferenceFrom;
-  String? supplyReferenceUuid;
-  String? supplytypeId;
-  String? supplytypeName;
-  String? supplytypeNameLanguage;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['user_company_supplytype_id'] = userCompanySupplytypeId;
-    map['supply_reference_from'] = supplyReferenceFrom;
-    map['supply_reference_uuid'] = supplyReferenceUuid;
-    map['supplytype_id'] = supplytypeId;
-    map['supplytype_name'] = supplytypeName;
-    map['supplytype_name_language'] = supplytypeNameLanguage;
     return map;
   }
 }

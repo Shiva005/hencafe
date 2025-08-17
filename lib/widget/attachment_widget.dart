@@ -63,7 +63,7 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+      margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
       color: Colors.white,
       shape: RoundedRectangleBorder(
         side: BorderSide(color: AppColors.primaryColor, width: 1),
@@ -147,10 +147,27 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                 color: Colors.black12,
               ),
               child: _isVideoInitialized && _chewieController != null
-                  ? Chewie(controller: _chewieController!)
+                  ? Stack(
+                      children: [
+                        Chewie(controller: _chewieController!),
+                        Center(
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                            child: Icon(
+                              Icons.play_circle,
+                              color: Colors.grey.shade700,
+                              size: 50,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   : const CircularProgressIndicator(),
             );
             break;
+          case "youtube":
           case "pdf":
           case "doc":
           case "docx":
@@ -204,7 +221,8 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => DocumentPreviewScreen(url: path,pageType: "AttachmentWidget"),
+                  builder: (_) => DocumentPreviewScreen(
+                      url: path, pageType: "AttachmentWidget"),
                 ),
               );
             } else {
