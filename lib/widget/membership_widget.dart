@@ -15,7 +15,6 @@ class MembershipWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (membershipList.isEmpty) return const SizedBox();
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5.0),
       color: Colors.white,

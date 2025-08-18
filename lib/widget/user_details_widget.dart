@@ -1,169 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/profile_model.dart';
-import '../services/services.dart';
-import '../utils/my_logger.dart';
 import '../utils/utils.dart';
-import '../values/app_strings.dart';
 
-class UserDetailsWidget extends StatefulWidget {
-  const UserDetailsWidget({super.key});
+class UserDetailsWidget extends StatelessWidget {
+  final ProfileModel detailsModel;
 
-  @override
-  State<UserDetailsWidget> createState() => _UserDetailsWidgetState();
-}
-
-class _UserDetailsWidgetState extends State<UserDetailsWidget> {
-  ProfileModel? detailsModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDetails();
-  }
-
-  Future<void> _loadDetails() async {
-    var prefs = await SharedPreferences.getInstance();
-
-    try {
-      final response = await AuthServices()
-          .getProfile(context, prefs.getString(AppStrings.prefUserID)!);
-      if (response != null) {
-        setState(() {
-          detailsModel = response;
-        });
-      } else {
-        logger.w('Failed to load user details');
-      }
-    } catch (e) {
-      logger.w("Error loading details: $e");
-    }
-  }
+  const UserDetailsWidget({super.key, required this.detailsModel});
 
   @override
   Widget build(BuildContext context) {
-    return detailsModel == null
-        ? const Center(child: CircularProgressIndicator())
-        : Card(
-            color: Colors.white,
-            elevation: 0.5,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(color: Colors.grey.shade400, width: 1),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
-            child: ListView(
-              padding: const EdgeInsets.all(12),
+    return Card(
+      color: Colors.white,
+      elevation: 0.5,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.grey.shade400, width: 1),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
+      child: ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          buildRow(Icons.person, 'Full Name',
+              '${detailsModel.apiResponse![0].userFirstName ?? ''} ${detailsModel.apiResponse![0].userLastName ?? ''}'),
+          buildRow(Icons.phone, 'Mobile',
+              detailsModel.apiResponse![0].userMobile ?? ''),
+          buildRow(Icons.email, 'Email',
+              detailsModel.apiResponse![0].userEmail ?? ''),
+          buildRow(
+              Icons.calendar_month,
+              'Date of Birth',
+              '${Utils.threeLetterDateFormatted(detailsModel.apiResponse![0].userDob.toString())} '
+                  '(${Utils.calculateAge(detailsModel.apiResponse![0].userDob!)} Years)'),
+          buildRow(
+              Icons.verified,
+              'Verified ? ',
+              Utils.getVerifiedEnum(
+                  detailsModel.apiResponse![0].userIsVerfied ?? '')),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                buildRow(Icons.person, 'Full Name',
-                    '${detailsModel!.apiResponse![0].userFirstName ?? ''} ${detailsModel!.apiResponse![0].userLastName ?? ''}'),
-                buildRow(Icons.phone, 'Mobile',
-                    detailsModel!.apiResponse![0].userMobile ?? ''),
-                buildRow(Icons.email, 'Email',
-                    detailsModel!.apiResponse![0].userEmail ?? ''),
-                buildRow(
-                    Icons.calendar_month,
-                    'Date of Birth',
-                    '${Utils.threeLetterDateFormatted(detailsModel!.apiResponse![0].userDob.toString())} '
-                        '(${Utils.calculateAge(detailsModel!.apiResponse![0].userDob!)} Years)'),
-                buildRow(
-                    Icons.verified,
-                    'Verified ? ',
-                    Utils.getVerifiedEnum(
-                        detailsModel!.apiResponse![0].userIsVerfied ?? '')),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 25.0, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: _buildTag(
-                            "Role: ",
-                            Utils.getUserRoleName(
-                                detailsModel!.apiResponse![0].userRoleType)),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildTag("Work: ",
-                            '${detailsModel!.apiResponse![0].userWorkType!.value}'),
-                      ),
-                    ],
+                Expanded(
+                  child: _buildTag(
+                      "Role: ",
+                      Utils.getUserRoleName(
+                          detailsModel.apiResponse![0].userRoleType)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildTag("Work: ",
+                      '${detailsModel.apiResponse![0].userWorkType!.value}'),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                // WhatsApp button
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Utils.openLink(
+                        "https://wa.me/${detailsModel.apiResponse![0].userMobile}/?text=Hello");
+                  },
+                  icon: Icon(Icons.message_outlined, color: Colors.white),
+                  label: const Text("Whatsapp"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    children: [
-                      // WhatsApp button
-                      ElevatedButton.icon(
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
                         onPressed: () {
                           Utils.openLink(
-                              "https://wa.me/${detailsModel!.apiResponse![0].userMobile}/?text=Hello");
+                              "mailto:${detailsModel.apiResponse![0].userEmail}");
                         },
-                        icon: Icon(Icons.message_outlined, color: Colors.white),
-                        label: const Text("Whatsapp"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade600,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 35),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Utils.openLink(
-                                    "mailto:${detailsModel!.apiResponse![0].userEmail}");
-                              },
-                              icon: const Icon(Icons.email_outlined,
-                                  color: Colors.white),
-                              label: const Text("Mail"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade600,
-                                foregroundColor: Colors.white,
-                                minimumSize: const Size(double.infinity, 35),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Utils.openDialPad(
-                                    detailsModel!.apiResponse![0].userMobile!);
-                              },
-                              icon: const Icon(Icons.call, color: Colors.white),
-                              label: const Text("Call"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue.shade600,
-                                foregroundColor: Colors.white,
-                                minimumSize: const Size(double.infinity, 35),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // Change Banner Image
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.camera_alt_outlined,
+                        icon: const Icon(Icons.email_outlined,
                             color: Colors.white),
-                        label: const Text("Change Banner Image"),
+                        label: const Text("Mail"),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade200,
+                          backgroundColor: Colors.red.shade600,
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 35),
                           shape: RoundedRectangleBorder(
@@ -171,50 +97,88 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                           ),
                         ),
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Utils.openDialPad(
+                              detailsModel.apiResponse![0].userMobile!);
+                        },
+                        icon: const Icon(Icons.call, color: Colors.white),
+                        label: const Text("Call"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade600,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 35),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Change Banner Image
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.camera_alt_outlined,
+                      color: Colors.white),
+                  label: const Text("Change Banner Image"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade200,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
 
-                      // Change Profile Image
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.camera_alt_outlined,
-                            color: Colors.white),
-                        label: const Text("Change Profile Image"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pink.shade200,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 35),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                // Change Profile Image
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.camera_alt_outlined,
+                      color: Colors.white),
+                  label: const Text("Change Profile Image"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink.shade200,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
-                      // Update button with arrow
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 35),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text("Edit Details"),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_right_alt, color: Colors.white),
-                          ],
-                        ),
-                      ),
+                // Update button with arrow
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text("Edit Details"),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_right_alt, color: Colors.white),
                     ],
                   ),
                 ),
               ],
             ),
-          );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTag(String key, String value) {

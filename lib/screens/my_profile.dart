@@ -97,6 +97,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       margin: EdgeInsets.zero,
                       elevation: 0.2,
                       color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -205,7 +208,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ],
               body: TabBarView(
                 children: [
-                  UserDetailsWidget(),
+                  UserDetailsWidget(
+                    detailsModel: detailsModel,
+                  ),
                   MembershipWidget(
                     membershipList: user.userMembershipInfo ?? [],
                   ),

@@ -135,7 +135,7 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
             mediaWidget = ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(path,
-                  fit: BoxFit.cover, height: 150, width: double.infinity),
+                  fit: BoxFit.cover, height: 140, width: double.infinity),
             );
             break;
           case 'video':

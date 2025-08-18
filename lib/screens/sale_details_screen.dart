@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/models/lifting_price_model.dart';
 import 'package:hencafe/screens/image_preview_screen.dart';
+import 'package:hencafe/widget/attachment_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
