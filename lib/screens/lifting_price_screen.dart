@@ -49,10 +49,9 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
         File imageFile = File(imagePath);
         await imageFile.writeAsBytes(imageBytes);
 
-        await Share.shareXFiles(
-          [XFile(imagePath)],
-          text: '${AppStrings.shareText}$_packageName}',
-        );
+        await Share.shareXFiles([
+          XFile(imagePath),
+        ], text: '${AppStrings.shareText}$_packageName}');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),
@@ -60,9 +59,9 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
       }
     } catch (e) {
       print("Error capturing or sharing: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -76,8 +75,13 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
 
   Future<LiftingPriceModel> _fetchData(String selectedDate) async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices()
-        .getLiftingPriceList(context, '', selectedDate, selectedDate, '');
+    return await AuthServices().getLiftingPriceList(
+      context,
+      '',
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<void> getBirdBreedData() async {
@@ -97,7 +101,9 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
   Future<void> getFavouriteStateData() async {
     prefs = await SharedPreferences.getInstance();
     final res = await AuthServices().getFavouriteStateList(
-        context, prefs.getString(AppStrings.prefUserID)!);
+      context,
+      prefs.getString(AppStrings.prefUserID)!,
+    );
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!
@@ -133,13 +139,19 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(filter,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text(
+                    filter,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   if (items.isEmpty)
-                    const Text("No items available for this filter.",
-                        textAlign: TextAlign.center)
+                    const Text(
+                      "No items available for this filter.",
+                      textAlign: TextAlign.center,
+                    )
                   else
                     ListView.separated(
                       shrinkWrap: true,
@@ -160,9 +172,10 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                         ),
                       ),
                       separatorBuilder: (context, index) => Divider(
-                          thickness: 1,
-                          height: 2.0,
-                          color: Colors.grey.shade300),
+                        thickness: 1,
+                        height: 2.0,
+                        color: Colors.grey.shade300,
+                      ),
                     ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -185,11 +198,11 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
     final filterMapping = {
       "Bird Type": {
         "key": "bird_breed_info.0.birdbreed_name_language",
-        "transform": (String value) => value.toLowerCase()
+        "transform": (String value) => value.toLowerCase(),
       },
       "State": {
         "key": "address_details.0.state_name_language",
-        "transform": (String value) => value.toLowerCase()
+        "transform": (String value) => value.toLowerCase(),
       },
       "My Data Only": {
         "key": "user_basic_info.0.user_id",
@@ -200,7 +213,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
             return uid ?? "n";
           }
           return "n";
-        }
+        },
       },
     };
 
@@ -215,8 +228,10 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
         final key = mapping['key'] as String;
         final transform = mapping['transform'] as String Function(String);
 
-        final itemValueRaw =
-            getNestedValue(item, key); // 'key' from the filter map
+        final itemValueRaw = getNestedValue(
+          item,
+          key,
+        ); // 'key' from the filter map
         final itemValue = itemValueRaw?.toString().toLowerCase() ?? '';
         final transformedValue = transform(filterValue.toLowerCase());
         if (itemValue != transformedValue) return false;
@@ -268,9 +283,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                   if (prefs.getString(AppStrings.prefRole) != "U") {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellLiftingScreen,
-                      arguments: {
-                        'pageType': AppRoutes.liftingPriceScreen,
-                      },
+                      arguments: {'pageType': AppRoutes.liftingPriceScreen},
                     );
                   } else {
                     AwesomeDialog(
@@ -293,13 +306,18 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                     backgroundColor: Colors.white,
                     label: Row(
                       children: [
-                        const Icon(Icons.add_circle_outline,
-                            color: AppColors.primaryColor, size: 16),
+                        const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primaryColor,
+                          size: 16,
+                        ),
                         const SizedBox(width: 5),
                         Text(
                           "Create Lifting sale",
                           style: const TextStyle(
-                              color: AppColors.primaryColor, fontSize: 11),
+                            color: AppColors.primaryColor,
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
@@ -329,8 +347,9 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                         lastDate: DateTime(2040),
                       );
                       if (pickedDate != null) {
-                        final formattedDate =
-                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        final formattedDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(pickedDate);
                         setState(() {
                           selectedDate = pickedDate;
                           liftingPriceData = _fetchData(formattedDate);
@@ -341,19 +360,28 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                       backgroundColor: Colors.white,
                       label: Row(
                         children: [
-                          const Icon(Icons.calendar_month,
-                              color: AppColors.primaryColor, size: 16),
+                          const Icon(
+                            Icons.calendar_month,
+                            color: AppColors.primaryColor,
+                            size: 16,
+                          ),
                           const SizedBox(width: 5),
                           Text(
                             Utils.threeLetterDateFormatted(
-                                selectedDate.toString()),
+                              selectedDate.toString(),
+                            ),
                             style: const TextStyle(
-                                color: AppColors.primaryColor, fontSize: 11),
+                              color: AppColors.primaryColor,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
                       shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                        side: BorderSide(
+                          color: Colors.grey.shade400,
+                          width: 1.5,
+                        ),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
@@ -361,12 +389,15 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                   IconButton(
                     onPressed: () =>
                         setState(() => cardVisibility = !cardVisibility),
-                    icon:
-                        const Icon(Icons.filter_list_alt, color: Colors.black54),
+                    icon: const Icon(
+                      Icons.filter_list_alt,
+                      color: Colors.black54,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => NavigationHelper.pushReplacementNamed(
-                        AppRoutes.chickenPriceScreen),
+                      AppRoutes.chickenPriceScreen,
+                    ),
                     icon: const Icon(Icons.refresh, color: Colors.black54),
                   ),
                   IconButton(
@@ -385,18 +416,21 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                     color: Colors.white,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 4),
+                        horizontal: 8.0,
+                        vertical: 4,
+                      ),
                       child: Wrap(
                         spacing: 7.0,
                         children: [
                           for (final filter in [
                             "State",
                             "Bird Type",
-                            "My Data Only"
+                            "My Data Only",
                           ])
                             FilterChipWidget(
                               label: filter,
-                              onPressed: () => _showBottomSheet(context, filter),
+                              onPressed: () =>
+                                  _showBottomSheet(context, filter),
                               isSelected: selectedFilters.containsKey(filter),
                             ),
                         ],
@@ -432,17 +466,20 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                           itemCount: filteredItems.length,
                           itemBuilder: (context, index) {
                             final filteredIndex = snapshot.data!.apiResponse!
-                                .indexWhere((e) =>
-                                    e.toJson().toString() ==
-                                    filteredItems[index].toString());
-                            return EggPriceCard(
+                                .indexWhere(
+                                  (e) =>
+                                      e.toJson().toString() ==
+                                      filteredItems[index].toString(),
+                                );
+                            return LiftingSaleCard(
                               liftingPriceModel: snapshot.data!,
                               index: filteredIndex,
                             );
                           },
                         )
                       : const Center(
-                          child: Text("No matching data for selected filters"));
+                          child: Text("No matching data for selected filters"),
+                        );
                 },
               ),
             ),
@@ -453,12 +490,15 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
   }
 }
 
-class EggPriceCard extends StatelessWidget {
+class LiftingSaleCard extends StatelessWidget {
   final LiftingPriceModel liftingPriceModel;
   final int index;
 
-  const EggPriceCard(
-      {required this.liftingPriceModel, super.key, required this.index});
+  const LiftingSaleCard({
+    required this.liftingPriceModel,
+    super.key,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -473,13 +513,14 @@ class EggPriceCard extends StatelessWidget {
         );
       },
       child: Card(
-        elevation: 0.0,
+        elevation: 0.2,
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: AppColors.primaryColor, width: 1),
+          side: BorderSide(color: Colors.grey.shade200, width: 1),
           // Change color here
-          borderRadius:
-              BorderRadius.circular(8.0), // Optional: Adjust border radius
+          borderRadius: BorderRadius.circular(
+            8.0,
+          ), // Optional: Adjust border radius
         ),
         margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
         child: Padding(
@@ -498,21 +539,27 @@ class EggPriceCard extends StatelessWidget {
                         side: BorderSide(color: Colors.black38, width: 1),
                         // Change color here
                         borderRadius: BorderRadius.circular(
-                            8.0), // Optional: Adjust border radius
+                          8.0,
+                        ), // Optional: Adjust border radius
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6.0),
+                          horizontal: 10,
+                          vertical: 6.0,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
                               'Rs/Kg',
-                              style:
-                                  TextStyle(fontSize: 10, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
                             ),
                             Text(
-                              liftingPriceModel.apiResponse![index]
+                              liftingPriceModel
+                                      .apiResponse![index]
                                       .liftingsaleCostPerKg ??
                                   '',
                               style: TextStyle(
@@ -539,23 +586,8 @@ class EggPriceCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                                "${liftingPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${liftingPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}"),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              height: 20.0,
-                              width: 20.0,
-                              child: Image.asset(
-                                AppIconsData.hen,
-                                fit: BoxFit.contain,
-                              ),
+                              "${liftingPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${liftingPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}",
                             ),
-                            const SizedBox(width: 3),
-                            Text(liftingPriceModel.apiResponse![index]
-                                    .birdBreedInfo![0].birdbreedNameLanguage ??
-                                ''),
                           ],
                         ),
                         Row(
@@ -570,8 +602,29 @@ class EggPriceCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                                '${liftingPriceModel.apiResponse![index].liftingsaleTotalBirds} Bird for sale' ??
-                                    ''),
+                              liftingPriceModel
+                                      .apiResponse![index]
+                                      .birdBreedInfo![0]
+                                      .birdbreedNameLanguage ??
+                                  '',
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 20.0,
+                              width: 20.0,
+                              child: Image.asset(
+                                AppIconsData.hen,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${liftingPriceModel.apiResponse![index].liftingsaleTotalBirds} Bird for sale' ??
+                                  '',
+                            ),
                           ],
                         ),
                         Row(
@@ -586,7 +639,8 @@ class EggPriceCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
-                                      '${liftingPriceModel.apiResponse![index].birdAgeInDays!} Days'),
+                                    '${liftingPriceModel.apiResponse![index].birdAgeInDays!} Days',
+                                  ),
                                 ],
                               ),
                             ),
@@ -600,7 +654,8 @@ class EggPriceCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
-                                      '${liftingPriceModel.apiResponse![index].birdWeightInKg!} Kg/Bird'),
+                                    '${liftingPriceModel.apiResponse![index].birdWeightInKg!} Kg/Bird',
+                                  ),
                                 ],
                               ),
                             ),
@@ -619,24 +674,35 @@ class EggPriceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          'Start Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectFrom.toString())}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.green.shade700)),
+                        'Start Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectFrom.toString())}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
                       Text(
-                          'End Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectTo.toString())}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.red.shade700)),
+                        'End Date: ${Utils.threeLetterDateFormatted(liftingPriceModel.apiResponse![index].liftingsaleEffectTo.toString())}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
                     children: [
                       Text(
-                          '${liftingPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${liftingPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey.shade700)),
+                        '${liftingPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${liftingPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
                       SizedBox(width: 10.0),
-                      Icon(Icons.arrow_right_alt_outlined,
-                          color: AppColors.primaryColor),
+                      Icon(
+                        Icons.arrow_right_alt_outlined,
+                        color: AppColors.primaryColor,
+                      ),
                     ],
                   ),
                 ],
@@ -654,11 +720,12 @@ class FilterChipWidget extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isSelected;
 
-  const FilterChipWidget(
-      {required this.label,
-      required this.onPressed,
-      required this.isSelected,
-      super.key});
+  const FilterChipWidget({
+    required this.label,
+    required this.onPressed,
+    required this.isSelected,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -666,14 +733,18 @@ class FilterChipWidget extends StatelessWidget {
       onTap: onPressed,
       child: Chip(
         backgroundColor: Colors.white,
-        label: Text(label,
-            style: TextStyle(
-                color: isSelected ? AppColors.primaryColor : Colors.black54,
-                fontSize: 11)),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppColors.primaryColor : Colors.black54,
+            fontSize: 11,
+          ),
+        ),
         shape: RoundedRectangleBorder(
           side: BorderSide(
-              color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
-              width: 1.5),
+            color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
+            width: 1.5,
+          ),
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),

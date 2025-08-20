@@ -25,6 +25,7 @@ class AppIconsData {
 
   /// gifs
   static const String splash_gif = 'assets/gifs/hen.gif';
+  static const String play_gif = 'assets/gifs/play.gif';
 
   /// images
   static const String otpHeader = 'assets/icons/otp_header_image.png';

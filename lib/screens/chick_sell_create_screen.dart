@@ -54,7 +54,9 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
   Map<String, String> cityList = {};
   String selectedCityID = '';
   bool isSpecialSale = false;
+  bool isVaccinated = false;
   var saleType = "N";
+  var vaccinatedType = "N";
   bool _isInitialized = false;
   late final chickPrice.ApiResponse chickPriceModel;
   late SharedPreferences prefs;
@@ -116,16 +118,24 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
 
   Future<UserFavouriteStateModel> _fetchStates() async {
     prefs = await SharedPreferences.getInstance();
-    final favStateRes = await AuthServices().getFavouriteStateList(context,  prefs.getString(AppStrings.prefUserID)!);
-    if (favStateRes.errorCount == 0 && favStateRes.apiResponse != null) {
-      setState(() {
-        for (int i = 0; i < favStateRes.apiResponse!.length; i++) {
-          statelist[favStateRes
-                  .apiResponse![i].stateInfo![0].stateNameLanguage!] =
-              favStateRes.apiResponse![i].stateInfo![0].stateId!;
+    final favStateRes = await AuthServices().getFavouriteStateList(
+      context,
+      prefs.getString(AppStrings.prefUserID)!,
+    );
+
+    if (favStateRes.errorCount != 0 || favStateRes.apiResponse == null) {
+      return favStateRes;
+    }
+
+    setState(() {
+      favStateRes.apiResponse!.forEach((item) {
+        final stateInfo = item.stateInfo?.first;
+        if (stateInfo != null) {
+          statelist[stateInfo.stateNameLanguage!] = stateInfo.stateId!;
         }
       });
-    }
+    });
+
     return favStateRes;
   }
 
@@ -135,8 +145,9 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
         getBirdBreedRes.apiResponse != null) {
       setState(() {
         for (int i = 0; i < getBirdBreedRes.apiResponse!.length; i++) {
-          birdBreedList[
-                  getBirdBreedRes.apiResponse![i].birdbreedNameLanguage!] =
+          birdBreedList[getBirdBreedRes
+                  .apiResponse![i]
+                  .birdbreedNameLanguage!] =
               getBirdBreedRes.apiResponse![i].birdbreedId!;
         }
       });
@@ -214,7 +225,9 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -237,13 +250,15 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                 onChanged: (query) {
                                   setModalState(() {
                                     filteredData = Map.fromEntries(
-                                      allData.entries.where((entry) =>
-                                          entry.key
-                                              .toLowerCase()
-                                              .contains(query.toLowerCase()) ||
-                                          entry.value
-                                              .toLowerCase()
-                                              .contains(query.toLowerCase())),
+                                      allData.entries.where(
+                                        (entry) =>
+                                            entry.key.toLowerCase().contains(
+                                              query.toLowerCase(),
+                                            ) ||
+                                            entry.value.toLowerCase().contains(
+                                              query.toLowerCase(),
+                                            ),
+                                      ),
                                     );
                                   });
                                 },
@@ -259,15 +274,17 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                   physics: const ClampingScrollPhysics(),
                                   itemCount: filteredData.length,
                                   itemBuilder: (context, index) {
-                                    final key =
-                                        filteredData.keys.elementAt(index);
+                                    final key = filteredData.keys.elementAt(
+                                      index,
+                                    );
                                     return Column(
                                       children: [
                                         ListTile(
                                           title: Text(
                                             key,
-                                            style:
-                                                const TextStyle(fontSize: 16),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
                                           ),
                                           onTap: () {
                                             controller.text = key;
@@ -276,10 +293,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                               cityList.clear();
                                               cityController.text = "";
                                               getCityData(
-                                                  statelist[key].toString());
+                                                statelist[key].toString(),
+                                              );
                                             } else if (title == "City") {
-                                              selectedCityID =
-                                                  cityList[key].toString();
+                                              selectedCityID = cityList[key]
+                                                  .toString();
                                             }
                                           },
                                         ),
@@ -344,13 +362,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(title: AppStrings.sellChick)),
+        preferredSize: Size.fromHeight(60.0),
+        child: MyAppBar(title: AppStrings.sellChick),
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10.0,
-          vertical: 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
         child: Card(
           color: Colors.white,
           child: ListView(
@@ -359,7 +375,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                 key: _formKey,
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 20, bottom: 20),
+                    left: 20,
+                    right: 20,
+                    top: 20,
+                    bottom: 20,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -379,18 +399,21 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               labelText: "Chick Type",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.green.shade200,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -422,8 +445,9 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               textInputAction: TextInputAction.next,
                               maxLength: 3,
                               enabled: false,
-                              prefixIcon:
-                                  Icon(Icons.production_quantity_limits),
+                              prefixIcon: Icon(
+                                Icons.production_quantity_limits,
+                              ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Enter Quantity';
@@ -486,6 +510,40 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                       Row(
                         children: [
                           Expanded(
+                            child: Text(
+                              "Is Vaccinated?",
+                              style: AppTheme.informationString,
+                            ),
+                          ),
+                          Transform.scale(
+                            alignment: Alignment.centerRight,
+                            scale: 0.7, // Adjust the scale to reduce the size
+                            child: Switch(
+                              value: isVaccinated,
+                              onChanged: (value) {
+                                setState(() {
+                                  isVaccinated = value;
+                                  if (value) {
+                                    vaccinatedType = "Y";
+                                  } else {
+                                    vaccinatedType = "N";
+                                  }
+                                });
+                              },
+                              activeColor: AppColors.primaryColor,
+                              // Color when the switch is "on"
+                              inactiveThumbColor: Colors.black,
+                              // Thumb color when "off"
+                              inactiveTrackColor:
+                                  Colors.white, // Track color when "off"
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Expanded(
                             child: SizedBox(
                               height: 70.0,
                               child: GestureDetector(
@@ -501,17 +559,20 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     labelText: "Start Date",
                                     border: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          color: Colors.grey.shade400),
+                                        color: Colors.grey.shade400,
+                                      ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          color: Colors.grey.shade400),
+                                        color: Colors.grey.shade400,
+                                      ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          color: Colors.green.shade200),
+                                        color: Colors.green.shade200,
+                                      ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
@@ -526,14 +587,15 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                   },
                                   onTap: () async {
                                     DateTime? pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2040));
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(1900),
+                                      lastDate: DateTime(2040),
+                                    );
                                     if (pickedDate != null) {
-                                      String formattedDate =
-                                          DateFormat('yyyy-MM-dd')
-                                              .format(pickedDate);
+                                      String formattedDate = DateFormat(
+                                        'yyyy-MM-dd',
+                                      ).format(pickedDate);
                                       setState(() {
                                         startDateController.text =
                                             formattedDate;
@@ -547,77 +609,95 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                              child: SizedBox(
-                                height: 70.0,
-                                child: TextFormField(
-                                  style: TextStyle(color: Colors.black),
-                                  controller: endDateController,
-                                  decoration: InputDecoration(
-                                    labelStyle: TextStyle(color: Colors.grey),
-                                    prefixIcon: Icon(Icons.calendar_month),
-                                    iconColor: Colors.white,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    labelText: "End Date",
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.grey.shade400),
-                                      borderRadius: BorderRadius.circular(10),
+                            child: SizedBox(
+                              height: 70.0,
+                              child: TextFormField(
+                                style: TextStyle(color: Colors.black),
+                                controller: endDateController,
+                                decoration: InputDecoration(
+                                  labelStyle: TextStyle(color: Colors.grey),
+                                  prefixIcon: Icon(Icons.calendar_month),
+                                  iconColor: Colors.white,
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  labelText: "End Date",
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.shade400,
                                     ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.grey.shade400),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.green.shade200),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  readOnly: true,
-                                  validator: (value) {
-                                    if (value == null ||
-                                        value.isEmpty ||
-                                        value == 'End Date') {
-                                      return 'Please select End Date';
-                                    }
-                                    return null;
-                                  },
-                                  onTap: () async {
-                                    // Try parsing start date
-                                    DateTime startDate;
-                                    try {
-                                      startDate = DateFormat('yyyy-MM-dd').parse(startDateController.text);
-                                    } catch (e) {
-                                      startDate = DateTime.now();
-                                    }
-
-                                    // Try parsing current end date if it's not empty
-                                    DateTime initialDate;
-                                    if (endDateController.text.isNotEmpty) {
-                                      try {
-                                        initialDate = DateFormat('yyyy-MM-dd').parse(endDateController.text);
-                                      } catch (e) {
-                                        initialDate = startDate.add(Duration(days: 0));
-                                      }
-                                    } else {
-                                      initialDate = startDate.add(Duration(days: 0));
-                                    }
-
-                                    // Show date picker
-                                    DateTime? pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: initialDate,
-                                      firstDate: startDate.add(Duration(days: 0)),
-                                      lastDate: startDate.add(Duration(days: 14)),
-                                    );
-
-                                    if (pickedDate != null) {
-                                      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                                      setState(() => endDateController.text = formattedDate);
-                                    }
-                                  },
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.green.shade200,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              )
+                                readOnly: true,
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.isEmpty ||
+                                      value == 'End Date') {
+                                    return 'Please select End Date';
+                                  }
+                                  return null;
+                                },
+                                onTap: () async {
+                                  // Try parsing start date
+                                  DateTime startDate;
+                                  try {
+                                    startDate = DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).parse(startDateController.text);
+                                  } catch (e) {
+                                    startDate = DateTime.now();
+                                  }
 
+                                  // Try parsing current end date if it's not empty
+                                  DateTime initialDate;
+                                  if (endDateController.text.isNotEmpty) {
+                                    try {
+                                      initialDate = DateFormat(
+                                        'yyyy-MM-dd',
+                                      ).parse(endDateController.text);
+                                    } catch (e) {
+                                      initialDate = startDate.add(
+                                        Duration(days: 0),
+                                      );
+                                    }
+                                  } else {
+                                    initialDate = startDate.add(
+                                      Duration(days: 0),
+                                    );
+                                  }
+
+                                  // Show date picker
+                                  DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: initialDate,
+                                    firstDate: startDate.add(Duration(days: 0)),
+                                    lastDate: startDate.add(Duration(days: 14)),
+                                  );
+
+                                  if (pickedDate != null) {
+                                    String formattedDate = DateFormat(
+                                      'yyyy-MM-dd',
+                                    ).format(pickedDate);
+                                    setState(
+                                      () => endDateController.text =
+                                          formattedDate,
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -636,18 +716,21 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               labelText: "State",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.green.shade200,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -683,24 +766,28 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               labelText: "City",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.green.shade200,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             readOnly: true,
-                            enabled:
-                                stateController.text.isEmpty ? false : true,
+                            enabled: stateController.text.isEmpty
+                                ? false
+                                : true,
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||
@@ -732,18 +819,21 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                               labelText: "Company",
                               suffixIcon: Icon(Icons.keyboard_arrow_down),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade400),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade400,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.green.shade200,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -821,35 +911,38 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     false) {
                                   var updateSellChickRes = await AuthServices()
                                       .updateSellChick(
-                                          context,
-                                          companyList[companyController.text]
-                                              .toString(),
-                                          birdBreedList[
-                                                  chickTypeController.text]
-                                              .toString(),
-                                          qtyController.text,
-                                          chickPriceController.text,
-                                          commentController.text,
-                                          startDateController.text,
-                                          endDateController.text,
-                                          saleType,
-                                          statelist[stateController.text]
-                                              .toString(),
-                                          selectedCityID,
-                                          ageController.text,
-                                          weightController.text,
-                                          chickPriceModel.chicksaleUuid
-                                              .toString(),
-                                          chickPriceModel.chicksaleId
-                                              .toString());
+                                        context,
+                                        companyList[companyController.text]
+                                            .toString(),
+                                        birdBreedList[chickTypeController.text]
+                                            .toString(),
+                                        qtyController.text,
+                                        chickPriceController.text,
+                                        commentController.text,
+                                        startDateController.text,
+                                        endDateController.text,
+                                        saleType,
+                                        statelist[stateController.text]
+                                            .toString(),
+                                        selectedCityID,
+                                        ageController.text,
+                                        weightController.text,
+                                        chickPriceModel.chicksaleUuid
+                                            .toString(),
+                                        chickPriceModel.chicksaleId.toString(),
+                                        vaccinatedType,
+                                      );
                                   if (updateSellChickRes
-                                          .apiResponse![0].responseStatus ==
+                                          .apiResponse![0]
+                                          .responseStatus ==
                                       true) {
                                     Navigator.pop(context);
                                   } else {
                                     SnackbarHelper.showSnackBar(
-                                        updateSellChickRes
-                                            .apiResponse![0].responseDetails);
+                                      updateSellChickRes
+                                          .apiResponse![0]
+                                          .responseDetails,
+                                    );
                                   }
                                 }
                               } else {
@@ -858,27 +951,29 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                   String uuids = uuid.v1();
                                   var sellEggRes = await AuthServices()
                                       .sellChick(
-                                          context,
-                                          companyList[companyController.text]
-                                              .toString(),
-                                          birdBreedList[
-                                                  chickTypeController.text]
-                                              .toString(),
-                                          qtyController.text,
-                                          chickPriceController.text,
-                                          commentController.text,
-                                          startDateController.text,
-                                          endDateController.text,
-                                          saleType,
-                                          statelist[stateController.text]
-                                              .toString(),
-                                          cityList[cityController.text]
-                                              .toString(),
-                                          uuids,
-                                          ageController.text,
-                                          weightController.text);
+                                        context,
+                                        companyList[companyController.text]
+                                            .toString(),
+                                        birdBreedList[chickTypeController.text]
+                                            .toString(),
+                                        qtyController.text,
+                                        chickPriceController.text,
+                                        commentController.text,
+                                        startDateController.text,
+                                        endDateController.text,
+                                        saleType,
+                                        statelist[stateController.text]
+                                            .toString(),
+                                        cityList[cityController.text]
+                                            .toString(),
+                                        uuids,
+                                        ageController.text,
+                                        weightController.text,
+                                        vaccinatedType,
+                                      );
                                   if (sellEggRes
-                                          .apiResponse![0].responseStatus ==
+                                          .apiResponse![0]
+                                          .responseStatus ==
                                       true) {
                                     AwesomeDialog(
                                       context: context,
@@ -886,7 +981,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                       dialogType: DialogType.success,
                                       dialogBackgroundColor: Colors.white,
                                       title: sellEggRes
-                                          .apiResponse![0].responseDetails,
+                                          .apiResponse![0]
+                                          .responseDetails,
                                       titleTextStyle: AppTheme.appBarText,
                                       descTextStyle: AppTheme.appBarText,
                                       btnOkOnPress: () {
@@ -901,8 +997,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper
-                                            .pushReplacementNamedUntil(
+                                        NavigationHelper.pushReplacementNamedUntil(
                                           AppRoutes.dashboardScreen,
                                         );
                                       },
@@ -911,8 +1006,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                       btnOkColor: Colors.greenAccent.shade700,
                                     ).show();
                                   } else {
-                                    SnackbarHelper.showSnackBar(sellEggRes
-                                        .apiResponse![0].responseDetails);
+                                    SnackbarHelper.showSnackBar(
+                                      sellEggRes
+                                          .apiResponse![0]
+                                          .responseDetails,
+                                    );
                                   }
                                 }
                                 _btnController.reset();

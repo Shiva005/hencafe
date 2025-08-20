@@ -53,6 +53,7 @@ class ApiResponse {
     this.chicksaleEffectFrom,
     this.chickaleEffectTo,
     this.isSpecialSale,
+    this.isVaccinated,
     this.birdAgeInDays,
     this.birdWeightInGrams,
     this.chicksaleComment,
@@ -74,6 +75,7 @@ class ApiResponse {
     chicksaleEffectFrom = json['chicksale_effect_from'];
     chickaleEffectTo = json['chickale_effect_to'];
     isSpecialSale = json['is_special_sale'];
+    isVaccinated = json['is_vaccinated'];
     birdAgeInDays = json['bird_age_in_days'];
     birdWeightInGrams = json['bird_weight_in_grams'];
     chicksaleComment = json['chicksale_comment'];
@@ -119,6 +121,7 @@ class ApiResponse {
   String? chicksaleEffectFrom;
   String? chickaleEffectTo;
   String? isSpecialSale;
+  String? isVaccinated;
   int? birdAgeInDays;
   int? birdWeightInGrams;
   String? chicksaleComment;
@@ -140,6 +143,7 @@ class ApiResponse {
     map['chicksale_effect_from'] = chicksaleEffectFrom;
     map['chickale_effect_to'] = chickaleEffectTo;
     map['is_special_sale'] = isSpecialSale;
+    map['is_vaccinated'] = isVaccinated;
     map['bird_age_in_days'] = birdAgeInDays;
     map['bird_weight_in_grams'] = birdWeightInGrams;
     map['chicksale_comment'] = chicksaleComment;

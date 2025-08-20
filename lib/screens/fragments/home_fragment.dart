@@ -46,12 +46,13 @@ class HomeFragment extends StatelessWidget {
           ),
         ),
       ],
-      navBarBuilder: (navBarConfig) => Style1BottomNavBar(
-        navBarConfig: navBarConfig,
-        navBarDecoration: NavBarDecoration(
-          color: Colors.white, // <-- This sets the background color
-        ),
-      ),
+      navBarBuilder: (navBarConfig) =>
+          Style1BottomNavBar(
+            navBarConfig: navBarConfig,
+            navBarDecoration: NavBarDecoration(
+              color: Colors.white, // <-- This sets the background color
+            ),
+          ),
     );
   }
 }
@@ -67,8 +68,9 @@ class _HomeFragmentState extends State<Home>
     with SingleTickerProviderStateMixin {
   late SharedPreferences prefs;
   bool isLoading = true;
-  late List<AttachmentInfo> attachments=[];
+  late List<AttachmentInfo> attachments = [];
   late final contactData;
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +81,7 @@ class _HomeFragmentState extends State<Home>
     prefs = await SharedPreferences.getInstance();
     setState(() => isLoading = true);
     contactData =
-        await AuthServices().getContactHistory(context, "APP_STATUS", "");
+    await AuthServices().getContactHistory(context, "APP_STATUS", "");
 
     setState(() {
       attachments = contactData.apiResponse![0].attachmentInfo ?? [];

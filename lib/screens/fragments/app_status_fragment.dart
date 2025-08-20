@@ -7,6 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../models/attachment_model.dart';
 import '../../values/app_colors.dart';
+import '../../values/app_icons.dart';
 import '../../widget/docs_preview_widget.dart';
 import '../image_preview_screen.dart';
 import '../video_player_screen.dart';
@@ -31,8 +32,11 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
 
   Future<void> fetchContactHistory() async {
     setState(() => isLoading = true);
-    final contactData =
-        await AuthServices().getContactHistory(context, "APP_STATUS", "");
+    final contactData = await AuthServices().getContactHistory(
+      context,
+      "APP_STATUS",
+      "",
+    );
 
     setState(() {
       complaintList = contactData.apiResponse ?? [];
@@ -48,68 +52,70 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : complaintList.isEmpty
-              ? const Center(child: Text('No data available'))
-              : RefreshIndicator(
-                  onRefresh: fetchContactHistory,
-                  child: ListView.builder(
-                    itemCount: complaintList.length,
-                    padding: const EdgeInsets.all(12),
-                    itemBuilder: (context, index) {
-                      final item = complaintList[index];
-                      final isExpanded = isExpandedList[index];
-                      final fullText = item.subjectLanguage ?? "No Subject";
-                      final isLongText = fullText.length > 160;
+          ? const Center(child: Text('No data available'))
+          : RefreshIndicator(
+              onRefresh: fetchContactHistory,
+              child: ListView.builder(
+                itemCount: complaintList.length,
+                padding: const EdgeInsets.all(12),
+                itemBuilder: (context, index) {
+                  final item = complaintList[index];
+                  final isExpanded = isExpandedList[index];
+                  final fullText = item.subjectLanguage ?? "No Subject";
+                  final isLongText = fullText.length > 160;
 
-                      return Container(
-                        width: double.maxFinite,
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade300),
+                  return Container(
+                    width: double.maxFinite,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 15,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isExpanded || !isLongText
+                              ? fullText
+                              : "${fullText.substring(0, 160)}...",
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isExpanded || !isLongText
-                                  ? fullText
-                                  : "${fullText.substring(0, 160)}...",
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            if (isLongText) ...[
-                              const SizedBox(height: 5),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isExpandedList[index] = !isExpanded;
-                                    });
-                                  },
-                                  child: Text(
-                                    isExpanded ? "Show Less" : "Show More",
-                                    style: const TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
-                                  ),
+                        if (isLongText) ...[
+                          const SizedBox(height: 5),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isExpandedList[index] = !isExpanded;
+                                });
+                              },
+                              child: Text(
+                                isExpanded ? "Show Less" : "Show More",
+                                style: const TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
                                 ),
                               ),
-                            ],
-                            const SizedBox(height: 15),
-                            if (item.attachmentInfo != null &&
-                                item.attachmentInfo!.isNotEmpty)
-                              _buildList(context, item.attachmentInfo!),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 15),
+                        if (item.attachmentInfo != null &&
+                            item.attachmentInfo!.isNotEmpty)
+                          _buildList(context, item.attachmentInfo!),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
     );
   }
 
@@ -173,12 +179,12 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                   ),
                   Align(
                     alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Icon(
-                        Icons.play_circle,
-                        color: Colors.grey.shade700,
-                        size: 70,
+                    child: ClipOval(
+                      child: Image.asset(
+                        AppIconsData.play_gif,
+                        fit: BoxFit.contain,
+                        height: 70,
+                        width: 70, // add width for perfect circle
                       ),
                     ),
                   ),
@@ -203,8 +209,11 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                   controller: WebViewController()
                     ..setJavaScriptMode(JavaScriptMode.unrestricted)
                     ..setBackgroundColor(Colors.transparent)
-                    ..loadRequest(Uri.parse(
-                        "https://docs.google.com/gview?embedded=true&url=$path")),
+                    ..loadRequest(
+                      Uri.parse(
+                        "https://docs.google.com/gview?embedded=true&url=$path",
+                      ),
+                    ),
                 ),
               ),
             );
@@ -225,25 +234,26 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
           onTap: () {
             if (att.attachmentType == 'image') {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ImagePreviewScreen(
-                      imageUrl: path,
-                      pageType: "AppStatus",
-                    ),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      ImagePreviewScreen(imageUrl: path, pageType: "AppStatus"),
+                ),
+              );
             } else if (att.attachmentType == 'video') {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPlayerScreen(
-                        videoUrl: path, pageType: "AppStatus",),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      VideoPlayerScreen(videoUrl: path, pageType: "AppStatus"),
+                ),
+              );
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => DocumentPreviewScreen(url: path, pageType: "AppStatus",),
+                  builder: (_) =>
+                      DocumentPreviewScreen(url: path, pageType: "AppStatus"),
                 ),
               );
             } else {
@@ -254,10 +264,7 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
           },
           child: Column(
             children: [
-              SizedBox(
-                width: double.maxFinite,
-                child: mediaWidget,
-              ),
+              SizedBox(width: double.maxFinite, child: mediaWidget),
               SizedBox(height: 10),
             ],
           ),

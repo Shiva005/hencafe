@@ -413,6 +413,50 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                   ),
                 ),
               ),
+            FutureBuilder<ChickPriceModel>(
+              future: chickPriceData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
+                  return const Center(child: Text("No data available"));
+                }
+
+                final specialSaleItems = snapshot.data!.apiResponse!
+                    .where((item) => item.isSpecialSale == "Y")
+                    .toList();
+
+                if (specialSaleItems.isEmpty) {
+                  return const Center(
+                    child: Text("No special sale items available"),
+                  );
+                }
+
+                return SizedBox(
+                  height: 155,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: specialSaleItems.length,
+                    itemBuilder: (context, index) {
+                      logger.d(specialSaleItems[index].toJson());
+                      return SizedBox(
+                        width: 360,
+                        child: ChickPriceCard(
+                          chickPriceModel: snapshot.data!,
+                          index: snapshot.data!.apiResponse!.indexOf(
+                            specialSaleItems[index],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
             Expanded(
               child: FutureBuilder<ChickPriceModel>(
                 future: chickPriceData,
@@ -443,7 +487,7 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                                 .indexWhere((e) =>
                                     e.toJson().toString() ==
                                     filteredItems[index].toString());
-                            return EggPriceCard(
+                            return ChickPriceCard(
                               chickPriceModel: snapshot.data!,
                               index: filteredIndex,
                             );
@@ -461,11 +505,11 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
   }
 }
 
-class EggPriceCard extends StatelessWidget {
+class ChickPriceCard extends StatelessWidget {
   final ChickPriceModel chickPriceModel;
   final int index;
 
-  const EggPriceCard(
+  const ChickPriceCard(
       {required this.chickPriceModel, super.key, required this.index});
 
   @override
@@ -481,10 +525,10 @@ class EggPriceCard extends StatelessWidget {
         );
       },
       child: Card(
-        elevation: 0.0,
+        elevation: 0.2,
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: AppColors.primaryColor, width: 1),
+          side: BorderSide(color: Colors.grey.shade200, width: 1),
           // Change color here
           borderRadius:
               BorderRadius.circular(8.0), // Optional: Adjust border radius

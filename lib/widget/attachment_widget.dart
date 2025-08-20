@@ -8,6 +8,7 @@ import '../models/attachment_model.dart';
 import '../screens/image_preview_screen.dart';
 import '../screens/video_player_screen.dart';
 import '../values/app_colors.dart';
+import '../values/app_icons.dart';
 
 class AttachmentWidget extends StatefulWidget {
   final List<AttachmentInfo> attachments;
@@ -45,7 +46,8 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
   void initState() {
     super.initState();
     _videoPlayerController = VideoPlayerController.network(
-        widget.attachments[widget.index].attachmentPath!);
+      widget.attachments[widget.index].attachmentPath!,
+    );
     _videoPlayerController.initialize().then((_) {
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
@@ -88,21 +90,26 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                 children: [
                   _buildGrid(context, widget.attachments),
                   _buildGrid(
-                      context,
-                      widget.attachments
-                          .where((e) => e.attachmentType == 'image')
-                          .toList()),
+                    context,
+                    widget.attachments
+                        .where((e) => e.attachmentType == 'image')
+                        .toList(),
+                  ),
                   _buildGrid(
-                      context,
-                      widget.attachments
-                          .where((e) => e.attachmentType == 'video')
-                          .toList()),
+                    context,
+                    widget.attachments
+                        .where((e) => e.attachmentType == 'video')
+                        .toList(),
+                  ),
                   _buildGrid(
-                      context,
-                      widget.attachments
-                          .where((e) =>
-                              ['pdf', 'doc', 'docx'].contains(e.attachmentType))
-                          .toList()),
+                    context,
+                    widget.attachments
+                        .where(
+                          (e) =>
+                              ['pdf', 'doc', 'docx'].contains(e.attachmentType),
+                        )
+                        .toList(),
+                  ),
                 ],
               ),
             ),
@@ -134,8 +141,12 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
           case 'image':
             mediaWidget = ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(path,
-                  fit: BoxFit.cover, height: 140, width: double.infinity),
+              child: Image.network(
+                path,
+                fit: BoxFit.cover,
+                height: 140,
+                width: double.infinity,
+              ),
             );
             break;
           case 'video':
@@ -151,14 +162,12 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                       children: [
                         Chewie(controller: _chewieController!),
                         Center(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            child: Icon(
-                              Icons.play_circle,
-                              color: Colors.grey.shade700,
-                              size: 50,
+                          child: ClipOval(
+                            child: Image.asset(
+                              AppIconsData.play_gif,
+                              fit: BoxFit.contain,
+                              height: 50,
+                              width: 50, // add width for perfect circle
                             ),
                           ),
                         ),
@@ -184,8 +193,11 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                   controller: WebViewController()
                     ..setJavaScriptMode(JavaScriptMode.unrestricted)
                     ..setBackgroundColor(Colors.transparent)
-                    ..loadRequest(Uri.parse(
-                        "https://docs.google.com/gview?embedded=true&url=$path")),
+                    ..loadRequest(
+                      Uri.parse(
+                        "https://docs.google.com/gview?embedded=true&url=$path",
+                      ),
+                    ),
                 ),
               ),
             );
@@ -201,28 +213,32 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
           onTap: () {
             if (att.attachmentType == 'image') {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ImagePreviewScreen(
-                      imageUrl: path,
-                      pageType: "AttachmentWidget",
-                    ),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ImagePreviewScreen(
+                    imageUrl: path,
+                    pageType: "AttachmentWidget",
+                  ),
+                ),
+              );
             } else if (att.attachmentType == 'video') {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VideoPlayerScreen(
-                      videoUrl: path,
-                      pageType: "AttachmentWidget",
-                    ),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (_) => VideoPlayerScreen(
+                    videoUrl: path,
+                    pageType: "AttachmentWidget",
+                  ),
+                ),
+              );
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => DocumentPreviewScreen(
-                      url: path, pageType: "AttachmentWidget"),
+                    url: path,
+                    pageType: "AttachmentWidget",
+                  ),
                 ),
               );
             } else {
@@ -242,8 +258,9 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(12)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
                       child: mediaWidget,
                     ),
                     const SizedBox(height: 8),
@@ -268,8 +285,11 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                       child: const CircleAvatar(
                         radius: 14,
                         backgroundColor: Colors.red,
-                        child: Icon(Icons.delete_forever,
-                            size: 16, color: Colors.white),
+                        child: Icon(
+                          Icons.delete_forever,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

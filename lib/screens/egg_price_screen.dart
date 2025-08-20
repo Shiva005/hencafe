@@ -49,10 +49,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
         File imageFile = File(imagePath);
         await imageFile.writeAsBytes(imageBytes);
 
-        await Share.shareXFiles(
-          [XFile(imagePath)],
-          text: '${AppStrings.shareText}$_packageName}',
-        );
+        await Share.shareXFiles([
+          XFile(imagePath),
+        ], text: '${AppStrings.shareText}$_packageName}');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),
@@ -60,9 +59,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
       }
     } catch (e) {
       print("Error capturing or sharing: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -76,8 +75,13 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
 
   Future<EggPriceModel> _fetchData(String selectedDate) async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices()
-        .getEggPriceList(context, '', selectedDate, selectedDate, '');
+    return await AuthServices().getEggPriceList(
+      context,
+      '',
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<void> getBirdBreedData() async {
@@ -97,7 +101,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
   Future<void> getFavouriteStateData() async {
     prefs = await SharedPreferences.getInstance();
     final res = await AuthServices().getFavouriteStateList(
-        context, prefs.getString(AppStrings.prefUserID)!);
+      context,
+      prefs.getString(AppStrings.prefUserID)!,
+    );
     if (res.errorCount == 0 && res.apiResponse != null) {
       setState(() {
         favouriteStateList = res.apiResponse!
@@ -135,13 +141,19 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Filter for $filter",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text(
+                    "Filter for $filter",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   if (items.isEmpty)
-                    const Text("No items available for this filter.",
-                        textAlign: TextAlign.center)
+                    const Text(
+                      "No items available for this filter.",
+                      textAlign: TextAlign.center,
+                    )
                   else
                     ListView.separated(
                       shrinkWrap: true,
@@ -162,9 +174,10 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                         ),
                       ),
                       separatorBuilder: (context, index) => Divider(
-                          thickness: 1,
-                          height: 2.0,
-                          color: Colors.grey.shade300),
+                        thickness: 1,
+                        height: 2.0,
+                        color: Colors.grey.shade300,
+                      ),
                     ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -187,19 +200,19 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
     final filterMapping = {
       "Special Sale": {
         "key": "is_special_sale",
-        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n",
       },
       "Hatching Eggs": {
         "key": "is_hatching_egg",
-        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n"
+        "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n",
       },
       "Birds": {
         "key": "bird_breed_info.0.birdbreed_name_language",
-        "transform": (String value) => value.toLowerCase()
+        "transform": (String value) => value.toLowerCase(),
       },
       "State": {
         "key": "address_details.0.state_name_language",
-        "transform": (String value) => value.toLowerCase()
+        "transform": (String value) => value.toLowerCase(),
       },
       "My Data Only": {
         "key": "user_basic_info.0.user_id",
@@ -210,7 +223,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
             return uid ?? "n";
           }
           return "n";
-        }
+        },
       },
     };
 
@@ -225,8 +238,10 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
         final key = mapping['key'] as String;
         final transform = mapping['transform'] as String Function(String);
 
-        final itemValueRaw =
-            getNestedValue(item, key); // 'key' from the filter map
+        final itemValueRaw = getNestedValue(
+          item,
+          key,
+        ); // 'key' from the filter map
         final itemValue = itemValueRaw?.toString().toLowerCase() ?? '';
         final transformedValue = transform(filterValue.toLowerCase());
         if (itemValue != transformedValue) return false;
@@ -278,9 +293,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                   if (prefs.getString(AppStrings.prefRole) != "U") {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellEggScreen,
-                      arguments: {
-                        'pageType': AppRoutes.eggPriceScreen,
-                      },
+                      arguments: {'pageType': AppRoutes.eggPriceScreen},
                     );
                   } else {
                     AwesomeDialog(
@@ -303,13 +316,18 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     backgroundColor: Colors.white,
                     label: Row(
                       children: [
-                        const Icon(Icons.add_circle_outline,
-                            color: AppColors.primaryColor, size: 16),
+                        const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primaryColor,
+                          size: 16,
+                        ),
                         const SizedBox(width: 5),
                         Text(
                           "Create egg sale",
                           style: const TextStyle(
-                              color: AppColors.primaryColor, fontSize: 11),
+                            color: AppColors.primaryColor,
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
@@ -339,8 +357,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                         lastDate: DateTime(2040),
                       );
                       if (pickedDate != null) {
-                        final formattedDate =
-                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        final formattedDate = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(pickedDate);
                         setState(() {
                           selectedDate = pickedDate;
                           eggPriceData = _fetchData(formattedDate);
@@ -351,20 +370,28 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       backgroundColor: Colors.white,
                       label: Row(
                         children: [
-                          const Icon(Icons.calendar_month,
-                              color: AppColors.primaryColor, size: 16),
+                          const Icon(
+                            Icons.calendar_month,
+                            color: AppColors.primaryColor,
+                            size: 16,
+                          ),
                           const SizedBox(width: 5),
                           Text(
                             Utils.threeLetterDateFormatted(
-                                selectedDate.toString()),
+                              selectedDate.toString(),
+                            ),
                             style: const TextStyle(
-                                color: AppColors.primaryColor, fontSize: 11),
+                              color: AppColors.primaryColor,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
                       shape: RoundedRectangleBorder(
-                        side:
-                            BorderSide(color: Colors.grey.shade400, width: 1.5),
+                        side: BorderSide(
+                          color: Colors.grey.shade400,
+                          width: 1.5,
+                        ),
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                     ),
@@ -372,12 +399,15 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                   IconButton(
                     onPressed: () =>
                         setState(() => cardVisibility = !cardVisibility),
-                    icon: const Icon(Icons.filter_list_alt,
-                        color: Colors.black54),
+                    icon: const Icon(
+                      Icons.filter_list_alt,
+                      color: Colors.black54,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => NavigationHelper.pushReplacementNamed(
-                        AppRoutes.eggPriceScreen),
+                      AppRoutes.eggPriceScreen,
+                    ),
                     icon: const Icon(Icons.refresh, color: Colors.black54),
                   ),
                   IconButton(
@@ -396,7 +426,9 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     color: Colors.white,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 4),
+                        horizontal: 8.0,
+                        vertical: 4,
+                      ),
                       child: Wrap(
                         spacing: 7.0,
                         children: [
@@ -405,7 +437,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                             "State",
                             "Birds",
                             "Hatching Eggs",
-                            "My Data Only"
+                            "My Data Only",
                           ])
                             FilterChipWidget(
                               label: filter,
@@ -419,6 +451,50 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                   ),
                 ),
               ),
+            FutureBuilder<EggPriceModel>(
+              future: eggPriceData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+                if (!snapshot.hasData || snapshot.data!.apiResponse == null) {
+                  return const Center(child: Text("No data available"));
+                }
+
+                final specialSaleItems = snapshot.data!.apiResponse!
+                    .where((item) => item.isSpecialSale == "Y")
+                    .toList();
+
+                if (specialSaleItems.isEmpty) {
+                  return const Center(
+                    child: Text("No special sale items available"),
+                  );
+                }
+
+                return SizedBox(
+                  height: 140,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: specialSaleItems.length,
+                    itemBuilder: (context, index) {
+                      logger.d(specialSaleItems[index].toJson());
+                      return SizedBox(
+                        width: 350,
+                        child: EggPriceCard(
+                          eggPriceModel: snapshot.data!,
+                          index: snapshot.data!.apiResponse!.indexOf(
+                            specialSaleItems[index],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
             Expanded(
               child: FutureBuilder<EggPriceModel>(
                 future: eggPriceData,
@@ -446,9 +522,11 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                           itemCount: filteredItems.length,
                           itemBuilder: (context, index) {
                             final filteredIndex = snapshot.data!.apiResponse!
-                                .indexWhere((e) =>
-                                    e.toJson().toString() ==
-                                    filteredItems[index].toString());
+                                .indexWhere(
+                                  (e) =>
+                                      e.toJson().toString() ==
+                                      filteredItems[index].toString(),
+                                );
                             return EggPriceCard(
                               eggPriceModel: snapshot.data!,
                               index: filteredIndex,
@@ -456,7 +534,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                           },
                         )
                       : const Center(
-                          child: Text("No matching data for selected filters"));
+                          child: Text("No matching data for selected filters"),
+                        );
                 },
               ),
             ),
@@ -471,8 +550,11 @@ class EggPriceCard extends StatelessWidget {
   final EggPriceModel eggPriceModel;
   final int index;
 
-  const EggPriceCard(
-      {required this.eggPriceModel, super.key, required this.index});
+  const EggPriceCard({
+    required this.eggPriceModel,
+    super.key,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -491,8 +573,9 @@ class EggPriceCard extends StatelessWidget {
         color: Colors.white,
         shape: RoundedRectangleBorder(
           //side: BorderSide(color: AppColors.primaryColor, width: 1),
-          borderRadius:
-              BorderRadius.circular(8.0), // Optional: Adjust border radius
+          borderRadius: BorderRadius.circular(
+            8.0,
+          ), // Optional: Adjust border radius
         ),
         margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
         child: Padding(
@@ -511,18 +594,23 @@ class EggPriceCard extends StatelessWidget {
                         side: BorderSide(color: Colors.black38, width: 1),
                         // Change color here
                         borderRadius: BorderRadius.circular(
-                            8.0), // Optional: Adjust border radius
+                          8.0,
+                        ), // Optional: Adjust border radius
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6.0),
+                          horizontal: 10,
+                          vertical: 6.0,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
                               'Rs/egg',
-                              style:
-                                  TextStyle(fontSize: 10, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
                             ),
                             Text(
                               eggPriceModel.apiResponse![index].eggsaleCost ??
@@ -558,7 +646,7 @@ class EggPriceCard extends StatelessWidget {
                             const SizedBox(width: 3),
                             Text(
                               "${eggPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${eggPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}",
-                            )
+                            ),
                           ],
                         ),
                         Row(
@@ -572,9 +660,13 @@ class EggPriceCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 3),
-                            Text(eggPriceModel.apiResponse![index]
-                                    .birdBreedInfo![0].birdbreedNameLanguage ??
-                                ''),
+                            Text(
+                              eggPriceModel
+                                      .apiResponse![index]
+                                      .birdBreedInfo![0]
+                                      .birdbreedNameLanguage ??
+                                  '',
+                            ),
                           ],
                         ),
                         Row(
@@ -585,8 +677,12 @@ class EggPriceCard extends StatelessWidget {
                               size: 18,
                             ),
                             const SizedBox(width: 3),
-                            Text(eggPriceModel.apiResponse![index]
-                                .companyBasicInfo![0].companyNameLanguage!),
+                            Text(
+                              eggPriceModel
+                                  .apiResponse![index]
+                                  .companyBasicInfo![0]
+                                  .companyNameLanguage!,
+                            ),
                           ],
                         ),
                       ],
@@ -597,7 +693,7 @@ class EggPriceCard extends StatelessWidget {
                       Visibility(
                         visible:
                             eggPriceModel.apiResponse![index].isHatchingEgg ==
-                                "Y",
+                            "Y",
                         child: Column(
                           children: [
                             SizedBox(
@@ -616,9 +712,12 @@ class EggPriceCard extends StatelessWidget {
                       Visibility(
                         visible:
                             eggPriceModel.apiResponse![index].isSpecialSale ==
-                                "Y",
-                        child: Icon(Icons.card_giftcard,
-                            color: AppColors.primaryColor, size: 20.0),
+                            "Y",
+                        child: Icon(
+                          Icons.card_giftcard,
+                          color: AppColors.primaryColor,
+                          size: 20.0,
+                        ),
                       ),
                     ],
                   ),
@@ -632,24 +731,35 @@ class EggPriceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.green.shade700)),
+                        'Start: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectFrom.toString())}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
                       Text(
-                          'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.red.shade700)),
+                        'End: ${Utils.threeLetterDateFormatted(eggPriceModel.apiResponse![index].eggsaleEffectTo.toString())}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
                     children: [
                       Text(
-                          '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey.shade700)),
+                        '${eggPriceModel.apiResponse![index].userBasicInfo![0].userLastName} ${eggPriceModel.apiResponse![index].userBasicInfo![0].userFirstName}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
                       SizedBox(width: 10.0),
-                      Icon(Icons.arrow_right_alt_outlined,
-                          color: AppColors.primaryColor),
+                      Icon(
+                        Icons.arrow_right_alt_outlined,
+                        color: AppColors.primaryColor,
+                      ),
                     ],
                   ),
                 ],
@@ -667,11 +777,12 @@ class FilterChipWidget extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isSelected;
 
-  const FilterChipWidget(
-      {required this.label,
-      required this.onPressed,
-      required this.isSelected,
-      super.key});
+  const FilterChipWidget({
+    required this.label,
+    required this.onPressed,
+    required this.isSelected,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -679,14 +790,18 @@ class FilterChipWidget extends StatelessWidget {
       onTap: onPressed,
       child: Chip(
         backgroundColor: Colors.white,
-        label: Text(label,
-            style: TextStyle(
-                color: isSelected ? AppColors.primaryColor : Colors.black54,
-                fontSize: 11)),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppColors.primaryColor : Colors.black54,
+            fontSize: 11,
+          ),
+        ),
         shape: RoundedRectangleBorder(
           side: BorderSide(
-              color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
-              width: 1.5),
+            color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
+            width: 1.5,
+          ),
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),

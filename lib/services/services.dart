@@ -11,8 +11,8 @@ import 'package:hencafe/models/company_list_model.dart';
 import 'package:hencafe/models/company_providers_model.dart';
 import 'package:hencafe/models/egg_price_model.dart';
 import 'package:hencafe/models/error_model.dart';
-import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/faq_model.dart';
+import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
 import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/referral_model.dart';
@@ -37,11 +37,14 @@ import 'service_name.dart';
 
 class AuthServices {
   Future<RegistrationCheckModel> userExists(
-      BuildContext context, String mobileNumber) async {
+    BuildContext context,
+    String mobileNumber,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.REGISTRATION_CHECK}mobile_number=$mobileNumber"),
+        "${ServiceNames.REGISTRATION_CHECK}mobile_number=$mobileNumber",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -51,17 +54,19 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Registration Check: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Registration Check: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return RegistrationCheckModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<OtpGenerateModel> otpGenerate(
-      BuildContext context, String mobileNumber) async {
+    BuildContext context,
+    String mobileNumber,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
-    final Map<String, dynamic> payload = {
-      'mobile': mobileNumber,
-    };
+    final Map<String, dynamic> payload = {'mobile': mobileNumber};
 
     final response = await http.post(
       Uri.parse(ServiceNames.OTP_GENERATE),
@@ -75,19 +80,21 @@ class AuthServices {
     );
 
     logger.d('TAG OTP Generate: $payload');
-    logger
-        .d('TAG OTP Generate: ${json.decode(utf8.decode(response.bodyBytes))}');
+    logger.d(
+      'TAG OTP Generate: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return OtpGenerateModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<ValidateOtpModel> otpValidate(
-      BuildContext context, String mobileNumber, String otp) async {
+    BuildContext context,
+    String mobileNumber,
+    String otp,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
-    final Map<String, dynamic> payload = {
-      'mobile': mobileNumber,
-      'otp': otp,
-    };
+    final Map<String, dynamic> payload = {'mobile': mobileNumber, 'otp': otp};
 
     final response = await http.put(
       Uri.parse(ServiceNames.OTP_VALIDATE),
@@ -101,14 +108,19 @@ class AuthServices {
     );
 
     logger.d('TAG OTP Validate: $payload');
-    logger
-        .d('TAG OTP Validate: ${json.decode(utf8.decode(response.bodyBytes))}');
+    logger.d(
+      'TAG OTP Validate: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return ValidateOtpModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<SuccessModel> updateMobileNumber(
-      BuildContext context, String newMobileNumber, String otp) async {
+    BuildContext context,
+    String newMobileNumber,
+    String otp,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'user_id': prefs.getString(AppStrings.prefUserID),
@@ -120,7 +132,8 @@ class AuthServices {
 
     final response = await http.put(
       Uri.parse(
-          '${ServiceNames.UPDATE_MOBILE_NUMBER}${prefs.getString(AppStrings.prefUserID)}/change-mobile-number'),
+        '${ServiceNames.UPDATE_MOBILE_NUMBER}${prefs.getString(AppStrings.prefUserID)}/change-mobile-number',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -135,16 +148,18 @@ class AuthServices {
 
     logger.d('TAG Change Number: $payload');
     logger.d(
-        'TAG Change Number: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Change Number: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<LoginPinCheckModel> loginPinCheck(
-      BuildContext context,
-      String mobileNumber,
-      String pin,
-      String loginType,
-      String isInsertAuth) async {
+    BuildContext context,
+    String mobileNumber,
+    String pin,
+    String loginType,
+    String isInsertAuth,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'mobile_number': mobileNumber,
@@ -167,14 +182,16 @@ class AuthServices {
     logger.d('TAG Login: $payload');
     logger.d('TAG Login: ${json.decode(utf8.decode(response.bodyBytes))}');
     return LoginPinCheckModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<StateModel> getStates(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states'),
+        '${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -183,16 +200,21 @@ class AuthServices {
       },
     );
 
-    logger.d('TAG State List: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states');
+    logger.d(
+      'TAG State List: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states',
+    );
     return StateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<CityListModel> getCityList(
-      BuildContext context, String stateID) async {
+    BuildContext context,
+    String stateID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states/$stateID/cities"),
+        "${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states/$stateID/cities",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -206,16 +228,17 @@ class AuthServices {
   }
 
   Future<RegistrationCreateModel> registrationCreate(
-      BuildContext context,
-      String firstName,
-      String lastName,
-      String mobileNumber,
-      String email,
-      String cityID,
-      String password,
-      String address,
-      String stateID,
-      String referralCode) async {
+    BuildContext context,
+    String firstName,
+    String lastName,
+    String mobileNumber,
+    String email,
+    String cityID,
+    String password,
+    String address,
+    String stateID,
+    String referralCode,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'first_name': firstName,
@@ -244,16 +267,18 @@ class AuthServices {
     logger.d('TAG Register: $payload');
     logger.d('TAG Register: ${json.decode(utf8.decode(response.bodyBytes))}');
     return RegistrationCreateModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<SuccessModel> updateBasicDetails(
-      BuildContext context,
-      String firstName,
-      String lastName,
-      String email,
-      String dob,
-      String workType) async {
+    BuildContext context,
+    String firstName,
+    String lastName,
+    String email,
+    String dob,
+    String workType,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'first_name': firstName,
@@ -267,7 +292,8 @@ class AuthServices {
 
     final response = await http.put(
       Uri.parse(
-          '${ServiceNames.UPDATE_BASIC_DETAILS}${prefs.getString(AppStrings.prefUserID)}/basic-info'),
+        '${ServiceNames.UPDATE_BASIC_DETAILS}${prefs.getString(AppStrings.prefUserID)}/basic-info',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -281,18 +307,20 @@ class AuthServices {
 
     logger.d('TAG Update Details: $payload');
     logger.d(
-        'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteProfile(
-      BuildContext context,
-      String userID,
-      String mobileNumber,
-      String reason,
-      String comment,
-      String password,
-      String otp) async {
+    BuildContext context,
+    String userID,
+    String mobileNumber,
+    String reason,
+    String comment,
+    String password,
+    String otp,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'mobile_number': mobileNumber,
@@ -319,7 +347,8 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Profile: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Profile: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -338,7 +367,8 @@ class AuthServices {
 
     final response = await http.put(
       Uri.parse(
-          '${ServiceNames.CHANGE_PASSWORD}${prefs.getString(AppStrings.prefUserID)}/change-password'),
+        '${ServiceNames.CHANGE_PASSWORD}${prefs.getString(AppStrings.prefUserID)}/change-password',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -352,17 +382,21 @@ class AuthServices {
 
     logger.d('TAG Update Details: $payload');
     logger.d(
-        'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ProfileModel?> getProfile(
-      BuildContext context, String thirdPartUserID) async {
+    BuildContext context,
+    String thirdPartUserID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
 
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile?profile_id=$thirdPartUserID"),
+        "${ServiceNames.GET_PROFILE}/${prefs.getString(AppStrings.prefUserID)}/profile?profile_id=$thirdPartUserID",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -376,16 +410,22 @@ class AuthServices {
     if (response.statusCode == 200 || response.statusCode == 201) {
       logger.d('Response Body: ${response.body}');
       return ProfileModel.fromJson(
-          json.decode(utf8.decode(response.bodyBytes)));
+        json.decode(utf8.decode(response.bodyBytes)),
+      );
     } else {
       StatusCodeHandler.handleStatusCode(
-          context, response.statusCode, response.body);
+        context,
+        response.statusCode,
+        response.body,
+      );
       return null;
     }
   }
 
   Future<ProfileModel?> getUsers(
-      BuildContext context, String promotionStatus) async {
+    BuildContext context,
+    String promotionStatus,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
 
     final response = await http.get(
@@ -425,7 +465,9 @@ class AuthServices {
   }
 
   Future<SuccessModel> updateFavState(
-      BuildContext context, String stateID) async {
+    BuildContext context,
+    String stateID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'user_uuid': prefs.getString(AppStrings.prefUserUUID)!,
@@ -447,13 +489,17 @@ class AuthServices {
     );
 
     logger.d('TAG Update State: $payload');
-    logger
-        .d('TAG Update State: ${json.decode(utf8.decode(response.bodyBytes))}');
+    logger.d(
+      'TAG Update State: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSupplies(
-      BuildContext context, String referenceFrom, String supplyIDs) async {
+    BuildContext context,
+    String referenceFrom,
+    String supplyIDs,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'reference_from': referenceFrom,
@@ -474,19 +520,21 @@ class AuthServices {
 
     logger.d('TAG Update Supplies: $payload');
     logger.d(
-        'TAG Update Supplies: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Supplies: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createAddress(
-      BuildContext context,
-      String addressUUID,
-      String referenceFrom,
-      String addressType,
-      String address,
-      String stateID,
-      String cityID,
-      String zipCode) async {
+    BuildContext context,
+    String addressUUID,
+    String referenceFrom,
+    String addressType,
+    String address,
+    String stateID,
+    String cityID,
+    String zipCode,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'address_type': addressType,
@@ -517,20 +565,22 @@ class AuthServices {
 
     logger.d('TAG Create Address: $payload');
     logger.d(
-        'TAG Create Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Address: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateAddress(
-      BuildContext context,
-      String addressID,
-      String addressUUID,
-      String referenceFrom,
-      String addressType,
-      String address,
-      String stateID,
-      String cityID,
-      String zipCode) async {
+    BuildContext context,
+    String addressID,
+    String addressUUID,
+    String referenceFrom,
+    String addressType,
+    String address,
+    String stateID,
+    String cityID,
+    String zipCode,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'address_id': addressID,
@@ -561,24 +611,26 @@ class AuthServices {
 
     logger.d('TAG Update Address: $payload');
     logger.d(
-        'TAG Update Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Address: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellEgg(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String isHatchingEgg,
-      String stateID,
-      String cityID,
-      String uuid) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String isHatchingEgg,
+    String stateID,
+    String cityID,
+    String uuid,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -613,25 +665,27 @@ class AuthServices {
 
     logger.d('TAG Create Sell Egg: $payload');
     logger.d(
-        'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellEgg(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String isHatchingEgg,
-      String stateID,
-      String cityID,
-      String uuid,
-      String eggSaleID) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String isHatchingEgg,
+    String stateID,
+    String cityID,
+    String uuid,
+    String eggSaleID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -667,25 +721,28 @@ class AuthServices {
 
     logger.d('TAG Create Sell Egg: $payload');
     logger.d(
-        'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellChick(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String stateID,
-      String cityID,
-      String uuid,
-      String age,
-      String weight) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String stateID,
+    String cityID,
+    String uuid,
+    String age,
+    String weight,
+    String isVaccinated,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -703,6 +760,7 @@ class AuthServices {
       'country_id': prefs.getString(AppStrings.prefCountryCode)!,
       'user_id': prefs.getString(AppStrings.prefUserID)!,
       'chicksale_uuid': uuid,
+      'is_vaccinated': isVaccinated,
     };
 
     final response = await http.post(
@@ -721,24 +779,26 @@ class AuthServices {
 
     logger.d('TAG Create Sell Chick: $payload');
     logger.d(
-        'TAG Create Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createLiftingSell(
-      BuildContext context,
-      String breedID,
-      String totalBirds,
-      String cost,
-      String comment,
-      String address,
-      String effectFromDate,
-      String effectTillDate,
-      String stateID,
-      String cityID,
-      String uuid,
-      String age,
-      String weight) async {
+    BuildContext context,
+    String breedID,
+    String totalBirds,
+    String cost,
+    String comment,
+    String address,
+    String effectFromDate,
+    String effectTillDate,
+    String stateID,
+    String cityID,
+    String uuid,
+    String age,
+    String weight,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'total_birds': totalBirds,
@@ -773,18 +833,20 @@ class AuthServices {
 
     logger.d('TAG Create Lifting Sale: $payload');
     logger.d(
-        'TAG Create Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> createContactSupport(
-      BuildContext context,
-      String uuid,
-      String type,
-      String subject,
-      String details,
-      String email,
-      String mobile) async {
+    BuildContext context,
+    String uuid,
+    String type,
+    String subject,
+    String details,
+    String email,
+    String mobile,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'uuid': uuid,
@@ -813,25 +875,27 @@ class AuthServices {
 
     logger.d('TAG Create Support: $payload');
     logger.d(
-        'TAG Create Support: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Support: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateLiftingSell(
-      BuildContext context,
-      String breedID,
-      String totalBirds,
-      String cost,
-      String comment,
-      String address,
-      String effectFromDate,
-      String effectTillDate,
-      String stateID,
-      String cityID,
-      String saleID,
-      String uuid,
-      String age,
-      String weight) async {
+    BuildContext context,
+    String breedID,
+    String totalBirds,
+    String cost,
+    String comment,
+    String address,
+    String effectFromDate,
+    String effectTillDate,
+    String stateID,
+    String cityID,
+    String saleID,
+    String uuid,
+    String age,
+    String weight,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'total_birds': totalBirds,
@@ -867,26 +931,29 @@ class AuthServices {
 
     logger.d('TAG Update Lifting Sale: $payload');
     logger.d(
-        'TAG Update Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellChick(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String stateID,
-      String cityID,
-      String age,
-      String weight,
-      String uuid,
-      String chickID) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String stateID,
+    String cityID,
+    String age,
+    String weight,
+    String uuid,
+    String chickID,
+    String isVaccinated,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -905,6 +972,7 @@ class AuthServices {
       'user_id': prefs.getString(AppStrings.prefUserID)!,
       'chicksale_uuid': uuid,
       'chicksale_id': chickID,
+      'is_vaccinated': isVaccinated,
     };
 
     final response = await http.put(
@@ -923,23 +991,25 @@ class AuthServices {
 
     logger.d('TAG Update Sell Chick: $payload');
     logger.d(
-        'TAG Update Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Update Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> sellChicken(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String stateID,
-      String cityID,
-      String uuid) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String stateID,
+    String cityID,
+    String uuid,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -976,24 +1046,26 @@ class AuthServices {
 
     logger.d('TAG Create Sell Chicken: $payload');
     logger.d(
-        'TAG Create Sell Chicken: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Sell Chicken: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateSellChicken(
-      BuildContext context,
-      String companyID,
-      String breedID,
-      String qty,
-      String cost,
-      String comment,
-      String effectFromDate,
-      String effectTillDate,
-      String saleType,
-      String stateID,
-      String cityID,
-      String uuid,
-      String chickenID) async {
+    BuildContext context,
+    String companyID,
+    String breedID,
+    String qty,
+    String cost,
+    String comment,
+    String effectFromDate,
+    String effectTillDate,
+    String saleType,
+    String stateID,
+    String cityID,
+    String uuid,
+    String chickenID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'qty': qty,
@@ -1031,16 +1103,20 @@ class AuthServices {
 
     logger.d('TAG Create Sell Egg: $payload');
     logger.d(
-        'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<UserFavouriteStateModel> getFavouriteStateList(
-      BuildContext context, String thirdPartUserID) async {
+    BuildContext context,
+    String thirdPartUserID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID"),
+        "${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1053,17 +1129,23 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Fav State: ${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID');
+      'TAG Get Fav State: ${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID',
+    );
     return UserFavouriteStateModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
-  Future<ContactHistoryModel> getContactHistory(BuildContext context,
-      String communicationType, String communicationID) async {
+  Future<ContactHistoryModel> getContactHistory(
+    BuildContext context,
+    String communicationType,
+    String communicationID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID"),
+        "${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1076,11 +1158,14 @@ class AuthServices {
     );
 
     logger.w(
-        'TAG Get Contact History: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Contact History: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     logger.w(
-        'TAG Get Contact History: ${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID');
+      'TAG Get Contact History: ${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID',
+    );
     return ContactHistoryModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<BirdBreedModel> getBirdList(BuildContext context) async {
@@ -1099,9 +1184,11 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Bird Breed: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Bird Breed: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return BirdBreedModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<CompanyListModel> getCompanyList(BuildContext context) async {
@@ -1120,17 +1207,23 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Company List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Company List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return CompanyListModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<CompanyProvidersModel> getCompanyProvidersList(
-      BuildContext context, companyUUID, promotionStatus) async {
+    BuildContext context,
+    companyUUID,
+    promotionStatus,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.GET_COMPANY_PROVIDERS_LIST}$companyUUID&&promotion_status=$promotionStatus'),
+        '${ServiceNames.GET_COMPANY_PROVIDERS_LIST}$companyUUID&&promotion_status=$promotionStatus',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1143,16 +1236,19 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return CompanyProvidersModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<ReferralModel> getReferralsList(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          "${ServiceNames.GET_REFERRALS_LIST}${prefs.getString(AppStrings.prefUserID)}/referral-bonus?target_user_mobile=${prefs.getString(AppStrings.prefMobileNumber)}"),
+        "${ServiceNames.GET_REFERRALS_LIST}${prefs.getString(AppStrings.prefUserID)}/referral-bonus?target_user_mobile=${prefs.getString(AppStrings.prefMobileNumber)}",
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1165,12 +1261,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return ReferralModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<MedicineModel> getMedicine(
-      BuildContext context, String medicineID) async {
+    BuildContext context,
+    String medicineID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse('${ServiceNames.GET_MEDICINE}$medicineID'),
@@ -1186,16 +1285,23 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return MedicineModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
-  Future<EggPriceModel> getEggPriceList(BuildContext context, String eggID,
-      String fromDate, String toDate, String saleType) async {
+  Future<EggPriceModel> getEggPriceList(
+    BuildContext context,
+    String eggID,
+    String fromDate,
+    String toDate,
+    String saleType,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate&eggsale_id=$eggID'),
+        '${ServiceNames.EGG_PRICE_LIST}$fromDate&sale_to_date=$toDate&eggsale_id=$eggID',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1208,16 +1314,22 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return EggPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
-  Future<AddressModel> getAddressList(BuildContext context,
-      String referenceFrom, String referenceUUID, String addressID) async {
+  Future<AddressModel> getAddressList(
+    BuildContext context,
+    String referenceFrom,
+    String referenceUUID,
+    String addressID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.GET_ADDRESS_LIST}$referenceFrom&reference_uuid=$referenceUUID&address_id=$addressID'),
+        '${ServiceNames.GET_ADDRESS_LIST}$referenceFrom&reference_uuid=$referenceUUID&address_id=$addressID',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1230,16 +1342,23 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return AddressModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
-  Future<ChickPriceModel> getChickPriceList(BuildContext context,
-      String chickID, String fromDate, String toDate, String saleType) async {
+  Future<ChickPriceModel> getChickPriceList(
+    BuildContext context,
+    String chickID,
+    String fromDate,
+    String toDate,
+    String saleType,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.CHICK_PRICE_LIST}$fromDate&sale_to_date=$toDate&chicksale_id=$chickID'),
+        '${ServiceNames.CHICK_PRICE_LIST}$fromDate&sale_to_date=$toDate&chicksale_id=$chickID',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1252,17 +1371,25 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Chick Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Chick Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return ChickPriceModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
-  Future<ChickenPriceModel> getChickenPriceList(BuildContext context,
-      String chickenID, String fromDate, String toDate, String saleType) async {
+  Future<ChickenPriceModel> getChickenPriceList(
+    BuildContext context,
+    String chickenID,
+    String fromDate,
+    String toDate,
+    String saleType,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.CHICKEN_PRICE_LIST}$fromDate&sale_to_date=$toDate&chickensale_id=$chickenID'),
+        '${ServiceNames.CHICKEN_PRICE_LIST}$fromDate&sale_to_date=$toDate&chickensale_id=$chickenID',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1275,17 +1402,25 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Chicken Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Chicken Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return ChickenPriceModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
-  Future<LiftingPriceModel> getLiftingPriceList(BuildContext context,
-      String liftingID, String fromDate, String toDate, String saleType) async {
+  Future<LiftingPriceModel> getLiftingPriceList(
+    BuildContext context,
+    String liftingID,
+    String fromDate,
+    String toDate,
+    String saleType,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(
-          '${ServiceNames.LIFTING_PRICE_LIST}$fromDate&sale_to_date=$toDate&liftingsale_id=$liftingID'),
+        '${ServiceNames.LIFTING_PRICE_LIST}$fromDate&sale_to_date=$toDate&liftingsale_id=$liftingID',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -1298,13 +1433,17 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return LiftingPriceModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<SuccessModel> deleteAddress(
-      BuildContext context, String addressUUID) async {
+    BuildContext context,
+    String addressUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_ADDRESS}$addressUUID'),
@@ -1320,12 +1459,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Address: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Address: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteContactRecord(
-      BuildContext context, String communicationUUID) async {
+    BuildContext context,
+    String communicationUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_CONTACT_RECORD}$communicationUUID'),
@@ -1341,12 +1483,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteEggSaleRecord(
-      BuildContext context, String eggSaleUUID) async {
+    BuildContext context,
+    String eggSaleUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_EGG_SALE}$eggSaleUUID'),
@@ -1362,12 +1507,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Egg Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Egg Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteChickSaleRecord(
-      BuildContext context, String chickSaleUUID) async {
+    BuildContext context,
+    String chickSaleUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_CHICK_SALE}$chickSaleUUID'),
@@ -1383,12 +1531,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Chick Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Chick Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteChickenSaleRecord(
-      BuildContext context, String chickSaleUUID) async {
+    BuildContext context,
+    String chickSaleUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_CHICKEN_SALE}$chickSaleUUID'),
@@ -1404,12 +1555,15 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Chicken Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Chicken Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> deleteLiftingSaleRecord(
-      BuildContext context, String chickSaleUUID) async {
+    BuildContext context,
+    String chickSaleUUID,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.delete(
       Uri.parse('${ServiceNames.DELETE_LIFTING_SALE}$chickSaleUUID'),
@@ -1425,16 +1579,18 @@ class AuthServices {
     );
 
     logger.d(
-        'TAG Delete Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}');
+      'TAG Delete Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ForgetPinModel> forgetPin(
-      BuildContext context, String mobileNumber, String otp) async {
+    BuildContext context,
+    String mobileNumber,
+    String otp,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
-    final Map<String, dynamic> payload = {
-      'mobile': mobileNumber,
-    };
+    final Map<String, dynamic> payload = {'mobile': mobileNumber};
 
     final response = await http.post(
       Uri.parse(ServiceNames.FORGET_PIN),
@@ -1450,11 +1606,15 @@ class AuthServices {
     logger.d('TAG Forget Pin: $payload');
     logger.d('TAG Forget Pin: ${json.decode(utf8.decode(response.bodyBytes))}');
     return ForgetPinModel.fromJson(
-        json.decode(utf8.decode(response.bodyBytes)));
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
   }
 
   Future<SuccessModel> attachmentDelete(
-      BuildContext context, String attachmentID, String fileUrl) async {
+    BuildContext context,
+    String attachmentID,
+    String fileUrl,
+  ) async {
     var prefs = await SharedPreferences.getInstance();
 
     var request = http.MultipartRequest(
@@ -1485,7 +1645,8 @@ class AuthServices {
       logger.d('Response: ${response.statusCode}');
       logger.d('Response Body: ${response.body}');
       return SuccessModel.fromJson(
-          json.decode(utf8.decode(response.bodyBytes)));
+        json.decode(utf8.decode(response.bodyBytes)),
+      );
     } catch (e) {
       logger.e('Exception during attachment delete: $e');
       rethrow;
@@ -1495,7 +1656,10 @@ class AuthServices {
 
 class StatusCodeHandler {
   static ErrorModel handleStatusCode(
-      BuildContext context, int statusCode, String body) {
+    BuildContext context,
+    int statusCode,
+    String body,
+  ) {
     try {
       var errorModel = ErrorModel.fromJson(jsonDecode(body));
       switch (statusCode) {
@@ -1518,7 +1682,10 @@ class StatusCodeHandler {
   }
 
   static void _showErrorDialog(
-      BuildContext context, ErrorModel errorModel, int statusCode) {
+    BuildContext context,
+    ErrorModel errorModel,
+    int statusCode,
+  ) {
     var message = '';
     for (int i = 0; i < errorModel.errorCount!; i++) {
       message = '$message\n${errorModel.errorMessage![i].errorDetails!}';

@@ -1,9 +1,16 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/attachment_model.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/models/lifting_price_model.dart';
 import 'package:hencafe/widget/attachment_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/navigation_helper.dart';
@@ -33,6 +40,34 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
   DateTime selectedDate = DateTime.now();
   String saleID = '';
   String pageType = '';
+  String _packageName = '';
+  final ScreenshotController screenshotController = ScreenshotController();
+
+  Future<void> captureAndShare() async {
+    try {
+      Uint8List? imageBytes = await screenshotController.capture();
+
+      if (imageBytes != null) {
+        final directory = await getTemporaryDirectory();
+        final imagePath = '${directory.path}/screenshot.png';
+        File imageFile = File(imagePath);
+        await imageFile.writeAsBytes(imageBytes);
+
+        await Share.shareXFiles([
+          XFile(imagePath),
+        ], text: '${AppStrings.shareText}$_packageName}');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to capture screenshot')),
+        );
+      }
+    } catch (e) {
+      print("Error capturing or sharing: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -42,47 +77,82 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       saleID = args['saleID'] ?? '';
       pageType = args['pageType'] ?? '';
+      loadDataPackageName();
       if (pageType == AppRoutes.eggPriceScreen) {
         eggPriceData = _fetchEggData(Utils.formatDate(selectedDate), saleID);
       } else if (pageType == AppRoutes.chickPriceScreen) {
-        chickPriceData =
-            _fetchChickData(Utils.formatDate(selectedDate), saleID);
+        chickPriceData = _fetchChickData(
+          Utils.formatDate(selectedDate),
+          saleID,
+        );
       } else if (pageType == AppRoutes.chickenPriceScreen) {
-        chickenPriceData =
-            _fetchChickenData(Utils.formatDate(selectedDate), saleID);
+        chickenPriceData = _fetchChickenData(
+          Utils.formatDate(selectedDate),
+          saleID,
+        );
       } else if (pageType == AppRoutes.liftingPriceScreen) {
-        liftingSaleData =
-            _fetchLiftingSaleData(Utils.formatDate(selectedDate), saleID);
+        liftingSaleData = _fetchLiftingSaleData(
+          Utils.formatDate(selectedDate),
+          saleID,
+        );
       }
     }
   }
 
   Future<LiftingPriceModel> _fetchLiftingSaleData(
-      String selectedDate, String eggSaleID) async {
+    String selectedDate,
+    String eggSaleID,
+  ) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getLiftingPriceList(
-        context, eggSaleID, selectedDate, selectedDate, '');
+      context,
+      eggSaleID,
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<EggPriceModel> _fetchEggData(
-      String selectedDate, String eggSaleID) async {
+    String selectedDate,
+    String eggSaleID,
+  ) async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices()
-        .getEggPriceList(context, eggSaleID, selectedDate, selectedDate, '');
+    return await AuthServices().getEggPriceList(
+      context,
+      eggSaleID,
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<ChickPriceModel> _fetchChickData(
-      String selectedDate, String eggSaleID) async {
+    String selectedDate,
+    String eggSaleID,
+  ) async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices()
-        .getChickPriceList(context, eggSaleID, selectedDate, selectedDate, '');
+    return await AuthServices().getChickPriceList(
+      context,
+      eggSaleID,
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<ChickenPriceModel> _fetchChickenData(
-      String selectedDate, String eggSaleID) async {
+    String selectedDate,
+    String eggSaleID,
+  ) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getChickenPriceList(
-        context, eggSaleID, selectedDate, selectedDate, '');
+      context,
+      eggSaleID,
+      selectedDate,
+      selectedDate,
+      '',
+    );
   }
 
   Future<void> loadData() async {
@@ -125,46 +195,46 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              Expanded(
-                child: MyAppBar(
+    return Screenshot(
+      controller: screenshotController,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Container(
+            color: Colors.white,
+            child: Row(
+              children: [
+                Expanded(
+                  child: MyAppBar(
                     title: pageType == AppRoutes.eggPriceScreen
                         ? 'Egg Sale Details'
                         : pageType == AppRoutes.chickPriceScreen
-                            ? 'Chick Sale Details'
-                            : pageType == AppRoutes.liftingPriceScreen
-                                ? 'Lifting Sale Details'
-                                : 'Chicken Sale Details'),
-              ),
-              GestureDetector(
-                onTap: captureAndShare,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 25.0,top: 20),
-                  child: Icon(
-                    Icons.share,
-                    color: Colors.black54,
+                        ? 'Chick Sale Details'
+                        : pageType == AppRoutes.liftingPriceScreen
+                        ? 'Lifting Sale Details'
+                        : 'Chicken Sale Details',
                   ),
                 ),
-              ),
-            ],
+                GestureDetector(
+                  onTap: captureAndShare,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 25.0, top: 20),
+                    child: Icon(Icons.share, color: Colors.black54),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      body: FutureBuilder<dynamic>(
+        body: FutureBuilder<dynamic>(
           future: pageType == AppRoutes.eggPriceScreen
               ? eggPriceData
               : pageType == AppRoutes.chickPriceScreen
-                  ? chickPriceData
-                  : pageType == AppRoutes.liftingPriceScreen
-                      ? liftingSaleData
-                      : chickenPriceData,
+              ? chickPriceData
+              : pageType == AppRoutes.liftingPriceScreen
+              ? liftingSaleData
+              : chickenPriceData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -206,7 +276,9 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               margin: const EdgeInsets.symmetric(
-                                  horizontal: 6.0, vertical: 6),
+                                horizontal: 6.0,
+                                vertical: 6,
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: Column(
@@ -214,161 +286,252 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                   children: [
                                     const SizedBox(height: 6),
                                     if (pageType == AppRoutes.eggPriceScreen)
-                                      buildRow(Icons.currency_rupee, 'Price',
-                                          '${priceModel.apiResponse![0].eggsaleCost ?? ''} rs/egg'),
+                                      buildRow(
+                                        Icons.tag,
+                                        'Sale ID',
+                                        '#${priceModel.apiResponse![0].eggsaleId ?? ''}',
+                                      ),
                                     if (pageType == AppRoutes.chickPriceScreen)
-                                      buildRow(Icons.currency_rupee, 'Price',
-                                          '${priceModel.apiResponse![0].chicksaleCost ?? ''} rs/chick'),
+                                      buildRow(
+                                        Icons.tag,
+                                        'Sale ID',
+                                        '#${priceModel.apiResponse![0].chicksaleId ?? ''}',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.chickenPriceScreen)
-                                      buildRow(Icons.currency_rupee, 'Price',
-                                          '${priceModel.apiResponse![0].farmLiveBirdCost ?? ''} Rs/kg'),
+                                      buildRow(
+                                        Icons.tag,
+                                        'Sale ID',
+                                        '#${priceModel.apiResponse![0].chickensaleId ?? ''}',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.liftingPriceScreen)
-                                      buildRow(Icons.currency_rupee, 'Price',
-                                          '${priceModel.apiResponse![0].liftingsaleCostPerKg ?? ''} Rs/kg'),
+                                      buildRow(
+                                        Icons.tag,
+                                        'Sale ID',
+                                        '#${priceModel.apiResponse![0].liftingsaleId ?? ''}',
+                                      ),
+                                    if (pageType == AppRoutes.eggPriceScreen)
+                                      buildRow(
+                                        Icons.currency_rupee,
+                                        'Price',
+                                        '${priceModel.apiResponse![0].eggsaleCost ?? ''} rs/egg',
+                                      ),
+                                    if (pageType == AppRoutes.chickPriceScreen)
+                                      buildRow(
+                                        Icons.currency_rupee,
+                                        'Price',
+                                        '${priceModel.apiResponse![0].chicksaleCost ?? ''} rs/chick',
+                                      ),
+                                    if (pageType ==
+                                        AppRoutes.chickenPriceScreen)
+                                      buildRow(
+                                        Icons.currency_rupee,
+                                        'Price',
+                                        '${priceModel.apiResponse![0].farmLiveBirdCost ?? ''} Rs/kg',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.liftingPriceScreen)
-                                      buildRow(Icons.cabin, 'Total Birds',
-                                          '${priceModel.apiResponse![0].liftingsaleTotalBirds ?? ''} Total Birds'),
-                                    buildRow(
+                                      buildRow(
+                                        Icons.currency_rupee,
+                                        'Price',
+                                        '${priceModel.apiResponse![0].liftingsaleCostPerKg ?? ''} Rs/kg',
+                                      ),
+                                    if (pageType ==
+                                        AppRoutes.liftingPriceScreen)
+                                      buildRow(
                                         Icons.cabin,
-                                        'Bird Breed',
-                                        priceModel.apiResponse![0].birdBreedInfo
-                                                ?.first.birdbreedNameLanguage ??
-                                            ''),
+                                        'Total Birds',
+                                        '${priceModel.apiResponse![0].liftingsaleTotalBirds ?? ''} Total Birds',
+                                      ),
+                                    buildRow(
+                                      Icons.cabin,
+                                      'Bird Breed',
+                                      priceModel
+                                              .apiResponse![0]
+                                              .birdBreedInfo
+                                              ?.first
+                                              .birdbreedNameLanguage ??
+                                          '',
+                                    ),
                                     if (pageType !=
                                         AppRoutes.liftingPriceScreen)
                                       buildRow(
-                                          Icons.business,
-                                          'Company Name',
-                                          priceModel
-                                                  .apiResponse![0]
-                                                  .companyBasicInfo
-                                                  ?.first
-                                                  .companyNameLanguage ??
-                                              ''),
+                                        Icons.business,
+                                        'Company Name',
+                                        priceModel
+                                                .apiResponse![0]
+                                                .companyBasicInfo
+                                                ?.first
+                                                .companyNameLanguage ??
+                                            '',
+                                      ),
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
-                                          Icons.egg,
-                                          'Is Hatching Eggs?',
-                                          priceModel.apiResponse![0]
-                                                      .isHatchingEgg ==
-                                                  'Y'
-                                              ? 'Yes'
-                                              : 'No'),
+                                        Icons.egg,
+                                        'Is Hatching Eggs?',
+                                        priceModel
+                                                    .apiResponse![0]
+                                                    .isHatchingEgg ==
+                                                'Y'
+                                            ? 'Yes'
+                                            : 'No',
+                                      ),
+                                    if (pageType == AppRoutes.chickPriceScreen)
+                                      buildRow(
+                                        Icons.vaccines,
+                                        'Is Vaccinated?',
+                                        priceModel
+                                                    .apiResponse![0]
+                                                    .isVaccinated ==
+                                                'Y'
+                                            ? 'Yes'
+                                            : 'No',
+                                      ),
                                     if (pageType ==
                                             AppRoutes.chickPriceScreen ||
                                         pageType ==
                                             AppRoutes.liftingPriceScreen)
                                       buildRow(
-                                          Icons.cake,
-                                          pageType ==
-                                                  AppRoutes.liftingPriceScreen
-                                              ? 'Bird Age'
-                                              : 'Chick age',
-                                          '${priceModel.apiResponse![0].birdAgeInDays ?? ''} Days'),
+                                        Icons.cake,
+                                        pageType == AppRoutes.liftingPriceScreen
+                                            ? 'Bird Age'
+                                            : 'Chick age',
+                                        '${priceModel.apiResponse![0].birdAgeInDays ?? ''} Days',
+                                      ),
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
-                                          Icons.monitor_weight_outlined,
-                                          'Chick weight',
-                                          '${priceModel.apiResponse![0].birdWeightInGrams ?? ''} Grams'),
+                                        Icons.monitor_weight_outlined,
+                                        'Chick weight',
+                                        '${priceModel.apiResponse![0].birdWeightInGrams ?? ''} Grams',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.liftingPriceScreen)
                                       buildRow(
-                                          Icons.monitor_weight_outlined,
-                                          'Bird weight',
-                                          '${priceModel.apiResponse![0].birdWeightInKg ?? ''} Kg'),
+                                        Icons.monitor_weight_outlined,
+                                        'Bird weight',
+                                        '${priceModel.apiResponse![0].birdWeightInKg ?? ''} Kg',
+                                      ),
                                     if (pageType !=
                                         AppRoutes.liftingPriceScreen)
                                       buildRow(
-                                          Icons.card_giftcard,
-                                          'Is Special Sell?',
-                                          priceModel.apiResponse![0]
-                                                      .isSpecialSale ==
-                                                  'Y'
-                                              ? 'Yes'
-                                              : 'No'),
+                                        Icons.card_giftcard,
+                                        'Is Special Sell?',
+                                        priceModel
+                                                    .apiResponse![0]
+                                                    .isSpecialSale ==
+                                                'Y'
+                                            ? 'Yes'
+                                            : 'No',
+                                      ),
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
-                                          Icons.calendar_today_outlined,
-                                          'Sale Start:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .eggsaleEffectFrom ??
-                                                  '')),
+                                        Icons.calendar_today_outlined,
+                                        'Sale Start:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .eggsaleEffectFrom ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
-                                          Icons.calendar_today_outlined,
-                                          'Sale Start:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .chicksaleEffectFrom ??
-                                                  '')),
+                                        Icons.calendar_today_outlined,
+                                        'Sale Start:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .chicksaleEffectFrom ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType ==
                                         AppRoutes.chickenPriceScreen)
                                       buildRow(
-                                          Icons.calendar_today_outlined,
-                                          'Sale Start:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .chickensaleEffectFrom ??
-                                                  '')),
+                                        Icons.calendar_today_outlined,
+                                        'Sale Start:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .chickensaleEffectFrom ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
-                                          Icons.calendar_month,
-                                          'Sale End:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .eggsaleEffectTo ??
-                                                  '')),
+                                        Icons.calendar_month,
+                                        'Sale End:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .eggsaleEffectTo ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
-                                          Icons.calendar_month,
-                                          'Sale End:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .chickaleEffectTo ??
-                                                  '')),
+                                        Icons.calendar_month,
+                                        'Sale End:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .chickaleEffectTo ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType ==
                                         AppRoutes.chickenPriceScreen)
                                       buildRow(
-                                          Icons.calendar_month,
-                                          'Sale End:',
-                                          Utils.threeLetterDateFormatted(
-                                              priceModel.apiResponse![0]
-                                                      .chickensaleEffectTo ??
-                                                  '')),
+                                        Icons.calendar_month,
+                                        'Sale End:',
+                                        Utils.threeLetterDateFormatted(
+                                          priceModel
+                                                  .apiResponse![0]
+                                                  .chickensaleEffectTo ??
+                                              '',
+                                        ),
+                                      ),
                                     if (pageType !=
                                         AppRoutes.liftingPriceScreen)
-                                      buildRow(Icons.pin_drop, 'Address',
-                                          '${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}'),
+                                      buildRow(
+                                        Icons.pin_drop,
+                                        'Address',
+                                        '${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.liftingPriceScreen)
-                                      buildRow(Icons.pin_drop, 'Address',
-                                          '${priceModel.apiResponse![0].liftingsaleAddress ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}'),
+                                      buildRow(
+                                        Icons.pin_drop,
+                                        'Address',
+                                        '${priceModel.apiResponse![0].liftingsaleAddress ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.cityNameLanguage ?? ''}, ${priceModel.apiResponse![0].addressDetails?.first.stateNameLanguage ?? ''}',
+                                      ),
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
-                                          Icons.message_outlined,
-                                          'Comment',
-                                          '${priceModel.apiResponse![0].eggsaleComment ?? ''}'),
+                                        Icons.message_outlined,
+                                        'Comment',
+                                        '${priceModel.apiResponse![0].eggsaleComment ?? ''}',
+                                      ),
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
-                                          Icons.message_outlined,
-                                          'Comment',
-                                          '${priceModel.apiResponse![0].chicksaleComment ?? ''}'),
+                                        Icons.message_outlined,
+                                        'Comment',
+                                        '${priceModel.apiResponse![0].chicksaleComment ?? ''}',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.chickenPriceScreen)
                                       buildRow(
-                                          Icons.message_outlined,
-                                          'Comment',
-                                          '${priceModel.apiResponse![0].chickensaleComment ?? ''}'),
+                                        Icons.message_outlined,
+                                        'Comment',
+                                        '${priceModel.apiResponse![0].chickensaleComment ?? ''}',
+                                      ),
                                     if (pageType ==
                                         AppRoutes.liftingPriceScreen)
                                       buildRow(
-                                          Icons.message_outlined,
-                                          'Comment',
-                                          '${priceModel.apiResponse![0].liftingsaleComment ?? ''}'),
+                                        Icons.message_outlined,
+                                        'Comment',
+                                        '${priceModel.apiResponse![0].liftingsaleComment ?? ''}',
+                                      ),
                                     Padding(
                                       padding: const EdgeInsets.all(15.0),
                                       child: Column(
@@ -377,12 +540,15 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                           ElevatedButton.icon(
                                             onPressed: () {},
                                             label: const Text(
-                                                "View Company Details"),
+                                              "View Company Details",
+                                            ),
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.pink,
                                               foregroundColor: Colors.white,
                                               minimumSize: const Size(
-                                                  double.infinity, 35),
+                                                double.infinity,
+                                                35,
+                                              ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
@@ -394,12 +560,15 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                           ElevatedButton.icon(
                                             onPressed: () {},
                                             label: const Text(
-                                                "View Seller Details"),
+                                              "View Seller Details",
+                                            ),
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.blue,
                                               foregroundColor: Colors.white,
                                               minimumSize: const Size(
-                                                  double.infinity, 35),
+                                                double.infinity,
+                                                35,
+                                              ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
@@ -407,10 +576,13 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                             ),
                                           ),
                                           const SizedBox(height: 20),
-                                          if (priceModel.apiResponse![0]
-                                                  .userBasicInfo![0].userId ==
+                                          if (priceModel
+                                                  .apiResponse![0]
+                                                  .userBasicInfo![0]
+                                                  .userId ==
                                               prefs.getString(
-                                                  AppStrings.prefUserID))
+                                                AppStrings.prefUserID,
+                                              ))
                                             ElevatedButton(
                                               onPressed: () {
                                                 if (pageType ==
@@ -479,7 +651,9 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                     Colors.deepPurple,
                                                 foregroundColor: Colors.white,
                                                 minimumSize: const Size(
-                                                    double.infinity, 35),
+                                                  double.infinity,
+                                                  35,
+                                                ),
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(30),
@@ -491,15 +665,20 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                 children: const [
                                                   Text("Edit Sale details"),
                                                   SizedBox(width: 8),
-                                                  Icon(Icons.arrow_right_alt,
-                                                      color: Colors.white),
+                                                  Icon(
+                                                    Icons.arrow_right_alt,
+                                                    color: Colors.white,
+                                                  ),
                                                 ],
                                               ),
                                             ),
-                                          if (priceModel.apiResponse![0]
-                                                  .userBasicInfo![0].userId ==
+                                          if (priceModel
+                                                  .apiResponse![0]
+                                                  .userBasicInfo![0]
+                                                  .userId ==
                                               prefs.getString(
-                                                  AppStrings.prefUserID))
+                                                AppStrings.prefUserID,
+                                              ))
                                             ElevatedButton.icon(
                                               onPressed: () {
                                                 AwesomeDialog(
@@ -523,17 +702,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                       var deleteEggSaleRes =
                                                           await AuthServices()
                                                               .deleteEggSaleRecord(
-                                                        context,
-                                                        priceModel
-                                                            .apiResponse![0]
-                                                            .eggsaleUuid,
-                                                      );
+                                                                context,
+                                                                priceModel
+                                                                    .apiResponse![0]
+                                                                    .eggsaleUuid,
+                                                              );
                                                       if (deleteEggSaleRes
                                                               .apiResponse![0]
                                                               .responseStatus ==
                                                           true) {
-                                                        NavigationHelper
-                                                            .pushReplacementNamed(
+                                                        NavigationHelper.pushReplacementNamed(
                                                           AppRoutes
                                                               .eggPriceScreen,
                                                         );
@@ -544,17 +722,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                       var deleteChickSaleRes =
                                                           await AuthServices()
                                                               .deleteChickSaleRecord(
-                                                        context,
-                                                        priceModel
-                                                            .apiResponse![0]
-                                                            .chicksaleUuid,
-                                                      );
+                                                                context,
+                                                                priceModel
+                                                                    .apiResponse![0]
+                                                                    .chicksaleUuid,
+                                                              );
                                                       if (deleteChickSaleRes
                                                               .apiResponse![0]
                                                               .responseStatus ==
                                                           true) {
-                                                        NavigationHelper
-                                                            .pushReplacementNamed(
+                                                        NavigationHelper.pushReplacementNamed(
                                                           AppRoutes
                                                               .chickPriceScreen,
                                                         );
@@ -565,17 +742,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                       var deleteChickenSaleRes =
                                                           await AuthServices()
                                                               .deleteChickenSaleRecord(
-                                                        context,
-                                                        priceModel
-                                                            .apiResponse![0]
-                                                            .chickensaleUuid,
-                                                      );
+                                                                context,
+                                                                priceModel
+                                                                    .apiResponse![0]
+                                                                    .chickensaleUuid,
+                                                              );
                                                       if (deleteChickenSaleRes
                                                               .apiResponse![0]
                                                               .responseStatus ==
                                                           true) {
-                                                        NavigationHelper
-                                                            .pushReplacementNamed(
+                                                        NavigationHelper.pushReplacementNamed(
                                                           AppRoutes
                                                               .chickenPriceScreen,
                                                         );
@@ -586,17 +762,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                       var deleteLiftingSaleRes =
                                                           await AuthServices()
                                                               .deleteLiftingSaleRecord(
-                                                        context,
-                                                        priceModel
-                                                            .apiResponse![0]
-                                                            .liftingsaleUuid,
-                                                      );
+                                                                context,
+                                                                priceModel
+                                                                    .apiResponse![0]
+                                                                    .liftingsaleUuid,
+                                                              );
                                                       if (deleteLiftingSaleRes
                                                               .apiResponse![0]
                                                               .responseStatus ==
                                                           true) {
-                                                        NavigationHelper
-                                                            .pushReplacementNamed(
+                                                        NavigationHelper.pushReplacementNamed(
                                                           AppRoutes
                                                               .liftingPriceScreen,
                                                         );
@@ -609,14 +784,17 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                 ).show();
                                               },
                                               icon: const Icon(
-                                                  Icons.delete_forever,
-                                                  color: Colors.white),
+                                                Icons.delete_forever,
+                                                color: Colors.white,
+                                              ),
                                               label: const Text("Delete Sale"),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
                                                 foregroundColor: Colors.white,
                                                 minimumSize: const Size(
-                                                    double.infinity, 35),
+                                                  double.infinity,
+                                                  35,
+                                                ),
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(30),
@@ -636,10 +814,12 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                             ? AttachmentWidget(
                                 attachments: attachments,
                                 userId: priceModel
-                                    .apiResponse![0].userBasicInfo![0].userId,
+                                    .apiResponse![0]
+                                    .userBasicInfo![0]
+                                    .userId,
                                 currentUserId:
                                     prefs.getString(AppStrings.prefUserID) ??
-                                        '',
+                                    '',
                                 onDelete: (index) {
                                   showDeleteAttachmentDialog(
                                     context: context,
@@ -649,7 +829,8 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     onUpdate: () => setState(() {}),
                                   );
                                 },
-                                index: 0)
+                                index: 0,
+                              )
                             : Center(child: Text('No attachments found.')),
                       ],
                     ),
@@ -657,8 +838,15 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                 ],
               ),
             );
-          }),
+          },
+        ),
+      ),
     );
+  }
+
+  Future<void> loadDataPackageName() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    _packageName = packageInfo.packageName;
   }
 }
 
@@ -703,11 +891,7 @@ Widget buildRow(IconData icon, String label, String value) {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: Colors.grey.shade600,
-            ),
+            Icon(icon, size: 18, color: Colors.grey.shade600),
             SizedBox(width: 5),
             Text(
               "$label:",
