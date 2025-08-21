@@ -431,9 +431,7 @@ class _ChickPriceScreenState extends State<ChickPriceScreen> {
                     .toList();
 
                 if (specialSaleItems.isEmpty) {
-                  return const Center(
-                    child: Text("No special sale items available"),
-                  );
+                  return SizedBox();
                 }
 
                 return SizedBox(

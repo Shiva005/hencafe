@@ -43,7 +43,9 @@ class CompanyDetailsWidget extends StatelessWidget {
                     visible: false, // set to true if needed
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 3),
+                        horizontal: 12,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryColor,
                         border: Border.all(color: AppColors.primaryColor),
@@ -63,8 +65,10 @@ class CompanyDetailsWidget extends StatelessWidget {
                           children: [
                             Text(
                               'Edit Info',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
                             ),
                             SizedBox(width: 5),
                             Icon(Icons.edit, color: Colors.white, size: 15),
@@ -76,18 +80,36 @@ class CompanyDetailsWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            buildRow(Icons.business, 'Name',
-                detailsModel.apiResponse![0].companyNameLanguage ?? ''),
-            buildRow(Icons.description_outlined, 'Details',
-                detailsModel.apiResponse![0].companyDetails ?? ''),
-            buildRow(Icons.person_2_outlined, 'Contact Name',
-                detailsModel.apiResponse![0].companyContactUserName ?? ''),
-            buildRow(Icons.phone_android, 'Contact Mobile',
-                detailsModel.apiResponse![0].companyContactUserMobile ?? ''),
-            buildRow(Icons.email_outlined, 'Contact Email',
-                detailsModel.apiResponse![0].companyContactUserEmail ?? ''),
-            buildRow(Icons.web_outlined, 'Website Url',
-                detailsModel.apiResponse![0].companyWebsite ?? ''),
+            buildRow(
+              Icons.business,
+              'Name',
+              detailsModel.apiResponse![0].companyNameLanguage ?? '',
+            ),
+            buildRow(
+              Icons.description_outlined,
+              'Details',
+              detailsModel.apiResponse![0].companyDetails ?? '',
+            ),
+            buildRow(
+              Icons.person_2_outlined,
+              'Contact Name',
+              detailsModel.apiResponse![0].companyContactUserName ?? '',
+            ),
+            buildRow(
+              Icons.phone_android,
+              'Contact Mobile',
+              detailsModel.apiResponse![0].companyContactUserMobile ?? '',
+            ),
+            buildRow(
+              Icons.email_outlined,
+              'Contact Email',
+              detailsModel.apiResponse![0].companyContactUserEmail ?? '',
+            ),
+            buildRow(
+              Icons.web_outlined,
+              'Website Url',
+              detailsModel.apiResponse![0].companyWebsite ?? '',
+            ),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
@@ -96,7 +118,8 @@ class CompanyDetailsWidget extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {
                       Utils.openLink(
-                          "https://wa.me/${detailsModel.apiResponse![0].companyContactUserMobile}/?text=Hello");
+                        "https://wa.me/${detailsModel.apiResponse![0].companyContactUserMobile}/?text=Hello",
+                      );
                     },
                     icon: Icon(Icons.message_outlined, color: Colors.white),
                     label: const Text("Whatsapp"),
@@ -115,10 +138,13 @@ class CompanyDetailsWidget extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Utils.openLink(
-                                "mailto:${detailsModel.apiResponse![0].companyContactUserEmail}");
+                              "mailto:${detailsModel.apiResponse![0].companyContactUserEmail}",
+                            );
                           },
-                          icon: const Icon(Icons.email_outlined,
-                              color: Colors.white),
+                          icon: const Icon(
+                            Icons.email_outlined,
+                            color: Colors.white,
+                          ),
                           label: const Text("Mail"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red.shade600,
@@ -134,8 +160,11 @@ class CompanyDetailsWidget extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            Utils.openDialPad(detailsModel
-                                .apiResponse![0].companyContactUserMobile);
+                            Utils.openDialPad(
+                              detailsModel
+                                  .apiResponse![0]
+                                  .companyContactUserMobile,
+                            );
                           },
                           icon: const Icon(Icons.call, color: Colors.white),
                           label: const Text("Call"),
@@ -155,8 +184,10 @@ class CompanyDetailsWidget extends StatelessWidget {
                   // Change Banner Image
                   ElevatedButton.icon(
                     onPressed: () {},
-                    icon: const Icon(Icons.camera_alt_outlined,
-                        color: Colors.white),
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                    ),
                     label: const Text("Change Banner Image"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade200,
@@ -171,8 +202,10 @@ class CompanyDetailsWidget extends StatelessWidget {
                   // Change Profile Image
                   ElevatedButton.icon(
                     onPressed: () {},
-                    icon: const Icon(Icons.camera_alt_outlined,
-                        color: Colors.white),
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                    ),
                     label: const Text("Change Profile Image"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink.shade200,
@@ -187,7 +220,16 @@ class CompanyDetailsWidget extends StatelessWidget {
 
                   // Update button with arrow
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.updateCompanyDetailsScreen,
+                        arguments: {
+                          'companyUUID':
+                              detailsModel.apiResponse![0].companyUuid,
+                          'companyPromotionStatus': 'true',
+                        },
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
@@ -201,7 +243,7 @@ class CompanyDetailsWidget extends StatelessWidget {
                       children: const [
                         Text("Update"),
                         SizedBox(width: 8),
-                        Icon(Icons.double_arrow_rounded, color: Colors.white),
+                        Icon(Icons.arrow_right_alt, color: Colors.white),
                       ],
                     ),
                   ),
@@ -223,11 +265,7 @@ Widget buildRow(IconData icon, String label, String value) {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: Colors.grey.shade600,
-            ),
+            Icon(icon, size: 18, color: Colors.grey.shade600),
             SizedBox(width: 5),
             Text(
               "$label:",

@@ -110,11 +110,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 height: 100,
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade300,
-                                  border:
-                                      Border.all(width: 3, color: Colors.white),
+                                  border: Border.all(
+                                    width: 3,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 alignment: Alignment.center,
-                                child: (user.userBannerImg != null &&
+                                child:
+                                    (user.userBannerImg != null &&
                                         user.userBannerImg!.isNotEmpty)
                                     ? Image.network(
                                         user.userBannerImg![0].attachmentPath!,
@@ -138,7 +141,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => ImagePreviewScreen(
-                                            imageUrl: user.userProfileImg![0]
+                                            imageUrl: user
+                                                .userProfileImg![0]
                                                 .attachmentPath!,
                                             pageType: AppRoutes.myProfileScreen,
                                           ),
@@ -152,10 +156,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         Card(
                                           elevation: 3.0,
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
                                             child: Image.network(
-                                              user.userProfileImg![0]
+                                              user
+                                                  .userProfileImg![0]
                                                   .attachmentPath!,
                                               width: 70,
                                               height: 70,
@@ -166,11 +172,14 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         const SizedBox(width: 10),
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 5.0, bottom: 15),
+                                            left: 5.0,
+                                            bottom: 15,
+                                          ),
                                           child: Text(
                                             user.userFirstName ?? 'No Name',
-                                            style:
-                                                const TextStyle(fontSize: 18),
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -208,36 +217,45 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ],
               body: TabBarView(
                 children: [
-                  UserDetailsWidget(
-                    detailsModel: detailsModel,
-                  ),
+                  UserDetailsWidget(detailsModel: detailsModel),
                   MembershipWidget(
                     membershipList: user.userMembershipInfo ?? [],
                   ),
-                  SuppliesWidget(
-                    supplyList: user.supplyInfo ?? [],
-                  ),
+                  user.supplyInfo.isNotEmpty
+                      ? SuppliesWidget(supplyList: user.supplyInfo ?? [])
+                      : Center(
+                          child: Text(
+                            "No Supply available",
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ),
                   FavouriteStateWidget(
                     favStateList: user.userFavouriteStateInfo ?? [],
                   ),
-                  AddressWidget(
-                    addressList: user.addressDetails ?? [],
-                  ),
-                  AttachmentWidget(
-                    attachments: attachments,
-                    userId: user.userId ?? '',
-                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                    onDelete: (index) {
-                      showDeleteAttachmentDialog(
-                        context: context,
-                        index: index,
-                        attachment: attachments[index],
-                        attachments: attachments,
-                        onUpdate: () => setState(() {}),
-                      );
-                    },
-                    index: 0,
-                  ),
+                  AddressWidget(addressList: user.addressDetails ?? []),
+                  attachments.isNotEmpty
+                      ? AttachmentWidget(
+                          attachments: attachments,
+                          userId: user.userId ?? '',
+                          currentUserId:
+                              prefs.getString(AppStrings.prefUserID) ?? '',
+                          onDelete: (index) {
+                            showDeleteAttachmentDialog(
+                              context: context,
+                              index: index,
+                              attachment: attachments[index],
+                              attachments: attachments,
+                              onUpdate: () => setState(() {}),
+                            );
+                          },
+                          index: 0,
+                        )
+                      : Center(
+                          child: Text(
+                            "No attachments available",
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -293,7 +311,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(color: Colors.white, child: _tabBar);
   }
 

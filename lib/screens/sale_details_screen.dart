@@ -538,7 +538,15 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                         children: [
                                           // Change Banner Image
                                           ElevatedButton.icon(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              NavigationHelper.pushNamed(
+                                                AppRoutes.companyDetailsScreen,
+                                                arguments: {
+                                                  'companyUUID': priceModel.apiResponse![0].companyBasicInfo![0].companyUuid,
+                                                  'companyPromotionStatus': 'false'
+                                                },
+                                              );
+                                            },
                                             label: const Text(
                                               "View Company Details",
                                             ),
@@ -558,7 +566,15 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
 
                                           // Change Profile Image
                                           ElevatedButton.icon(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              NavigationHelper.pushNamed(
+                                                AppRoutes.myProfileScreen,
+                                                arguments: {
+                                                  'pageType': AppRoutes.saleDetailsScreen,
+                                                  'userID':priceModel.apiResponse![0].userBasicInfo![0].userId.toString(),
+                                                },
+                                              );
+                                            },
                                             label: const Text(
                                               "View Seller Details",
                                             ),

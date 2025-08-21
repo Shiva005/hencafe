@@ -46,6 +46,7 @@ class ServiceNames {
   static String UPDATE_ADDRESS = '${BASE_URL}v1/address/update';
   static String DELETE_ADDRESS = '${BASE_URL}v1/address/delete?address_uuid=';
   static String CHANGE_PASSWORD = '${BASE_URL}v1/user/';
+  static String UPDATE_COMPANY = '${BASE_URL}v1/company/update';
   static String GET_MEDICINE = '${BASE_URL}v1/medicine?medicine_id=';
   static String CREATE_CONTACT_SUPPORT = '${BASE_URL}v1/communication/create';
   static String GET_CONTACT_HISTORY =

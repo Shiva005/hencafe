@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -469,9 +468,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     .toList();
 
                 if (specialSaleItems.isEmpty) {
-                  return const Center(
-                    child: Text("No special sale items available"),
-                  );
+                  return const SizedBox();
                 }
 
                 return SizedBox(
@@ -480,7 +477,6 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: specialSaleItems.length,
                     itemBuilder: (context, index) {
-                      logger.d(specialSaleItems[index].toJson());
                       return SizedBox(
                         width: 350,
                         child: EggPriceCard(
@@ -513,9 +509,6 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     snapshot.data!.apiResponse!.map((e) => e.toJson()).toList(),
                     selectedFilters,
                   );
-
-                  logger.d(selectedFilters);
-                  logger.d(filteredItems);
 
                   return filteredItems.isNotEmpty
                       ? ListView.builder(

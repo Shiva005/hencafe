@@ -1,7 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/company_providers_model.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_routes.dart';
 import 'package:hencafe/widget/address_widget.dart';
 import 'package:hencafe/widget/company_details_widget.dart';
@@ -45,10 +44,15 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
   }
 
   Future<CompanyProvidersModel> _fetchCompanyDetails(
-      String referenceUUID, String companyPromotionStatus) async {
+    String referenceUUID,
+    String companyPromotionStatus,
+  ) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getCompanyProvidersList(
-        context, referenceUUID, companyPromotionStatus);
+      context,
+      referenceUUID,
+      companyPromotionStatus,
+    );
   }
 
   @override
@@ -94,8 +98,10 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   child: SizedBox(
                     height: 160,
                     child: Card(
-                      margin:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 0,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0),
                       ),
@@ -112,15 +118,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade300,
                                   borderRadius: BorderRadius.circular(10),
-                                  border:
-                                      Border.all(width: 3, color: Colors.white),
+                                  border: Border.all(
+                                    width: 3,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 alignment: Alignment.center,
-                                child: (company.attachmentBannerInfo != null &&
+                                child:
+                                    (company.attachmentBannerInfo != null &&
                                         company
-                                            .attachmentBannerInfo!.isNotEmpty)
+                                            .attachmentBannerInfo!
+                                            .isNotEmpty)
                                     ? Image.network(
-                                        company.attachmentBannerInfo![0]
+                                        company
+                                            .attachmentBannerInfo![0]
                                             .attachmentPath!,
                                         fit: BoxFit.fitWidth,
                                       )
@@ -138,15 +149,19 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                   bottom: -50,
                                   child: GestureDetector(
                                     onTap: () {
-                                      if (company.attachmentLogoInfo![0]
-                                          .attachmentPath!.isNotEmpty) {
+                                      if (company
+                                          .attachmentLogoInfo![0]
+                                          .attachmentPath!
+                                          .isNotEmpty) {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => ImagePreviewScreen(
                                               imageUrl: company
                                                   .attachmentLogoInfo![0]
-                                                  .attachmentPath!, pageType: AppRoutes.companyDetailsScreen,
+                                                  .attachmentPath!,
+                                              pageType: AppRoutes
+                                                  .companyDetailsScreen,
                                             ),
                                           ),
                                         );
@@ -159,10 +174,12 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                         Card(
                                           elevation: 3.0,
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
                                             child: Image.network(
-                                              company.attachmentLogoInfo![0]
+                                              company
+                                                  .attachmentLogoInfo![0]
                                                   .attachmentPath!,
                                               width: 70,
                                               height: 70,
@@ -173,11 +190,14 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                         const SizedBox(width: 10),
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 5.0, bottom: 15),
+                                            left: 5.0,
+                                            bottom: 15,
+                                          ),
                                           child: Text(
                                             company.companyName ?? 'No Name',
-                                            style:
-                                                const TextStyle(fontSize: 18),
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -218,31 +238,52 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     userInfo: userInfo,
                     prefs: prefs,
                   ),
-                  SuppliesWidget(
-                    supplyList: detailsModel.apiResponse![0].supplyInfo ?? [],
+                  detailsModel.apiResponse![0].supplyInfo.isNotEmpty
+                      ? SuppliesWidget(supplyList: detailsModel.apiResponse![0].supplyInfo ?? [])
+                      : Center(
+                    child: Text(
+                      "No Supply available",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
                   ),
                   AddressWidget(
-                    addressList:
-                        detailsModel.apiResponse![0].addressDetails!.toList(),
+                    addressList: detailsModel.apiResponse![0].addressDetails!
+                        .toList(),
                   ),
-                  AttachmentWidget(
-                    attachments:
-                        detailsModel.apiResponse![0].attachmentInfo ?? [],
-                    userId:
-                        detailsModel.apiResponse![0].userBasicInfo![0].userId ??
-                            '',
-                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                    onDelete: (index) {
-                      showDeleteAttachmentDialog(
-                        context: context,
-                        index: index,
-                        attachment: attachments[index],
-                        attachments: attachments,
-                        onUpdate: () => setState(() {}),
-                      );
-                    },
-                    index: 0,
-                  ),
+
+                  detailsModel.apiResponse![0].attachmentInfo != null &&
+                          detailsModel
+                              .apiResponse![0]
+                              .attachmentInfo!
+                              .isNotEmpty
+                      ? AttachmentWidget(
+                          attachments:
+                              detailsModel.apiResponse![0].attachmentInfo ?? [],
+                          userId:
+                              detailsModel
+                                  .apiResponse![0]
+                                  .userBasicInfo![0]
+                                  .userId ??
+                              '',
+                          currentUserId:
+                              prefs.getString(AppStrings.prefUserID) ?? '',
+                          onDelete: (index) {
+                            showDeleteAttachmentDialog(
+                              context: context,
+                              index: index,
+                              attachment: attachments[index],
+                              attachments: attachments,
+                              onUpdate: () => setState(() {}),
+                            );
+                          },
+                          index: 0,
+                        )
+                      : Center(
+                          child: Text(
+                            "No attachments available",
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -299,7 +340,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       color: Colors.white, // background color for tab bar
       child: _tabBar,

@@ -29,6 +29,7 @@ import 'package:hencafe/screens/register_basic_details.dart';
 import 'package:hencafe/screens/register_create_pin.dart';
 import 'package:hencafe/screens/sale_details_screen.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
+import 'package:hencafe/screens/update_company_details.dart';
 import 'package:hencafe/screens/upload_file_screen.dart';
 import 'package:hencafe/screens/welcome_screen.dart';
 
@@ -293,6 +294,14 @@ class Routes {
             mobile: ChangeMobileScreen(),
             tablet: ChangeMobileScreen(),
             desktop: ChangeMobileScreen(),
+          ),
+        );
+      case AppRoutes.updateCompanyDetailsScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: UpdateCompanyDetailsScreen(),
+            tablet: UpdateCompanyDetailsScreen(),
+            desktop: UpdateCompanyDetailsScreen(),
           ),
         );
       default:

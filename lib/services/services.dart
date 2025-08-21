@@ -116,6 +116,54 @@ class AuthServices {
     );
   }
 
+  Future<ValidateOtpModel> companyUpdate(
+    BuildContext context,
+    String companyID,
+    String companyUUID,
+    String companyName,
+    String companyDetails,
+    String contactPersonName,
+    String contactPersonMobile,
+    String contactPersonEmail,
+    String websiteUrl,
+  ) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'id': companyID,
+      'uuid': companyUUID,
+      'name': companyName,
+      'details': companyDetails,
+      'website': websiteUrl,
+      'contact_user_name': contactPersonName,
+      'contact_user_mobile': contactPersonMobile,
+      'contact_user_email': contactPersonEmail,
+      'status': "A",
+      'user_id': prefs.getString(AppStrings.prefUserID)!,
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.UPDATE_COMPANY),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+
+    logger.d('Company Update: $payload');
+    logger.d(
+      'Company Update: ${json.decode(utf8.decode(response.bodyBytes))}',
+    );
+    return ValidateOtpModel.fromJson(
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
+  }
+
   Future<SuccessModel> updateMobileNumber(
     BuildContext context,
     String newMobileNumber,

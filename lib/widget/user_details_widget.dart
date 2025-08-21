@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/navigation_helper.dart';
 
 import '../models/profile_model.dart';
 import '../utils/utils.dart';
+import '../values/app_routes.dart';
 
 class UserDetailsWidget extends StatelessWidget {
   final ProfileModel detailsModel;
@@ -21,22 +23,34 @@ class UserDetailsWidget extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          buildRow(Icons.person, 'Full Name',
-              '${detailsModel.apiResponse![0].userFirstName ?? ''} ${detailsModel.apiResponse![0].userLastName ?? ''}'),
-          buildRow(Icons.phone, 'Mobile',
-              detailsModel.apiResponse![0].userMobile ?? ''),
-          buildRow(Icons.email, 'Email',
-              detailsModel.apiResponse![0].userEmail ?? ''),
           buildRow(
-              Icons.calendar_month,
-              'Date of Birth',
-              '${Utils.threeLetterDateFormatted(detailsModel.apiResponse![0].userDob.toString())} '
-                  '(${Utils.calculateAge(detailsModel.apiResponse![0].userDob!)} Years)'),
+            Icons.person,
+            'Full Name',
+            '${detailsModel.apiResponse![0].userFirstName ?? ''} ${detailsModel.apiResponse![0].userLastName ?? ''}',
+          ),
           buildRow(
-              Icons.verified,
-              'Verified ? ',
-              Utils.getVerifiedEnum(
-                  detailsModel.apiResponse![0].userIsVerfied ?? '')),
+            Icons.phone,
+            'Mobile',
+            detailsModel.apiResponse![0].userMobile ?? '',
+          ),
+          buildRow(
+            Icons.email,
+            'Email',
+            detailsModel.apiResponse![0].userEmail ?? '',
+          ),
+          buildRow(
+            Icons.calendar_month,
+            'Date of Birth',
+            '${Utils.threeLetterDateFormatted(detailsModel.apiResponse![0].userDob.toString())} '
+                '(${Utils.calculateAge(detailsModel.apiResponse![0].userDob!)} Years)',
+          ),
+          buildRow(
+            Icons.verified,
+            'Verified ? ',
+            Utils.getVerifiedEnum(
+              detailsModel.apiResponse![0].userIsVerfied ?? '',
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
             child: Row(
@@ -44,14 +58,18 @@ class UserDetailsWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildTag(
-                      "Role: ",
-                      Utils.getUserRoleName(
-                          detailsModel.apiResponse![0].userRoleType)),
+                    "Role: ",
+                    Utils.getUserRoleName(
+                      detailsModel.apiResponse![0].userRoleType,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildTag("Work: ",
-                      '${detailsModel.apiResponse![0].userWorkType!.value}'),
+                  child: _buildTag(
+                    "Work: ",
+                    '${detailsModel.apiResponse![0].userWorkType!.value}',
+                  ),
                 ),
               ],
             ),
@@ -64,7 +82,8 @@ class UserDetailsWidget extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     Utils.openLink(
-                        "https://wa.me/${detailsModel.apiResponse![0].userMobile}/?text=Hello");
+                      "https://wa.me/${detailsModel.apiResponse![0].userMobile}/?text=Hello",
+                    );
                   },
                   icon: Icon(Icons.message_outlined, color: Colors.white),
                   label: const Text("Whatsapp"),
@@ -83,10 +102,13 @@ class UserDetailsWidget extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Utils.openLink(
-                              "mailto:${detailsModel.apiResponse![0].userEmail}");
+                            "mailto:${detailsModel.apiResponse![0].userEmail}",
+                          );
                         },
-                        icon: const Icon(Icons.email_outlined,
-                            color: Colors.white),
+                        icon: const Icon(
+                          Icons.email_outlined,
+                          color: Colors.white,
+                        ),
                         label: const Text("Mail"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red.shade600,
@@ -103,7 +125,8 @@ class UserDetailsWidget extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Utils.openDialPad(
-                              detailsModel.apiResponse![0].userMobile!);
+                            detailsModel.apiResponse![0].userMobile!,
+                          );
                         },
                         icon: const Icon(Icons.call, color: Colors.white),
                         label: const Text("Call"),
@@ -123,8 +146,10 @@ class UserDetailsWidget extends StatelessWidget {
                 // Change Banner Image
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.camera_alt_outlined,
-                      color: Colors.white),
+                  icon: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.white,
+                  ),
                   label: const Text("Change Banner Image"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red.shade200,
@@ -139,8 +164,10 @@ class UserDetailsWidget extends StatelessWidget {
                 // Change Profile Image
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.camera_alt_outlined,
-                      color: Colors.white),
+                  icon: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.white,
+                  ),
                   label: const Text("Change Profile Image"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink.shade200,
@@ -155,7 +182,16 @@ class UserDetailsWidget extends StatelessWidget {
 
                 // Update button with arrow
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    NavigationHelper.pushNamed(
+                      AppRoutes.registerBasicDetails,
+                      arguments: {
+                        'mobileNumber': detailsModel.apiResponse![0].userMobile,
+                        'pageType': AppRoutes.myProfileScreen,
+                        'profileModel': detailsModel.apiResponse![0],
+                      },
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     foregroundColor: Colors.white,
@@ -193,17 +229,11 @@ class UserDetailsWidget extends StatelessWidget {
         children: [
           Text(
             key,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black54),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
         ],
       ),
@@ -218,11 +248,7 @@ class UserDetailsWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                size: 18,
-                color: Colors.grey.shade600,
-              ),
+              Icon(icon, size: 18, color: Colors.grey.shade600),
               SizedBox(width: 5),
               Text(
                 "$label:",

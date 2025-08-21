@@ -36,4 +36,5 @@ class AppRoutes {
   static const String deleteAccountScreen = 'delete_account_screen';
   static const String referralBonusScreen = 'referral_bonus_screen';
   static const String changeMobileScreen = 'change_mobile_screen';
+  static const String updateCompanyDetailsScreen = 'update_company_details_screen';
 }

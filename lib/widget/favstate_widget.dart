@@ -4,13 +4,13 @@ import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:hencafe/values/app_colors.dart';
 
+import '../helpers/navigation_helper.dart';
+import '../values/app_routes.dart';
+
 class FavouriteStateWidget extends StatelessWidget {
   final List<UserFavouriteStateInfo> favStateList;
 
-  const FavouriteStateWidget({
-    super.key,
-    required this.favStateList,
-  });
+  const FavouriteStateWidget({super.key, required this.favStateList});
 
   @override
   Widget build(BuildContext context) {
@@ -36,34 +36,40 @@ class FavouriteStateWidget extends StatelessWidget {
                     .map((e) => e.stateInfo![0].stateNameLanguage ?? '')
                     .where((name) => name.isNotEmpty) // filter null/empty names
                     .map((name) {
-                  final color = Utils.getRandomColor(name);
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(color: color),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14.0,
+                      final color = Utils.getRandomColor(name);
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            border: Border.all(color: color),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              name,
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14.0,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    })
+                    .toList(),
               ),
             ),
             const SizedBox(height: 30),
+
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                NavigationHelper.pushNamed(AppRoutes.stateSelection);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
@@ -78,25 +84,6 @@ class FavouriteStateWidget extends StatelessWidget {
                   Text("Edit Favourite State"),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_right_alt, color: Colors.white),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade700,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 35),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.delete_forever, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text("Delete"),
                 ],
               ),
             ),
