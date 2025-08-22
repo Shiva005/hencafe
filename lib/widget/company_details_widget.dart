@@ -190,7 +190,7 @@ class CompanyDetailsWidget extends StatelessWidget {
                     ),
                     label: const Text("Change Banner Image"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade200,
+                      backgroundColor: Colors.orange.shade300,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
@@ -208,7 +208,7 @@ class CompanyDetailsWidget extends StatelessWidget {
                     ),
                     label: const Text("Change Profile Image"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink.shade200,
+                      backgroundColor: Colors.pink.shade300,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
@@ -228,7 +228,16 @@ class CompanyDetailsWidget extends StatelessWidget {
                               detailsModel.apiResponse![0].companyUuid,
                           'companyPromotionStatus': 'true',
                         },
-                      );
+                      )?.then((result) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.companyDetailsScreen,
+                          arguments: {
+                            'companyUUID':
+                                detailsModel.apiResponse![0].companyUuid,
+                            'companyPromotionStatus': 'true',
+                          },
+                        );
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,

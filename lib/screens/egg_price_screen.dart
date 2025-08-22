@@ -471,6 +471,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                   return const SizedBox();
                 }
 
+
                 return SizedBox(
                   height: 140,
                   child: ListView.builder(

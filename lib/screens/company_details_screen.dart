@@ -38,7 +38,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       referenceUUID = args['companyUUID'] ?? '';
-      companyPromotionStatus = args['companyUUID'] ?? '';
+      companyPromotionStatus = args['companyPromotionStatus'] ?? '';
       companyData = _fetchCompanyDetails(referenceUUID, companyPromotionStatus);
     }
   }
@@ -75,7 +75,9 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           }
 
           final detailsModel = snapshot.data!;
-          List<AttachmentInfo> attachments = [];
+          final company = detailsModel.apiResponse![0] ?? [];
+          final userInfo = detailsModel.apiResponse![0].userBasicInfo ?? [];
+          List<AttachmentInfo> attachments = company.attachmentInfo ?? [];
 
           for (var address
               in detailsModel.apiResponse![0].addressDetails ?? []) {
@@ -84,9 +86,6 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
               attachments.addAll(address.attachmentInfo!);
             }
           }
-
-          final company = detailsModel.apiResponse![0] ?? [];
-          final userInfo = detailsModel.apiResponse![0].userBasicInfo ?? [];
 
           // Wrap everything in DefaultTabController & NestedScrollView to enable sticky tabs
           return DefaultTabController(
@@ -238,14 +237,13 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     userInfo: userInfo,
                     prefs: prefs,
                   ),
-                  detailsModel.apiResponse![0].supplyInfo.isNotEmpty
-                      ? SuppliesWidget(supplyList: detailsModel.apiResponse![0].supplyInfo ?? [])
-                      : Center(
-                    child: Text(
-                      "No Supply available",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
+
+                  SuppliesWidget(
+                    supplyList: detailsModel.apiResponse![0].supplyInfo ?? [],
+                    pageType: AppRoutes.companyDetailsScreen,
+                    userCompanyUUID: referenceUUID,
                   ),
+
                   AddressWidget(
                     addressList: detailsModel.apiResponse![0].addressDetails!
                         .toList(),
@@ -257,8 +255,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                               .attachmentInfo!
                               .isNotEmpty
                       ? AttachmentWidget(
-                          attachments:
-                              detailsModel.apiResponse![0].attachmentInfo ?? [],
+                          attachments: attachments,
                           userId:
                               detailsModel
                                   .apiResponse![0]

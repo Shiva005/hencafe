@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/navigation_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/profile_model.dart';
 import '../utils/utils.dart';
 import '../values/app_routes.dart';
+import '../values/app_strings.dart';
 
-class UserDetailsWidget extends StatelessWidget {
+class UserDetailsWidget extends StatefulWidget {
   final ProfileModel detailsModel;
 
   const UserDetailsWidget({super.key, required this.detailsModel});
 
   @override
+  State<UserDetailsWidget> createState() => _UserDetailsWidgetState();
+}
+
+class _UserDetailsWidgetState extends State<UserDetailsWidget> {
+  SharedPreferences? prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _initPrefs();
+  }
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {}); // rebuild once prefs is loaded
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (prefs == null) {
+      return const CircularProgressIndicator(); // loading state
+    }
     return Card(
       color: Colors.white,
       elevation: 0.5,
@@ -26,29 +49,29 @@ class UserDetailsWidget extends StatelessWidget {
           buildRow(
             Icons.person,
             'Full Name',
-            '${detailsModel.apiResponse![0].userFirstName ?? ''} ${detailsModel.apiResponse![0].userLastName ?? ''}',
+            '${widget.detailsModel.apiResponse![0].userFirstName ?? ''} ${widget.detailsModel.apiResponse![0].userLastName ?? ''}',
           ),
           buildRow(
             Icons.phone,
             'Mobile',
-            detailsModel.apiResponse![0].userMobile ?? '',
+            widget.detailsModel.apiResponse![0].userMobile ?? '',
           ),
           buildRow(
             Icons.email,
             'Email',
-            detailsModel.apiResponse![0].userEmail ?? '',
+            widget.detailsModel.apiResponse![0].userEmail ?? '',
           ),
           buildRow(
             Icons.calendar_month,
             'Date of Birth',
-            '${Utils.threeLetterDateFormatted(detailsModel.apiResponse![0].userDob.toString())} '
-                '(${Utils.calculateAge(detailsModel.apiResponse![0].userDob!)} Years)',
+            '${Utils.threeLetterDateFormatted(widget.detailsModel.apiResponse![0].userDob.toString())} '
+                '(${Utils.calculateAge(widget.detailsModel.apiResponse![0].userDob!)} Years)',
           ),
           buildRow(
             Icons.verified,
             'Verified ? ',
             Utils.getVerifiedEnum(
-              detailsModel.apiResponse![0].userIsVerfied ?? '',
+              widget.detailsModel.apiResponse![0].userIsVerfied ?? '',
             ),
           ),
           Padding(
@@ -60,7 +83,7 @@ class UserDetailsWidget extends StatelessWidget {
                   child: _buildTag(
                     "Role: ",
                     Utils.getUserRoleName(
-                      detailsModel.apiResponse![0].userRoleType,
+                      widget.detailsModel.apiResponse![0].userRoleType,
                     ),
                   ),
                 ),
@@ -68,7 +91,7 @@ class UserDetailsWidget extends StatelessWidget {
                 Expanded(
                   child: _buildTag(
                     "Work: ",
-                    '${detailsModel.apiResponse![0].userWorkType!.value}',
+                    '${widget.detailsModel.apiResponse![0].userWorkType!.value}',
                   ),
                 ),
               ],
@@ -82,7 +105,7 @@ class UserDetailsWidget extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     Utils.openLink(
-                      "https://wa.me/${detailsModel.apiResponse![0].userMobile}/?text=Hello",
+                      "https://wa.me/${widget.detailsModel.apiResponse![0].userMobile}/?text=Hello",
                     );
                   },
                   icon: Icon(Icons.message_outlined, color: Colors.white),
@@ -102,7 +125,7 @@ class UserDetailsWidget extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Utils.openLink(
-                            "mailto:${detailsModel.apiResponse![0].userEmail}",
+                            "mailto:${widget.detailsModel.apiResponse![0].userEmail}",
                           );
                         },
                         icon: const Icon(
@@ -125,7 +148,7 @@ class UserDetailsWidget extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Utils.openDialPad(
-                            detailsModel.apiResponse![0].userMobile!,
+                            widget.detailsModel.apiResponse![0].userMobile!,
                           );
                         },
                         icon: const Icon(Icons.call, color: Colors.white),
@@ -143,25 +166,30 @@ class UserDetailsWidget extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
+
                 // Change Banner Image
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.camera_alt_outlined,
-                    color: Colors.white,
-                  ),
-                  label: const Text("Change Banner Image"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade200,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                if (prefs!.getString(AppStrings.prefUserID) ==
+                    widget.detailsModel.apiResponse![0].userId)
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                    ),
+                    label: const Text("Change Banner Image"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade200,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
                   ),
-                ),
 
                 // Change Profile Image
+                if (prefs!.getString(AppStrings.prefUserID) ==
+                    widget.detailsModel.apiResponse![0].userId)
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(
@@ -181,14 +209,17 @@ class UserDetailsWidget extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Update button with arrow
+                if (prefs!.getString(AppStrings.prefUserID) ==
+                    widget.detailsModel.apiResponse![0].userId)
                 ElevatedButton(
                   onPressed: () {
                     NavigationHelper.pushNamed(
                       AppRoutes.registerBasicDetails,
                       arguments: {
-                        'mobileNumber': detailsModel.apiResponse![0].userMobile,
+                        'mobileNumber':
+                            widget.detailsModel.apiResponse![0].userMobile,
                         'pageType': AppRoutes.myProfileScreen,
-                        'profileModel': detailsModel.apiResponse![0],
+                        'profileModel': widget.detailsModel.apiResponse![0],
                       },
                     );
                   },

@@ -20,7 +20,7 @@ import 'package:hencafe/models/registration_check_model.dart';
 import 'package:hencafe/models/registration_create_model.dart';
 import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/success_model.dart';
-import 'package:hencafe/models/supplies_model.dart';
+import 'package:hencafe/models/supply_model.dart';
 import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'package:hencafe/models/validate_otp_model.dart';
 import 'package:http/http.dart' as http;
@@ -156,9 +156,7 @@ class AuthServices {
     );
 
     logger.d('Company Update: $payload');
-    logger.d(
-      'Company Update: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
+    logger.d('Company Update: ${json.decode(utf8.decode(response.bodyBytes))}');
     return ValidateOtpModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -493,7 +491,7 @@ class AuthServices {
     return ProfileModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
-  Future<SuppliesModel> getSupplies(BuildContext context) async {
+  Future<SupplyModel> getSupplies(BuildContext context) async {
     var prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse(ServiceNames.GET_SUPPLIES),
@@ -509,7 +507,7 @@ class AuthServices {
     );
 
     logger.d('TAG Supplies: ${json.decode(utf8.decode(response.bodyBytes))}');
-    return SuppliesModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+    return SupplyModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<SuccessModel> updateFavState(
@@ -547,11 +545,12 @@ class AuthServices {
     BuildContext context,
     String referenceFrom,
     String supplyIDs,
+    String referenceUUID,
   ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
       'reference_from': referenceFrom,
-      'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+      'reference_uuid': referenceUUID,
       'supply_id_list': supplyIDs,
     };
 
@@ -561,6 +560,9 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefSessionID)!,
       },
       body: jsonEncode(payload),

@@ -130,62 +130,64 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         fit: BoxFit.cover,
                                       ),
                               ),
-                              if (user.userProfileImg != null &&
-                                  user.userProfileImg!.isNotEmpty)
-                                Positioned(
-                                  left: 16,
-                                  bottom: -50,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => ImagePreviewScreen(
-                                            imageUrl: user
-                                                .userProfileImg![0]
-                                                .attachmentPath!,
-                                            pageType: AppRoutes.myProfileScreen,
-                                          ),
+                              Positioned(
+                                left: 16,
+                                bottom: -50,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ImagePreviewScreen(
+                                          imageUrl: user
+                                              .userProfileImg![0]
+                                              .attachmentPath!,
+                                          pageType: AppRoutes.myProfileScreen,
                                         ),
-                                      );
-                                    },
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Card(
-                                          elevation: 3.0,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            child: Image.network(
-                                              user
-                                                  .userProfileImg![0]
-                                                  .attachmentPath!,
-                                              width: 70,
-                                              height: 70,
-                                              fit: BoxFit.cover,
-                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Card(
+                                        elevation: 3.0,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            6,
                                           ),
+                                          child: user.userProfileImg!.isNotEmpty
+                                              ? Image.network(
+                                                  user
+                                                      .userProfileImg![0]
+                                                      .attachmentPath!,
+                                                  width: 70,
+                                                  height: 70,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  AppIconsData.noImage,
+                                                  width: 70,
+                                                  height: 70,
+                                                  fit: BoxFit.cover,
+                                                ),
                                         ),
-                                        const SizedBox(width: 10),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 5.0,
-                                            bottom: 15,
-                                          ),
-                                          child: Text(
-                                            user.userFirstName ?? 'No Name',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                          ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5.0,
+                                          bottom: 15,
                                         ),
-                                      ],
-                                    ),
+                                        child: Text(
+                                          user.userFirstName ?? 'No Name',
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                              ),
                             ],
                           ),
                         ],
@@ -221,14 +223,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   MembershipWidget(
                     membershipList: user.userMembershipInfo ?? [],
                   ),
-                  user.supplyInfo.isNotEmpty
-                      ? SuppliesWidget(supplyList: user.supplyInfo ?? [])
-                      : Center(
-                          child: Text(
-                            "No Supply available",
-                            style: TextStyle(color: Colors.grey.shade600),
-                          ),
-                        ),
+                  SuppliesWidget(
+                    supplyList: detailsModel.apiResponse![0].supplyInfo ?? [],
+                    pageType: AppRoutes.myProfileScreen,
+                    userCompanyUUID: user.userUuid,
+                  ),
                   FavouriteStateWidget(
                     favStateList: user.userFavouriteStateInfo ?? [],
                   ),

@@ -1,4 +1,4 @@
-import 'package:hencafe/models/supply_model.dart';
+import 'package:hencafe/models/supply_Info.dart';
 
 import 'address_details_model.dart';
 import 'attachment_model.dart';

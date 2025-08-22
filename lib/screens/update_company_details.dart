@@ -108,7 +108,7 @@ class _UpdateCompanyDetailsScreenState
       backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
-        child: MyAppBar(title: 'Update Basic Details'),
+        child: MyAppBar(title: 'Update Company Details'),
       ),
       body: FutureBuilder<CompanyProvidersModel>(
         future: companyData,
@@ -190,20 +190,6 @@ class _UpdateCompanyDetailsScreenState
                           ),
                           SizedBox(height: 20),
                           AppTextFormField(
-                            controller: contactPersonNameController,
-                            labelText: "Contact Person Name",
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            enabled: true,
-                            prefixIcon: Icon(Icons.person),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter contact person name';
-                              }
-                              return null;
-                            },
-                          ),
-                          AppTextFormField(
                             controller: websiteUrlController,
                             labelText: "Website Url",
                             keyboardType: TextInputType.text,
@@ -213,6 +199,20 @@ class _UpdateCompanyDetailsScreenState
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter website url';
+                              }
+                              return null;
+                            },
+                          ),
+                          AppTextFormField(
+                            controller: contactPersonNameController,
+                            labelText: "Contact Person Name",
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            enabled: true,
+                            prefixIcon: Icon(Icons.person),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter contact person name';
                               }
                               return null;
                             },
@@ -251,6 +251,7 @@ class _UpdateCompanyDetailsScreenState
                               return null;
                             },
                           ),
+                          SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [

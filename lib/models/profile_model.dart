@@ -5,7 +5,7 @@ import 'package:hencafe/models/user_favourite_state_model.dart';
 import 'address_details_model.dart';
 import 'attachment_model.dart';
 import 'membership_model.dart';
-import 'supply_model.dart';
+import 'supply_Info.dart';
 
 class ProfileModel {
   ProfileModel({

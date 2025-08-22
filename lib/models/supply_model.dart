@@ -1,37 +1,69 @@
-class SupplyInfo {
-  SupplyInfo({
-    this.userCompanySupplytypeId,
-    this.supplyReferenceFrom,
-    this.supplyReferenceUuid,
-    this.supplytypeId,
-    this.supplytypeName,
-    this.supplytypeNameLanguage,
+class SupplyModel {
+  SupplyModel({
+    this.apiCode,
+    this.errorCount,
+    this.errorMessage,
+    this.apiResponse,
   });
 
-  SupplyInfo.fromJson(dynamic json) {
-    userCompanySupplytypeId = json['user_company_supplytype_id'];
-    supplyReferenceFrom = json['supply_reference_from'];
-    supplyReferenceUuid = json['supply_reference_uuid'];
-    supplytypeId = json['supplytype_id'];
-    supplytypeName = json['supplytype_name'];
-    supplytypeNameLanguage = json['supplytype_name_language'];
+  SupplyModel.fromJson(dynamic json) {
+    apiCode = json['api_code'];
+    errorCount = json['error_count'];
+    if (json['error_message'] != null) {
+      errorMessage = [];
+      json['error_message'].forEach((v) {
+        errorMessage?.add(SupplyModel.fromJson(v));
+      });
+    }
+    if (json['api_response'] != null) {
+      apiResponse = [];
+      json['api_response'].forEach((v) {
+        apiResponse?.add(ApiResponse.fromJson(v));
+      });
+    }
   }
 
-  String? userCompanySupplytypeId;
-  String? supplyReferenceFrom;
-  String? supplyReferenceUuid;
-  String? supplytypeId;
-  String? supplytypeName;
-  String? supplytypeNameLanguage;
+  int? apiCode;
+  int? errorCount;
+  List<dynamic>? errorMessage;
+  List<ApiResponse>? apiResponse;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['user_company_supplytype_id'] = userCompanySupplytypeId;
-    map['supply_reference_from'] = supplyReferenceFrom;
-    map['supply_reference_uuid'] = supplyReferenceUuid;
+    map['api_code'] = apiCode;
+    map['error_count'] = errorCount;
+    if (errorMessage != null) {
+      map['error_message'] = errorMessage?.map((v) => v.toJson()).toList();
+    }
+    if (apiResponse != null) {
+      map['api_response'] = apiResponse?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class ApiResponse {
+  ApiResponse({
+    this.supplytypeId,
+    this.supplytypeName,
+    this.supplytypeLanguage,
+  });
+
+  ApiResponse.fromJson(dynamic json) {
+    supplytypeId = json['supplytype_id'];
+    supplytypeName = json['supplytype_name'];
+    supplytypeLanguage = json['supplytype_language'];
+  }
+
+  int? supplytypeId;
+  String? supplytypeName;
+  String? supplytypeLanguage;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
     map['supplytype_id'] = supplytypeId;
     map['supplytype_name'] = supplytypeName;
-    map['supplytype_name_language'] = supplytypeNameLanguage;
+    map['supplytype_language'] = supplytypeLanguage;
     return map;
   }
 }
