@@ -74,10 +74,6 @@ class _SuppliesWidgetState extends State<SuppliesWidget> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    /* if (_userSupplies.isEmpty) {
-      return const SizedBox();
-    }*/
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5.0),
       color: Colors.white,

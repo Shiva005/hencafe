@@ -41,6 +41,8 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
   String saleID = '';
   String pageType = '';
   String _packageName = '';
+  String referenceUUID = "", referenceFrom = "";
+
   final ScreenshotController screenshotController = ScreenshotController();
 
   Future<void> captureAndShare() async {
@@ -245,6 +247,23 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
             }
 
             final priceModel = snapshot.data!;
+            if (pageType == AppRoutes.eggPriceScreen) {
+              referenceUUID = priceModel.apiResponse![0].eggsaleUuid.toString();
+              referenceFrom = "EGG_SALE";
+            } else if (pageType == AppRoutes.chickPriceScreen) {
+              referenceUUID = priceModel.apiResponse![0].chicksaleUuid
+                  .toString();
+              referenceFrom = "CHICK_SALE";
+            } else if (pageType == AppRoutes.chickenPriceScreen) {
+              referenceUUID = priceModel.apiResponse![0].chickensaleUuid
+                  .toString();
+              referenceFrom = "CHICKEN_SALE";
+            } else if (pageType == AppRoutes.liftingPriceScreen) {
+              referenceUUID = priceModel.apiResponse![0].liftingsaleUuid
+                  .toString();
+              referenceFrom = "LIFTING_SALE";
+            }
+
             final List<AttachmentInfo> attachments =
                 priceModel.apiResponse![0].attachmentInfo ?? [];
             return DefaultTabController(
@@ -542,8 +561,12 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                               NavigationHelper.pushNamed(
                                                 AppRoutes.companyDetailsScreen,
                                                 arguments: {
-                                                  'companyUUID': priceModel.apiResponse![0].companyBasicInfo![0].companyUuid,
-                                                  'companyPromotionStatus': 'false'
+                                                  'companyUUID': priceModel
+                                                      .apiResponse![0]
+                                                      .companyBasicInfo![0]
+                                                      .companyUuid,
+                                                  'companyPromotionStatus':
+                                                      'false',
                                                 },
                                               );
                                             },
@@ -570,8 +593,13 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                               NavigationHelper.pushNamed(
                                                 AppRoutes.myProfileScreen,
                                                 arguments: {
-                                                  'pageType': AppRoutes.saleDetailsScreen,
-                                                  'userID':priceModel.apiResponse![0].userBasicInfo![0].userId.toString(),
+                                                  'pageType': AppRoutes
+                                                      .saleDetailsScreen,
+                                                  'userID': priceModel
+                                                      .apiResponse![0]
+                                                      .userBasicInfo![0]
+                                                      .userId
+                                                      .toString(),
                                                 },
                                               );
                                             },
@@ -826,28 +854,28 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                             ),
                           ],
                         ),
-                        attachments.isNotEmpty
-                            ? AttachmentWidget(
-                                attachments: attachments,
-                                userId: priceModel
-                                    .apiResponse![0]
-                                    .userBasicInfo![0]
-                                    .userId,
-                                currentUserId:
-                                    prefs.getString(AppStrings.prefUserID) ??
-                                    '',
-                                onDelete: (index) {
-                                  showDeleteAttachmentDialog(
-                                    context: context,
-                                    index: index,
-                                    attachment: attachments[index],
-                                    attachments: attachments,
-                                    onUpdate: () => setState(() {}),
-                                  );
-                                },
-                                index: 0,
-                              )
-                            : Center(child: Text('No attachments found.')),
+                        AttachmentWidget(
+                          attachments: attachments,
+                          userId: priceModel
+                              .apiResponse![0]
+                              .userBasicInfo![0]
+                              .userId,
+                          currentUserId:
+                              prefs.getString(AppStrings.prefUserID) ?? '',
+                          referenceFrom: referenceFrom,
+                          referenceUUID: referenceUUID,
+                          onDelete: (index) {
+                            showDeleteAttachmentDialog(
+                              context: context,
+                              index: index,
+                              attachment: attachments[index],
+                              attachments: attachments,
+                              onUpdate: () => setState(() {}),
+                            );
+                          },
+                          index: 0,
+                          pageType: pageType,
+                        ),
                       ],
                     ),
                   ),

@@ -1,29 +1,38 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/widget/docs_preview_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../helpers/navigation_helper.dart';
 import '../models/attachment_model.dart';
 import '../screens/image_preview_screen.dart';
 import '../screens/video_player_screen.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
+import '../values/app_routes.dart';
 
 class AttachmentWidget extends StatefulWidget {
   final List<AttachmentInfo> attachments;
   final String userId;
   final String currentUserId;
+  final String referenceFrom;
+  final String referenceUUID;
   final Function(int index) onDelete;
   final int index;
+  final String pageType;
 
   const AttachmentWidget({
     super.key,
     required this.attachments,
     required this.userId,
     required this.currentUserId,
+    required this.referenceFrom,
+    required this.referenceUUID,
     required this.onDelete,
     required this.index,
+    required this.pageType,
   });
 
   @override
@@ -45,6 +54,9 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
   @override
   void initState() {
     super.initState();
+
+    logger.w(widget.pageType);
+    if (widget.attachments.isEmpty) return;
     _videoPlayerController = VideoPlayerController.network(
       widget.attachments[widget.index].attachmentPath!,
     );
@@ -61,69 +73,138 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
       });
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: AppColors.primaryColor, width: 1),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: DefaultTabController(
-        length: 4,
-        child: Column(
-          children: [
-            const TabBar(
-              labelColor: Colors.blue,
-              unselectedLabelColor: Colors.black54,
-              tabs: [
-                Tab(text: 'All'),
-                Tab(text: 'Images'),
-                Tab(text: 'Videos'),
-                Tab(text: 'Docs'),
-              ],
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 10.0),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  NavigationHelper.pushNamed(
+                    AppRoutes.uploadFileScreen,
+                    arguments: {
+                      'reference_from': widget.referenceFrom,
+                      'reference_uuid': widget.referenceUUID,
+                      'pageType': AppRoutes.addressDetailsScreen,
+                    },
+                  )?.then((value) {
+                    if(widget.pageType==AppRoutes.myProfileScreen){
+                      NavigationHelper.pushReplacementNamed(
+                        AppRoutes.myProfileScreen,
+                        arguments: {
+                          'pageType': AppRoutes.dashboardScreen,
+                          'userID': widget.userId,
+                        },
+                      );
+                    }
+                    if(widget.pageType==AppRoutes.companyDetailsScreen){
+                      NavigationHelper.pushNamed(
+                        AppRoutes.companyDetailsScreen,
+                        arguments: {
+                          'companyUUID': widget.referenceUUID,
+                          'companyPromotionStatus': 'true'
+                        },
+                      );
+                    }
+                    /*if(widget.pageType==AppRoutes.eggPriceScreen){
+                      NavigationHelper.pushNamed(
+                        AppRoutes.saleDetailsScreen,
+                        arguments: {
+                          'saleID': widget.referenceUUID,
+                          'pageType': AppRoutes.saleDetailsScreen,
+                        },
+                      );
+                    }*/
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 35),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text("Upload Attachment"),
+                    SizedBox(width: 8),
+                    Icon(Icons.file_upload_outlined, color: Colors.white),
+                  ],
+                ),
+              ),
             ),
-            Expanded(
-              child: TabBarView(
+          ),
+        ),
+        Expanded(
+          child: Card(
+            margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: AppColors.primaryColor, width: 1),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: DefaultTabController(
+              length: 4,
+              child: Column(
                 children: [
-                  _buildGrid(context, widget.attachments),
-                  _buildGrid(
-                    context,
-                    widget.attachments
-                        .where((e) => e.attachmentType == 'image')
-                        .toList(),
+                  const TabBar(
+                    labelColor: Colors.blue,
+                    unselectedLabelColor: Colors.black54,
+                    tabs: [
+                      Tab(text: 'All'),
+                      Tab(text: 'Images'),
+                      Tab(text: 'Videos'),
+                      Tab(text: 'Docs'),
+                    ],
                   ),
-                  _buildGrid(
-                    context,
-                    widget.attachments
-                        .where((e) => e.attachmentType == 'video')
-                        .toList(),
-                  ),
-                  _buildGrid(
-                    context,
-                    widget.attachments
-                        .where(
-                          (e) =>
-                              ['pdf', 'doc', 'docx'].contains(e.attachmentType),
-                        )
-                        .toList(),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildGrid(context, widget.attachments),
+                        _buildGrid(
+                          context,
+                          widget.attachments
+                              .where((e) => e.attachmentType == 'image')
+                              .toList(),
+                        ),
+                        _buildGrid(
+                          context,
+                          widget.attachments
+                              .where((e) => e.attachmentType == 'video')
+                              .toList(),
+                        ),
+                        _buildGrid(
+                          context,
+                          widget.attachments
+                              .where(
+                                (e) => [
+                                  'pdf',
+                                  'doc',
+                                  'docx',
+                                ].contains(e.attachmentType),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildGrid(BuildContext context, List<AttachmentInfo> data) {
-    if (data.isEmpty) {
-      return const Center(child: Text("No attachments found."));
-    }
-
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       itemCount: data.length,

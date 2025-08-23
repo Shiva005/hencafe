@@ -2,9 +2,11 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/navigation_helper.dart';
 import '../models/address_details_model.dart';
 import '../models/attachment_model.dart';
 import '../services/services.dart';
+import '../values/app_routes.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 import 'attachment_widget.dart';
@@ -38,7 +40,7 @@ class AddressWidgetData extends StatefulWidget {
 class _AddressWidgetDataState extends State<AddressWidgetData> {
   int selectedTab = 0;
   final PageController _attachmentController = PageController();
-  late SharedPreferences prefs;
+  var prefs;
 
   @override
   void initState() {
@@ -48,10 +50,14 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
 
   Future<void> _fetchPrefs() async {
     prefs = await SharedPreferences.getInstance();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    if (prefs == null) {
+      return Center(child: CircularProgressIndicator());
+    }
     return SizedBox(
       width: 370,
       child: Card(
@@ -72,7 +78,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
                     padding: const EdgeInsets.all(12.0),
                     child: _buildAddressCard(widget.address),
                   )
-                : _buildAttachmentsSection(widget.address),
+                : Expanded(child: _buildAttachmentsSection(widget.address)),
           ],
         ),
       ),
@@ -84,7 +90,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _tabButton("Address", 0),
-        const SizedBox(width: 12),
+        const SizedBox(width: 15),
         _tabButton("Attachments", 1),
       ],
     );
@@ -99,8 +105,9 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
         style: ElevatedButton.styleFrom(
           backgroundColor: isSelected ? Colors.indigo : Colors.grey.shade300,
           foregroundColor: isSelected ? Colors.white : Colors.black,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         child: Text(title),
       ),
@@ -115,86 +122,168 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
         const SizedBox(height: 8),
         buildRow(Icons.home, "Address", address.addressAddress ?? "-"),
         const SizedBox(height: 8),
-        buildRow(Icons.location_city, "City",
-            address.locationInfo?.first.cityNameLanguage ?? "-"),
+        buildRow(
+          Icons.location_city,
+          "City",
+          address.locationInfo?.first.cityNameLanguage ?? "-",
+        ),
         const SizedBox(height: 8),
-        buildRow(Icons.map, "State",
-            address.locationInfo?.first.stateNameLanguage ?? "-"),
+        buildRow(
+          Icons.map,
+          "State",
+          address.locationInfo?.first.stateNameLanguage ?? "-",
+        ),
         const SizedBox(height: 8),
         buildRow(Icons.pin_drop, "Pincode", address.addressZipcode ?? "-"),
         const SizedBox(height: 30),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 35),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+
+        if (address.userBasicInfo![0].userId ==
+            prefs.getString(AppStrings.prefUserID))
+          ElevatedButton(
+            onPressed: () {
+              NavigationHelper.pushNamed(
+                AppRoutes.createAddressScreen,
+                arguments: {
+                  'addressModel': address,
+                  'pageType': "UpdateAddressScreen",
+                },
+              )?.then((value) {
+                NavigationHelper.pushReplacementNamed(
+                  AppRoutes.myProfileScreen,
+                  arguments: {
+                    'pageType': AppRoutes.dashboardScreen,
+                    'userID': prefs.getString(AppStrings.prefUserID),
+                  },
+                );
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 35),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Edit Address"),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_right_alt, color: Colors.white),
+              ],
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text("Edit Address"),
-              SizedBox(width: 8),
-              Icon(Icons.arrow_right_alt, color: Colors.white),
-            ],
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade700,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 35),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+        if (address.userBasicInfo![0].userId ==
+            prefs.getString(AppStrings.prefUserID))
+          ElevatedButton(
+            onPressed: () {
+              AwesomeDialog(
+                context: context,
+                animType: AnimType.bottomSlide,
+                dialogType: DialogType.warning,
+                dialogBackgroundColor: Colors.white,
+                titleTextStyle: AppTheme.appBarText,
+                title: 'Are you sure you want to delete this Address?',
+                btnCancelOnPress: () {},
+                btnCancelText: 'Cancel',
+                btnOkOnPress: () async {
+                  var deleteAddressRes = await AuthServices().deleteAddress(
+                    context,
+                    address.addressUuid!,
+                  );
+                  if (deleteAddressRes.apiResponse![0].responseStatus == true) {
+                    NavigationHelper.pop(context);
+                  }
+                },
+                btnOkText: 'Yes',
+                btnOkColor: Colors.yellow.shade700,
+              ).show();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 35),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.delete_forever, color: Colors.white),
+                SizedBox(width: 8),
+                Text("Delete"),
+              ],
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.delete_forever, color: Colors.white),
-              SizedBox(width: 8),
-              Text("Delete"),
-            ],
+        SizedBox(height: 20),
+        if (address.userBasicInfo![0].userId ==
+            prefs.getString(AppStrings.prefUserID))
+          ElevatedButton(
+            onPressed: () {
+              NavigationHelper.pushNamed(
+                AppRoutes.createAddressScreen,
+                arguments: {
+                  'addressModel': address,
+                  'pageType': AppRoutes.createAddressScreen,
+                },
+              )?.then((value) {
+                NavigationHelper.pushReplacementNamed(
+                  AppRoutes.myProfileScreen,
+                  arguments: {
+                    'pageType': AppRoutes.dashboardScreen,
+                    'userID': prefs.getString(AppStrings.prefUserID),
+                  },
+                );
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 35),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Add New Address"),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_right_alt, color: Colors.white),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
 
   Widget _buildAttachmentsSection(AddressDetails address) {
     final attachments = address.attachmentInfo;
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
-          child: PageView.builder(
-            controller: _attachmentController,
-            itemCount: attachments!.length,
-            itemBuilder: (context, index) {
-              return AttachmentWidget(
-                attachments: address.attachmentInfo ?? [],
-                userId: address.userBasicInfo![0].userId ?? '',
-                currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                onDelete: (index) {
-                  showDeleteAttachmentDialog(
-                    context: context,
-                    index: index,
-                    attachment: attachments[index],
-                    attachments: attachments,
-                    onUpdate: () => setState(() {}),
-                  );
-                },
-                index: index,
-              );
-            },
-          ),
-        ),
-      ],
+    return PageView.builder(
+      controller: _attachmentController,
+      itemCount: attachments?.length,
+      itemBuilder: (context, index) {
+        return AttachmentWidget(
+          attachments: address.attachmentInfo ?? [],
+          userId: address.userBasicInfo![0].userId ?? '',
+          currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
+          referenceFrom: "ADDRESS",
+          referenceUUID: widget.address.addressUuid!,
+          onDelete: (index) {
+            showDeleteAttachmentDialog(
+              context: context,
+              index: index,
+              attachment: attachments![index],
+              attachments: attachments,
+              onUpdate: () => setState(() {}),
+            );
+          },
+          index: index,
+          pageType: "address_widget",
+        );
+      },
     );
   }
 

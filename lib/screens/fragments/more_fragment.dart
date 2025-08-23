@@ -93,7 +93,7 @@ class _MoreFragmentState extends State<MoreFragment>
                   });
             } else if (label == 'FAQ\'s') {
               NavigationHelper.pushNamed(
-                AppRoutes.medicineScreen,
+                AppRoutes.faqScreen,
               );
             } else if (label == 'Contact Us') {
               NavigationHelper.pushNamed(

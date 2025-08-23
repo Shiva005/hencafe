@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/navigation_helper.dart';
+import 'package:hencafe/models/address_details_model.dart';
 import 'package:hencafe/models/address_model.dart';
 import 'package:hencafe/models/city_list_model.dart' as city;
 import 'package:hencafe/models/user_favourite_state_model.dart' as state;
@@ -42,7 +43,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
   String? _selectedStateID;
   String? _selectedCityID;
   bool _isInitialized = false;
-  late final AddressModel addressDetailsModel;
+  late final AddressDetails addressDetailsModel;
 
   late SharedPreferences prefs;
 
@@ -405,19 +406,19 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
     if (!_isInitialized && pageType != AppRoutes.createAddressScreen) {
       addressDetailsModel = args!['addressModel'];
       addressController.text =
-          addressDetailsModel.apiResponse![0].addressAddress!;
+          addressDetailsModel.addressAddress!;
       addressTypeController.text =
-          addressDetailsModel.apiResponse![0].addressType!;
+          addressDetailsModel.addressType!;
       stateController.text = addressDetailsModel
-          .apiResponse![0].locationInfo![0].stateNameLanguage!;
+          .locationInfo![0].stateNameLanguage!;
       cityController.text = addressDetailsModel
-          .apiResponse![0].locationInfo![0].cityNameLanguage!;
+          .locationInfo![0].cityNameLanguage!;
       zipCodeController.text =
-          addressDetailsModel.apiResponse![0].addressZipcode!;
+          addressDetailsModel.addressZipcode!;
       _selectedCityID =
-          addressDetailsModel.apiResponse![0].locationInfo![0].cityId!;
+          addressDetailsModel.locationInfo![0].cityId!;
       _selectedStateID =
-          addressDetailsModel.apiResponse![0].locationInfo![0].stateId!;
+          addressDetailsModel.locationInfo![0].stateId!;
       _isInitialized = true;
     }
 
@@ -662,9 +663,9 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                                       .updateAddress(
                                           context,
                                           addressDetailsModel
-                                              .apiResponse![0].addressId!,
+                                              .addressId!,
                                           addressDetailsModel
-                                              .apiResponse![0].addressUuid!,
+                                              .addressUuid!,
                                           'USER',
                                           addressTypeController.text,
                                           addressController.text,

@@ -6,6 +6,7 @@ import 'package:hencafe/widget/attachment_widget.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
 import '../values/app_colors.dart';
+import '../values/app_routes.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -95,8 +96,11 @@ class _FaqScreenState extends State<FaqScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          margin:
-                              EdgeInsets.only(bottom: 8, left: 15, right: 15),
+                          margin: EdgeInsets.only(
+                            bottom: 8,
+                            left: 15,
+                            right: 15,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -109,7 +113,7 @@ class _FaqScreenState extends State<FaqScreen> {
                               Icon(
                                 Icons.arrow_right_alt_outlined,
                                 color: AppColors.primaryColor,
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -183,8 +187,11 @@ class FaqDetailPage extends StatelessWidget {
                     attachments: data.attachmentInfo!,
                     userId: '-1',
                     currentUserId: '-2',
+                    referenceFrom: '',
+                    referenceUUID: '-1',
                     onDelete: (index) {},
                     index: 0,
+              pageType: AppRoutes.faqScreen,
                   )
                 : Center(
                     child: Text(
@@ -235,20 +242,25 @@ Widget _buildCard({
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: contentList
-                .map((e) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: Row(
-                        children: [
-                          const Text("• ",
-                              style: TextStyle(fontSize: 14, height: 1.3)),
-                          Expanded(
-                            child: Text(e,
-                                style:
-                                    const TextStyle(fontSize: 14, height: 1.3)),
-                          )
-                        ],
-                      ),
-                    ))
+                .map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "• ",
+                          style: TextStyle(fontSize: 14, height: 1.3),
+                        ),
+                        Expanded(
+                          child: Text(
+                            e,
+                            style: const TextStyle(fontSize: 14, height: 1.3),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         if (contentText != null)

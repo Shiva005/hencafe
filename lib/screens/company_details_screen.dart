@@ -249,38 +249,26 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                         .toList(),
                   ),
 
-                  detailsModel.apiResponse![0].attachmentInfo != null &&
-                          detailsModel
-                              .apiResponse![0]
-                              .attachmentInfo!
-                              .isNotEmpty
-                      ? AttachmentWidget(
-                          attachments: attachments,
-                          userId:
-                              detailsModel
-                                  .apiResponse![0]
-                                  .userBasicInfo![0]
-                                  .userId ??
-                              '',
-                          currentUserId:
-                              prefs.getString(AppStrings.prefUserID) ?? '',
-                          onDelete: (index) {
-                            showDeleteAttachmentDialog(
-                              context: context,
-                              index: index,
-                              attachment: attachments[index],
-                              attachments: attachments,
-                              onUpdate: () => setState(() {}),
-                            );
-                          },
-                          index: 0,
-                        )
-                      : Center(
-                          child: Text(
-                            "No attachments available",
-                            style: TextStyle(color: Colors.grey.shade600),
-                          ),
-                        ),
+                  AttachmentWidget(
+                    attachments: attachments,
+                    userId:
+                        detailsModel.apiResponse![0].userBasicInfo![0].userId ??
+                        '',
+                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
+                    referenceFrom: "COMPANY",
+                    referenceUUID: referenceUUID,
+                    onDelete: (index) {
+                      showDeleteAttachmentDialog(
+                        context: context,
+                        index: index,
+                        attachment: attachments[index],
+                        attachments: attachments,
+                        onUpdate: () => setState(() {}),
+                      );
+                    },
+                    index: 0,
+                    pageType: AppRoutes.companyDetailsScreen,
+                  ),
                 ],
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hencafe/models/user_fav_state_info.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,15 +10,19 @@ import '../values/app_strings.dart';
 
 class FavouriteStateWidget extends StatefulWidget {
   final List<UserFavouriteStateInfo> favStateList;
+  final String userID;
 
-  const FavouriteStateWidget({super.key, required this.favStateList});
+  const FavouriteStateWidget({
+    super.key,
+    required this.favStateList,
+    required this.userID,
+  });
 
   @override
   State<FavouriteStateWidget> createState() => _FavouriteStateWidgetState();
 }
 
 class _FavouriteStateWidgetState extends State<FavouriteStateWidget> {
-
   var prefs;
 
   @override
@@ -27,13 +30,17 @@ class _FavouriteStateWidgetState extends State<FavouriteStateWidget> {
     super.initState();
     _loadData();
   }
+
   Future<void> _loadData() async {
     prefs = await SharedPreferences.getInstance();
-
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    if (prefs == null) {
+      return const CircularProgressIndicator(); // loading state
+    }
     if (widget.favStateList.isEmpty) return const SizedBox();
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5.0),
@@ -85,12 +92,20 @@ class _FavouriteStateWidgetState extends State<FavouriteStateWidget> {
             ),
             const SizedBox(height: 30),
 
-            ///we have to work here...
-            /*if (prefs!.getString(AppStrings.prefUserID) ==
-                widget.detailsModel.apiResponse![0].userId)*/
+            if (prefs!.getString(AppStrings.prefUserID) == widget.userID)
               ElevatedButton(
                 onPressed: () {
-                  NavigationHelper.pushNamed(AppRoutes.stateSelection);
+                  NavigationHelper.pushNamed(AppRoutes.stateSelection)?.then((
+                    result,
+                  ) {
+                    NavigationHelper.pushReplacementNamed(
+                      AppRoutes.myProfileScreen,
+                      arguments: {
+                        'pageType': AppRoutes.dashboardScreen,
+                        'userID': prefs.getString(AppStrings.prefUserID),
+                      },
+                    );
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,

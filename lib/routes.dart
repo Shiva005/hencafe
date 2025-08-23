@@ -256,7 +256,7 @@ class Routes {
             desktop: ChangePasswordScreen(),
           ),
         );
-      case AppRoutes.medicineScreen:
+      case AppRoutes.faqScreen:
         return getRoute(
           widget: ResponsiveScaffold(
             mobile: FaqScreen(),

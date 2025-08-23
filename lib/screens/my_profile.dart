@@ -230,31 +230,27 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ),
                   FavouriteStateWidget(
                     favStateList: user.userFavouriteStateInfo ?? [],
+                    userID: user.userId ?? '',
                   ),
                   AddressWidget(addressList: user.addressDetails ?? []),
-                  attachments.isNotEmpty
-                      ? AttachmentWidget(
-                          attachments: attachments,
-                          userId: user.userId ?? '',
-                          currentUserId:
-                              prefs.getString(AppStrings.prefUserID) ?? '',
-                          onDelete: (index) {
-                            showDeleteAttachmentDialog(
-                              context: context,
-                              index: index,
-                              attachment: attachments[index],
-                              attachments: attachments,
-                              onUpdate: () => setState(() {}),
-                            );
-                          },
-                          index: 0,
-                        )
-                      : Center(
-                          child: Text(
-                            "No attachments available",
-                            style: TextStyle(color: Colors.grey.shade600),
-                          ),
-                        ),
+                  AttachmentWidget(
+                    attachments: attachments,
+                    userId: user.userId ?? '',
+                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
+                    referenceFrom:"USER",
+                    referenceUUID: user.userUuid ?? '',
+                    onDelete: (index) {
+                      showDeleteAttachmentDialog(
+                        context: context,
+                        index: index,
+                        attachment: attachments[index],
+                        attachments: attachments,
+                        onUpdate: () => setState(() {}),
+                      );
+                    },
+                    index: 0,
+                    pageType: AppRoutes.myProfileScreen,
+                  ),
                 ],
               ),
             ),

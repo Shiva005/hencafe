@@ -41,24 +41,38 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
       pageType = args['pageType'] ?? '';
       addressID = args['addressID'] ?? '';
       setState(() {
-        addressData =
-            _fetchUserAddress(referenceFrom, referenceUUID, addressID);
+        addressData = _fetchUserAddress(
+          referenceFrom,
+          referenceUUID,
+          addressID,
+        );
       });
     });
   }
 
   Future<AddressModel> _fetchUserAddress(
-      String referenceFrom, String referenceUUID, String addressID) async {
+    String referenceFrom,
+    String referenceUUID,
+    String addressID,
+  ) async {
     prefs = await SharedPreferences.getInstance();
-    return await AuthServices()
-        .getAddressList(context, referenceFrom, referenceUUID, addressID);
+    return await AuthServices().getAddressList(
+      context,
+      referenceFrom,
+      referenceUUID,
+      addressID,
+    );
   }
 
   Future<void> loadData() async {
     prefs = await SharedPreferences.getInstance();
     if (pageType == AppRoutes.myProfileScreen) {
-      addressData = AuthServices()
-          .getAddressList(context, referenceFrom, referenceUUID, addressID);
+      addressData = AuthServices().getAddressList(
+        context,
+        referenceFrom,
+        referenceUUID,
+        addressID,
+      );
     }
     setState(() {});
   }
@@ -70,9 +84,10 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60.0),
         child: MyAppBar(
-            title: pageType == AppRoutes.myProfileScreen
-                ? 'Address Details'
-                : 'Address Details'),
+          title: pageType == AppRoutes.myProfileScreen
+              ? 'Address Details'
+              : 'Address Details',
+        ),
       ),
       body: addressData != null
           ? FutureBuilder<dynamic>(
@@ -99,70 +114,53 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0, right: 20.0),
                       child: GestureDetector(
-                        onTap: () {
-                          AwesomeDialog(
-                            context: context,
-                            animType: AnimType.bottomSlide,
-                            dialogType: DialogType.warning,
-                            dialogBackgroundColor: Colors.white,
-                            titleTextStyle: AppTheme.appBarText,
-                            title:
-                                'Are you sure you want to delete this Address?',
-                            btnCancelOnPress: () {},
-                            btnCancelText: 'Cancel',
-                            btnOkOnPress: () async {
-                              var deleteAddressRes =
-                                  await AuthServices().deleteAddress(
-                                context,
-                                detailsModel.apiResponse![0].addressUuid,
-                              );
-                              if (deleteAddressRes
-                                      .apiResponse![0].responseStatus ==
-                                  true) {
-                                NavigationHelper.pop(context);
-                              }
-                            },
-                            btnOkText: 'Yes',
-                            btnOkColor: Colors.yellow.shade700,
-                          ).show();
-                        },
+                        onTap: () {},
                         child: Container(
-                            width: 145,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.red),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Delete Address',
-                                  style: const TextStyle(
-                                      color: Colors.red, fontSize: 13),
-                                ),
-                                SizedBox(width: 5),
-                                Icon(
-                                  Icons.delete_forever,
+                          width: 145,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.red),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Delete Address',
+                                style: const TextStyle(
                                   color: Colors.red,
-                                  size: 18,
+                                  fontSize: 13,
                                 ),
-                              ],
-                            )),
+                              ),
+                              SizedBox(width: 5),
+                              Icon(
+                                Icons.delete_forever,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(height: 5),
                     Card(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                        side:
-                            BorderSide(color: AppColors.primaryColor, width: 1),
+                        side: BorderSide(
+                          color: AppColors.primaryColor,
+                          width: 1,
+                        ),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 12.0, vertical: 6),
+                        horizontal: 12.0,
+                        vertical: 6,
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
@@ -174,38 +172,34 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                 Text(
                                   'Address Information',
                                   style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
                                 ),
                                 if (userInfo[0].userId ==
                                     prefs.getString(AppStrings.prefUserID))
                                   Container(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 3),
+                                      horizontal: 12,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.primaryColor,
                                       border: Border.all(
-                                          color: AppColors.primaryColor),
+                                        color: AppColors.primaryColor,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: GestureDetector(
-                                      onTap: () {
-                                        NavigationHelper.pushNamed(
-                                          AppRoutes.createAddressScreen,
-                                          arguments: {
-                                            'addressModel': detailsModel,
-                                            'pageType': "UpdateAddressScreen",
-                                          },
-                                        )?.then((value) {
-                                          loadData();
-                                        });
-                                      },
+                                      onTap: () {},
                                       child: Row(
                                         children: [
                                           Text(
                                             'Edit Info',
                                             style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 13),
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                            ),
                                           ),
                                           SizedBox(width: 5),
                                           Icon(
@@ -216,20 +210,30 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                         ],
                                       ),
                                     ),
-                                  )
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 6),
-                            buildRow('Address Type',
-                                '${detailsModel.apiResponse![0].addressType ?? ''}'),
-                            buildRow('Address',
-                                '${detailsModel.apiResponse![0].addressAddress ?? ''}'),
-                            buildRow('ZipCode',
-                                '${detailsModel.apiResponse![0].addressZipcode ?? ''}'),
-                            buildRow('City',
-                                '${detailsModel.apiResponse![0].locationInfo![0].cityNameLanguage ?? ''}'),
-                            buildRow('State',
-                                '${detailsModel.apiResponse![0].locationInfo![0].stateNameLanguage ?? ''}'),
+                            buildRow(
+                              'Address Type',
+                              '${detailsModel.apiResponse![0].addressType ?? ''}',
+                            ),
+                            buildRow(
+                              'Address',
+                              '${detailsModel.apiResponse![0].addressAddress ?? ''}',
+                            ),
+                            buildRow(
+                              'ZipCode',
+                              '${detailsModel.apiResponse![0].addressZipcode ?? ''}',
+                            ),
+                            buildRow(
+                              'City',
+                              '${detailsModel.apiResponse![0].locationInfo![0].cityNameLanguage ?? ''}',
+                            ),
+                            buildRow(
+                              'State',
+                              '${detailsModel.apiResponse![0].locationInfo![0].stateNameLanguage ?? ''}',
+                            ),
                           ],
                         ),
                       ),
@@ -237,13 +241,18 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                     Expanded(
                       child: Card(
                         margin: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 5.0),
+                          horizontal: 12.0,
+                          vertical: 5.0,
+                        ),
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              color: AppColors.primaryColor, width: 1),
+                            color: AppColors.primaryColor,
+                            width: 1,
+                          ),
                           borderRadius: BorderRadius.circular(
-                              10.0), // Optional: Adjust border radius
+                            10.0,
+                          ), // Optional: Adjust border radius
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -252,7 +261,8 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0),
+                                  horizontal: 12.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -260,19 +270,25 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                     Text(
                                       'Attachments',
                                       style: TextStyle(
-                                          fontSize: 18, color: Colors.black),
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                     if (userInfo[0].userId ==
                                         prefs.getString(AppStrings.prefUserID))
                                       Container(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 3),
+                                          horizontal: 12,
+                                          vertical: 3,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: AppColors.primaryColor,
                                           border: Border.all(
-                                              color: AppColors.primaryColor),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                            color: AppColors.primaryColor,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         child: GestureDetector(
                                           onTap: () {
@@ -295,8 +311,9 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                               Text(
                                                 'Upload',
                                                 style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 13),
+                                                  color: Colors.white,
+                                                  fontSize: 13,
+                                                ),
                                               ),
                                               SizedBox(width: 5),
                                               Icon(
@@ -307,7 +324,7 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                             ],
                                           ),
                                         ),
-                                      )
+                                      ),
                                   ],
                                 ),
                               ),
@@ -321,9 +338,9 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                         itemCount: attachments.length,
                                         gridDelegate:
                                             const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          childAspectRatio: 0.88,
-                                        ),
+                                              crossAxisCount: 2,
+                                              childAspectRatio: 0.88,
+                                            ),
                                         itemBuilder: (context, index) {
                                           final attachment = attachments[index];
                                           final path =
@@ -356,17 +373,20 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            8),
+                                                          8,
+                                                        ),
                                                     color: Colors.black12,
                                                   ),
                                                   child: const Icon(
-                                                      Icons.videocam,
-                                                      color: Colors.grey),
+                                                    Icons.videocam,
+                                                    color: Colors.grey,
+                                                  ),
                                                 ),
-                                                const Icon(Icons.videocam,
-                                                    size: 28,
-                                                    color:
-                                                        AppColors.primaryColor),
+                                                const Icon(
+                                                  Icons.videocam,
+                                                  size: 28,
+                                                  color: AppColors.primaryColor,
+                                                ),
                                               ],
                                             );
                                           } else if (attType == 'pdf') {
@@ -379,8 +399,9 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                     BorderRadius.circular(8),
                                               ),
                                               child: const Icon(
-                                                  Icons.picture_as_pdf,
-                                                  color: Colors.red),
+                                                Icons.picture_as_pdf,
+                                                color: Colors.red,
+                                              ),
                                             );
                                           } else {
                                             mediaWidget = Container(
@@ -388,8 +409,9 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                               height: 150,
                                               alignment: Alignment.center,
                                               child: const Icon(
-                                                  Icons.insert_drive_file,
-                                                  color: Colors.blue),
+                                                Icons.insert_drive_file,
+                                                color: Colors.blue,
+                                              ),
                                             );
                                           }
 
@@ -397,28 +419,39 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                             onTap: () {
                                               if (attType == 'image') {
                                                 Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          ImagePreviewScreen(
-                                                              imageUrl: path, pageType: AppRoutes.addressDetailsScreen,),
-                                                    ));
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        ImagePreviewScreen(
+                                                          imageUrl: path,
+                                                          pageType: AppRoutes
+                                                              .addressDetailsScreen,
+                                                        ),
+                                                  ),
+                                                );
                                               } else if (attType == 'video') {
                                                 Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          VideoPlayerScreen(
-                                                              videoUrl: path, pageType: AppRoutes.addressDetailsScreen,),
-                                                    ));
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        VideoPlayerScreen(
+                                                          videoUrl: path,
+                                                          pageType: AppRoutes
+                                                              .addressDetailsScreen,
+                                                        ),
+                                                  ),
+                                                );
                                               } else if (attType == 'pdf') {
                                                 _openExternalApp(path);
                                               } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
                                                   const SnackBar(
-                                                      content: Text(
-                                                          "Unsupported file format")),
+                                                    content: Text(
+                                                      "Unsupported file format",
+                                                    ),
+                                                  ),
                                                 );
                                               }
                                             },
@@ -429,8 +462,8 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                                 side: BorderSide(
-                                                    color:
-                                                        Colors.grey.shade300),
+                                                  color: Colors.grey.shade300,
+                                                ),
                                               ),
                                               child: Stack(
                                                 children: [
@@ -441,19 +474,20 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                     children: [
                                                       ClipRRect(
                                                         borderRadius:
-                                                            const BorderRadius
-                                                                .vertical(
-                                                                top: Radius
-                                                                    .circular(
-                                                                        12)),
+                                                            const BorderRadius.vertical(
+                                                              top:
+                                                                  Radius.circular(
+                                                                    12,
+                                                                  ),
+                                                            ),
                                                         child: mediaWidget,
                                                       ),
                                                       const SizedBox(height: 8),
                                                       Padding(
                                                         padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 6),
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 6,
+                                                            ),
                                                         child: Text(
                                                           fileName,
                                                           textAlign:
@@ -461,10 +495,12 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                           maxLines: 1,
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                          style: const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
+                                                          style:
+                                                              const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
                                                         ),
                                                       ),
                                                       /*Padding(
@@ -488,8 +524,9 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                           .apiResponse![0]
                                                           .userBasicInfo![0]
                                                           .userId ==
-                                                      prefs.getString(AppStrings
-                                                          .prefUserID))
+                                                      prefs.getString(
+                                                        AppStrings.prefUserID,
+                                                      ))
                                                     Positioned(
                                                       top: 4,
                                                       right: 4,
@@ -513,26 +550,24 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                                 () {},
                                                             btnCancelText:
                                                                 'Cancel',
-                                                            btnOkOnPress:
-                                                                () async {
+                                                            btnOkOnPress: () async {
                                                               var attachmentDeleteRes =
-                                                                  await AuthServices()
-                                                                      .attachmentDelete(
-                                                                context,
-                                                                attachment
-                                                                    .attachmentId!,
-                                                                attachment
-                                                                    .attachmentPath!,
-                                                              );
+                                                                  await AuthServices().attachmentDelete(
+                                                                    context,
+                                                                    attachment
+                                                                        .attachmentId!,
+                                                                    attachment
+                                                                        .attachmentPath!,
+                                                                  );
                                                               if (attachmentDeleteRes
-                                                                      .apiResponse![
-                                                                          0]
+                                                                      .apiResponse![0]
                                                                       .responseStatus ==
                                                                   true) {
                                                                 setState(() {
                                                                   attachments
                                                                       .removeAt(
-                                                                          index);
+                                                                        index,
+                                                                      );
                                                                 });
                                                               }
                                                             },
@@ -542,17 +577,16 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                                                 .shade700,
                                                           ).show();
                                                         },
-                                                        child:
-                                                            const CircleAvatar(
+                                                        child: const CircleAvatar(
                                                           radius: 14,
                                                           backgroundColor:
                                                               Colors.red,
                                                           child: Icon(
-                                                              Icons
-                                                                  .delete_forever,
-                                                              size: 16,
-                                                              color:
-                                                                  Colors.white),
+                                                            Icons
+                                                                .delete_forever,
+                                                            size: 16,
+                                                            color: Colors.white,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -563,7 +597,8 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                                         },
                                       )
                                     : const Center(
-                                        child: Text("No attachments found.")),
+                                        child: Text("No attachments found."),
+                                      ),
                               ),
                             ],
                           ),
@@ -572,20 +607,26 @@ class _AddressDetailsScreenState extends State<AddressDetailsScreen> {
                     ),
                   ],
                 );
-              })
+              },
+            )
           : Center(child: CircularProgressIndicator()),
     );
   }
 }
 
-Widget buildRow(String title, String value,
-    {bool isHighlight = false, bool isMultiline = false}) {
+Widget buildRow(
+  String title,
+  String value, {
+  bool isHighlight = false,
+  bool isMultiline = false,
+}) {
   return Padding(
     padding: const EdgeInsets.only(top: 3),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment:
-          isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: isMultiline
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       children: [
         Text(
           title,
