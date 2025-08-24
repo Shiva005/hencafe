@@ -217,7 +217,44 @@ class CompanyDetailsWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-
+                  ElevatedButton(
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "COMPANY",
+                          'reference_uuid':
+                              detailsModel.apiResponse![0].companyUuid,
+                          'pageType': AppRoutes.addressDetailsScreen,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.companyDetailsScreen,
+                          arguments: {
+                            'companyUUID':
+                                detailsModel.apiResponse![0].companyUuid,
+                            'companyPromotionStatus': 'true',
+                          },
+                        );
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text("Upload Attachment"),
+                        SizedBox(width: 8),
+                        Icon(Icons.file_upload_outlined, color: Colors.white),
+                      ],
+                    ),
+                  ),
                   // Update button with arrow
                   ElevatedButton(
                     onPressed: () {

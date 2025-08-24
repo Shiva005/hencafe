@@ -190,56 +190,97 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                 // Change Profile Image
                 if (prefs!.getString(AppStrings.prefUserID) ==
                     widget.detailsModel.apiResponse![0].userId)
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.camera_alt_outlined,
-                    color: Colors.white,
-                  ),
-                  label: const Text("Change Profile Image"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink.shade200,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                    ),
+                    label: const Text("Change Profile Image"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink.shade200,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 20),
 
                 // Update button with arrow
                 if (prefs!.getString(AppStrings.prefUserID) ==
                     widget.detailsModel.apiResponse![0].userId)
-                ElevatedButton(
-                  onPressed: () {
-                    NavigationHelper.pushNamed(
-                      AppRoutes.registerBasicDetails,
-                      arguments: {
-                        'mobileNumber':
-                            widget.detailsModel.apiResponse![0].userMobile,
-                        'pageType': AppRoutes.myProfileScreen,
-                        'profileModel': widget.detailsModel.apiResponse![0],
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                  ElevatedButton(
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "USER",
+                          'reference_uuid':
+                              widget.detailsModel.apiResponse![0].userUuid,
+                          'pageType': AppRoutes.addressDetailsScreen,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.myProfileScreen,
+                          arguments: {
+                            'pageType': AppRoutes.dashboardScreen,
+                            'userID':
+                                widget.detailsModel.apiResponse![0].userId,
+                          },
+                        );
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text("Upload Attachment"),
+                        SizedBox(width: 8),
+                        Icon(Icons.file_upload_outlined, color: Colors.white),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text("Edit Details"),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_right_alt, color: Colors.white),
-                    ],
+                // Update button with arrow
+                if (prefs!.getString(AppStrings.prefUserID) ==
+                    widget.detailsModel.apiResponse![0].userId)
+                  ElevatedButton(
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.registerBasicDetails,
+                        arguments: {
+                          'mobileNumber':
+                              widget.detailsModel.apiResponse![0].userMobile,
+                          'pageType': AppRoutes.myProfileScreen,
+                          'profileModel': widget.detailsModel.apiResponse![0],
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text("Edit Details"),
+                        SizedBox(width: 8),
+                        Icon(Icons.arrow_right_alt, color: Colors.white),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),

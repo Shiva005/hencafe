@@ -1,17 +1,15 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/widget/docs_preview_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../helpers/navigation_helper.dart';
 import '../models/attachment_model.dart';
 import '../screens/image_preview_screen.dart';
 import '../screens/video_player_screen.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
-import '../values/app_routes.dart';
 
 class AttachmentWidget extends StatefulWidget {
   final List<AttachmentInfo> attachments;
@@ -40,108 +38,46 @@ class AttachmentWidget extends StatefulWidget {
 }
 
 class _AttachmentWidgetState extends State<AttachmentWidget> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
-  bool _isVideoInitialized = false;
+  final Map<int, VideoPlayerController> _videoControllers = {};
+  final Map<int, ChewieController> _chewieControllers = {};
+  final Set<int> _initializedVideos = {};
 
   @override
   void dispose() {
-    _chewieController?.dispose();
-    _videoPlayerController.dispose();
+    for (var controller in _chewieControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _videoControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> _initializeVideo(int index, String url) async {
+    if (_videoControllers.containsKey(index)) return; // Already initialized
 
-    logger.w(widget.pageType);
-    if (widget.attachments.isEmpty) return;
-    _videoPlayerController = VideoPlayerController.network(
-      widget.attachments[widget.index].attachmentPath!,
+    final videoController = VideoPlayerController.network(url);
+    await videoController.initialize();
+
+    final chewieController = ChewieController(
+      videoPlayerController: videoController,
+      aspectRatio: videoController.value.aspectRatio,
+      autoPlay: false,
+      looping: false,
+      showControls: false,
     );
-    _videoPlayerController.initialize().then((_) {
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController,
-        aspectRatio: _videoPlayerController.value.aspectRatio,
-        autoPlay: false,
-        looping: false,
-        showControls: false,
-      );
-      setState(() {
-        _isVideoInitialized = true;
-      });
+
+    setState(() {
+      _videoControllers[index] = videoController;
+      _chewieControllers[index] = chewieController;
+      _initializedVideos.add(index);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 10.0),
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  NavigationHelper.pushNamed(
-                    AppRoutes.uploadFileScreen,
-                    arguments: {
-                      'reference_from': widget.referenceFrom,
-                      'reference_uuid': widget.referenceUUID,
-                      'pageType': AppRoutes.addressDetailsScreen,
-                    },
-                  )?.then((value) {
-                    if(widget.pageType==AppRoutes.myProfileScreen){
-                      NavigationHelper.pushReplacementNamed(
-                        AppRoutes.myProfileScreen,
-                        arguments: {
-                          'pageType': AppRoutes.dashboardScreen,
-                          'userID': widget.userId,
-                        },
-                      );
-                    }
-                    if(widget.pageType==AppRoutes.companyDetailsScreen){
-                      NavigationHelper.pushNamed(
-                        AppRoutes.companyDetailsScreen,
-                        arguments: {
-                          'companyUUID': widget.referenceUUID,
-                          'companyPromotionStatus': 'true'
-                        },
-                      );
-                    }
-                    /*if(widget.pageType==AppRoutes.eggPriceScreen){
-                      NavigationHelper.pushNamed(
-                        AppRoutes.saleDetailsScreen,
-                        arguments: {
-                          'saleID': widget.referenceUUID,
-                          'pageType': AppRoutes.saleDetailsScreen,
-                        },
-                      );
-                    }*/
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 35),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text("Upload Attachment"),
-                    SizedBox(width: 8),
-                    Icon(Icons.file_upload_outlined, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
         Expanded(
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
@@ -231,6 +167,11 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
             );
             break;
           case 'video':
+            if (!_initializedVideos.contains(index)) {
+              _initializeVideo(index, path);
+            }
+
+            final chewie = _chewieControllers[index];
             mediaWidget = Container(
               height: 150,
               alignment: Alignment.center,
@@ -238,17 +179,17 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.black12,
               ),
-              child: _isVideoInitialized && _chewieController != null
+              child: chewie != null
                   ? Stack(
                       children: [
-                        Chewie(controller: _chewieController!),
+                        Chewie(controller: chewie),
                         Center(
                           child: ClipOval(
                             child: Image.asset(
                               AppIconsData.play_gif,
                               fit: BoxFit.contain,
                               height: 50,
-                              width: 50, // add width for perfect circle
+                              width: 50,
                             ),
                           ),
                         ),
@@ -258,6 +199,43 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
             );
             break;
           case "youtube":
+            final videoId = YoutubePlayer.convertUrlToId(path);
+            if (videoId != null) {
+              mediaWidget = Container(
+                height: 150,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black12,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.network(
+                      "https://img.youtube.com/vi/$videoId/0.jpg",
+                      // YouTube thumbnail
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 150,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ClipOval(
+                        child: Image.asset(
+                          AppIconsData.play_gif,
+                          fit: BoxFit.contain,
+                          height: 50,
+                          width: 50, // add width for perfect circle
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              mediaWidget = const Icon(Icons.error, color: Colors.red);
+            }
+            break;
           case "pdf":
           case "doc":
           case "docx":
@@ -300,6 +278,14 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
                     imageUrl: path,
                     pageType: "AttachmentWidget",
                   ),
+                ),
+              );
+            } else if (att.attachmentType == 'youtube') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      VideoPlayerScreen(videoUrl: path, pageType: "attachment"),
                 ),
               );
             } else if (att.attachmentType == 'video') {

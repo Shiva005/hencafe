@@ -79,13 +79,13 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           final userInfo = detailsModel.apiResponse![0].userBasicInfo ?? [];
           List<AttachmentInfo> attachments = company.attachmentInfo ?? [];
 
-          for (var address
+          /*for (var address
               in detailsModel.apiResponse![0].addressDetails ?? []) {
             if (address.attachmentInfo != null &&
                 address.attachmentInfo!.isNotEmpty) {
               attachments.addAll(address.attachmentInfo!);
             }
-          }
+          }*/
 
           // Wrap everything in DefaultTabController & NestedScrollView to enable sticky tabs
           return DefaultTabController(
@@ -247,6 +247,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   AddressWidget(
                     addressList: detailsModel.apiResponse![0].addressDetails!
                         .toList(),
+                    pageType: AppRoutes.companyDetailsScreen,
                   ),
 
                   AttachmentWidget(

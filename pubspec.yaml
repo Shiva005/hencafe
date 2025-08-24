@@ -54,6 +54,7 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^6.1.0
   flutter_inappwebview: ^6.1.5
   screenshot: ^3.0.0
+  youtube_player_flutter: ^9.1.2
 
 dev_dependencies:
   flutter_test:

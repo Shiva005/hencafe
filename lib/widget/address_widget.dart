@@ -13,8 +13,13 @@ import 'attachment_widget.dart';
 
 class AddressWidget extends StatelessWidget {
   final List<AddressDetails> addressList;
+  final String pageType;
 
-  const AddressWidget({super.key, required this.addressList});
+  const AddressWidget({
+    super.key,
+    required this.addressList,
+    required this.pageType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,10 @@ class AddressWidget extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       itemCount: addressList.length,
       itemBuilder: (context, index) {
-        return AddressWidgetData(address: addressList[index]);
+        return AddressWidgetData(
+          address: addressList[index],
+          pageType: pageType,
+        );
       },
     );
   }
@@ -30,8 +38,13 @@ class AddressWidget extends StatelessWidget {
 
 class AddressWidgetData extends StatefulWidget {
   final AddressDetails address;
+  final String pageType;
 
-  const AddressWidgetData({super.key, required this.address});
+  const AddressWidgetData({
+    super.key,
+    required this.address,
+    required this.pageType,
+  });
 
   @override
   State<AddressWidgetData> createState() => _AddressWidgetDataState();
@@ -41,6 +54,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
   int selectedTab = 0;
   final PageController _attachmentController = PageController();
   var prefs;
+  String referenceFrom = "";
 
   @override
   void initState() {
@@ -217,6 +231,54 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
               ],
             ),
           ),
+        ElevatedButton(
+          onPressed: () {
+            NavigationHelper.pushNamed(
+              AppRoutes.uploadFileScreen,
+              arguments: {
+                'reference_from': "ADDRESS",
+                'reference_uuid': address.addressUuid,
+                'pageType': AppRoutes.addressDetailsScreen,
+              },
+            )?.then((value) {
+              if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                NavigationHelper.pushReplacementNamed(
+                  AppRoutes.companyDetailsScreen,
+                  arguments: {
+                    'companyUUID': address.addressReferenceUuid,
+                    'companyPromotionStatus': '',
+                  },
+                );
+              }
+              if (widget.pageType == AppRoutes.myProfileScreen) {
+                NavigationHelper.pushReplacementNamed(
+                  AppRoutes.myProfileScreen,
+                  arguments: {
+                    'pageType': AppRoutes.dashboardScreen,
+                    'userID': prefs.getString(AppStrings.prefUserID),
+                  },
+                );
+              }
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.pink,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 35),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text("Upload Attachment"),
+              SizedBox(width: 8),
+              Icon(Icons.file_upload_outlined, color: Colors.white),
+            ],
+          ),
+        ),
+
         SizedBox(height: 20),
         if (address.userBasicInfo![0].userId ==
             prefs.getString(AppStrings.prefUserID))

@@ -4,6 +4,7 @@ import 'package:hencafe/models/contact_history_model.dart';
 import 'package:hencafe/services/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../models/attachment_model.dart';
 import '../../values/app_colors.dart';
@@ -192,7 +193,43 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
               ),
             );
             break;
-
+          case "youtube":
+            final videoId = YoutubePlayer.convertUrlToId(path);
+            if (videoId != null) {
+              mediaWidget = Container(
+                height: 150,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black12,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.network(
+                      "https://img.youtube.com/vi/$videoId/0.jpg", // YouTube thumbnail
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 150,
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ClipOval(
+                        child: Image.asset(
+                          AppIconsData.play_gif,
+                          fit: BoxFit.contain,
+                          height: 70,
+                          width: 70, // add width for perfect circle
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              mediaWidget = const Icon(Icons.error, color: Colors.red);
+            }
+            break;
           case 'pdf':
           case 'doc':
           case 'docx':
@@ -241,6 +278,14 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                 ),
               );
             } else if (att.attachmentType == 'video') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      VideoPlayerScreen(videoUrl: path, pageType: "AppStatus"),
+                ),
+              );
+            } else if (att.attachmentType == 'youtube') {
               Navigator.push(
                 context,
                 MaterialPageRoute(

@@ -232,7 +232,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     favStateList: user.userFavouriteStateInfo ?? [],
                     userID: user.userId ?? '',
                   ),
-                  AddressWidget(addressList: user.addressDetails ?? []),
+                  AddressWidget(addressList: user.addressDetails ?? [],
+                    pageType: AppRoutes.myProfileScreen,),
                   AttachmentWidget(
                     attachments: attachments,
                     userId: user.userId ?? '',
