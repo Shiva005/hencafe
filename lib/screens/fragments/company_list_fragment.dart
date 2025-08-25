@@ -110,6 +110,11 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                 company.attachmentBannerInfo!
                                                     .isNotEmpty)
                                             ? Image.network(
+                                          width: MediaQuery.of(
+                                            context,
+                                          ).size.width,
+                                          height: 100,
+
                                                 company.attachmentBannerInfo![0]
                                                     .attachmentPath!,
                                                 fit: BoxFit.fitWidth,

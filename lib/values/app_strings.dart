@@ -62,6 +62,6 @@ class AppStrings {
   static const String prefRole = 'role';
   static const String prefFavStateMaxCount = 'fav_state_max_count';
   static const String prefIsUserVerified = 'is_user_verified';
-  static const String prefSessionID = 'session_id';
+  static const String prefAppSessionID = 'app_session_id';
   static const String prefIsFavStateSelected = 'is_fav_state_selected';
 }

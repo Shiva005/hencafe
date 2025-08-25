@@ -231,6 +231,8 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
               ],
             ),
           ),
+        if (address.userBasicInfo![0].userId ==
+            prefs.getString(AppStrings.prefUserID))
         ElevatedButton(
           onPressed: () {
             NavigationHelper.pushNamed(

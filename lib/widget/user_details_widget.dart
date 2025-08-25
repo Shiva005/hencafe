@@ -171,7 +171,26 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                 if (prefs!.getString(AppStrings.prefUserID) ==
                     widget.detailsModel.apiResponse![0].userId)
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "USER_BANNER",
+                          'reference_uuid':
+                          widget.detailsModel.apiResponse![0].userUuid,
+                          'isSingleFilePick': true,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.myProfileScreen,
+                          arguments: {
+                            'pageType': AppRoutes.dashboardScreen,
+                            'userID':
+                            widget.detailsModel.apiResponse![0].userId,
+                          },
+                        );
+                      });
+                    },
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       color: Colors.white,
@@ -191,7 +210,26 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                 if (prefs!.getString(AppStrings.prefUserID) ==
                     widget.detailsModel.apiResponse![0].userId)
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "USER_PROFILE",
+                          'reference_uuid':
+                              widget.detailsModel.apiResponse![0].userUuid,
+                          'isSingleFilePick': true,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.myProfileScreen,
+                          arguments: {
+                            'pageType': AppRoutes.dashboardScreen,
+                            'userID':
+                                widget.detailsModel.apiResponse![0].userId,
+                          },
+                        );
+                      });
+                    },
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       color: Colors.white,

@@ -102,6 +102,10 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                     child: (seller.userBannerImg != null &&
                                             seller.userBannerImg!.isNotEmpty)
                                         ? Image.network(
+                                      width: MediaQuery.of(
+                                        context,
+                                      ).size.width,
+                                      height: 100,
                                             seller.userBannerImg![0]
                                                 .attachmentPath!,
                                             fit: BoxFit.fitWidth,

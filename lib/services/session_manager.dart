@@ -5,11 +5,11 @@ import 'package:uuid/uuid.dart';
 class SessionManager {
   static Future<void> generateNewSessionId() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AppStrings.prefSessionID, Uuid().v4());
+    await prefs.setString(AppStrings.prefAppSessionID, Uuid().v4());
   }
 
   static Future<String?> getSessionId() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(AppStrings.prefSessionID);
+    return prefs.getString(AppStrings.prefAppSessionID);
   }
 }

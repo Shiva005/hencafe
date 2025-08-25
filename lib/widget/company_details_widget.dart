@@ -182,8 +182,29 @@ class CompanyDetailsWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   // Change Banner Image
+                  if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
+                      prefs.getString(AppStrings.prefUserID))
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "COMPANY_BANNER",
+                          'reference_uuid':
+                          detailsModel.apiResponse![0].companyUuid,
+                          'isSingleFilePick': true,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.companyDetailsScreen,
+                          arguments: {
+                            'companyUUID':
+                            detailsModel.apiResponse![0].companyUuid,
+                            'companyPromotionStatus': 'true',
+                          },
+                        );
+                      });
+                    },
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       color: Colors.white,
@@ -200,8 +221,29 @@ class CompanyDetailsWidget extends StatelessWidget {
                   ),
 
                   // Change Profile Image
+                  if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
+                      prefs.getString(AppStrings.prefUserID))
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      NavigationHelper.pushNamed(
+                        AppRoutes.uploadFileScreen,
+                        arguments: {
+                          'reference_from': "COMPANY_LOGO",
+                          'reference_uuid':
+                          detailsModel.apiResponse![0].companyUuid,
+                          'isSingleFilePick': true,
+                        },
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.companyDetailsScreen,
+                          arguments: {
+                            'companyUUID':
+                            detailsModel.apiResponse![0].companyUuid,
+                            'companyPromotionStatus': 'true',
+                          },
+                        );
+                      });
+                    },
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       color: Colors.white,
@@ -217,6 +259,8 @@ class CompanyDetailsWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
+                      prefs.getString(AppStrings.prefUserID))
                   ElevatedButton(
                     onPressed: () {
                       NavigationHelper.pushNamed(
@@ -256,6 +300,8 @@ class CompanyDetailsWidget extends StatelessWidget {
                     ),
                   ),
                   // Update button with arrow
+                  if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
+                      prefs.getString(AppStrings.prefUserID))
                   ElevatedButton(
                     onPressed: () {
                       NavigationHelper.pushNamed(

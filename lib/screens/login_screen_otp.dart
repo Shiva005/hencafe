@@ -339,7 +339,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                               var countryCode =
                                   prefs.getString(AppStrings.prefCountryCode);
                               var sessionID =
-                                  prefs.getString(AppStrings.prefSessionID);
+                                  prefs.getString(AppStrings.prefAppSessionID);
                               prefs.clear();
                               prefs.setString(
                                   AppStrings.prefLanguage, language!);
@@ -347,7 +347,7 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                               prefs.setString(
                                   AppStrings.prefCountryCode, countryCode!);
                               prefs.setString(
-                                  AppStrings.prefSessionID, sessionID!);
+                                  AppStrings.prefAppSessionID, sessionID!);
                               NavigationHelper.pushReplacementNamedUntil(
                                   AppRoutes.loginMobile);
                               SnackbarHelper.showSnackBar(

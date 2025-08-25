@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/attachment_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
+import '../utils/my_logger.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
 import '../values/app_strings.dart';
@@ -118,7 +119,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                   color: Colors.grey.shade300,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    width: 3,
+                                    width: 0,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -132,7 +133,11 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                         company
                                             .attachmentBannerInfo![0]
                                             .attachmentPath!,
-                                        fit: BoxFit.fitWidth,
+                                        width: MediaQuery.of(
+                                          context,
+                                        ).size.width,
+                                        height: 100,
+                                        fit: BoxFit.cover,
                                       )
                                     : Image.asset(
                                         width: 70,
@@ -141,68 +146,57 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                         AppIconsData.noImage,
                                       ),
                               ),
-                              if (company.attachmentLogoInfo != null &&
-                                  company.attachmentLogoInfo!.isNotEmpty)
-                                Positioned(
-                                  left: 16,
-                                  bottom: -50,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (company
-                                          .attachmentLogoInfo![0]
-                                          .attachmentPath!
-                                          .isNotEmpty) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => ImagePreviewScreen(
-                                              imageUrl: company
-                                                  .attachmentLogoInfo![0]
-                                                  .attachmentPath!,
-                                              pageType: AppRoutes
-                                                  .companyDetailsScreen,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Card(
-                                          elevation: 3.0,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                            child: Image.network(
-                                              company
-                                                  .attachmentLogoInfo![0]
-                                                  .attachmentPath!,
-                                              width: 70,
-                                              height: 70,
-                                              fit: BoxFit.cover,
-                                            ),
+                              Positioned(
+                                left: 16,
+                                bottom: -50,
+                                child: GestureDetector(
+                                  onTap: (){
+                                    logger.w("message");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ImagePreviewScreen(
+                                          imageUrl: company
+                                              .attachmentLogoInfo![0]
+                                              .attachmentPath!,
+                                          pageType: AppRoutes
+                                              .companyDetailsScreen,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Card(
+                                        elevation: 3.0,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(6),
+                                          child: Image.network(
+                                            company
+                                                .attachmentLogoInfo![0]
+                                                .attachmentPath!,
+                                            width: 70,
+                                            height: 70,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 5.0,
-                                            bottom: 15,
-                                          ),
-                                          child: Text(
-                                            company.companyName ?? 'No Name',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                          ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5.0,
+                                          bottom: 15,
                                         ),
-                                      ],
-                                    ),
+                                        child: Text(
+                                          company.companyName ?? 'No Name',
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                              ),
                             ],
                           ),
                         ],
@@ -242,6 +236,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     supplyList: detailsModel.apiResponse![0].supplyInfo ?? [],
                     pageType: AppRoutes.companyDetailsScreen,
                     userCompanyUUID: referenceUUID,
+                    createdByUserID:
+                        detailsModel.apiResponse![0].userBasicInfo![0].userId,
                   ),
 
                   AddressWidget(

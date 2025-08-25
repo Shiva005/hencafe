@@ -15,12 +15,14 @@ class SuppliesWidget extends StatefulWidget {
   final List<SupplyInfo> supplyList;
   final String pageType;
   final String userCompanyUUID;
+  final String createdByUserID;
 
   const SuppliesWidget({
     super.key,
     required this.supplyList,
     required this.pageType,
     required this.userCompanyUUID,
+    required this.createdByUserID,
   });
 
   @override
@@ -120,8 +122,8 @@ class _SuppliesWidgetState extends State<SuppliesWidget> {
             ),
             const SizedBox(height: 30),
 
-            if (prefs!.getString(AppStrings.prefUserUUID) ==
-                widget.userCompanyUUID)
+            if (prefs!.getString(AppStrings.prefUserID) ==
+                widget.createdByUserID)
               ElevatedButton(
                 onPressed: () {
                   _openSuppliesBottomSheet(widget.userCompanyUUID);

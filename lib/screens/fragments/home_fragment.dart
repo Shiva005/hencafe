@@ -113,15 +113,6 @@ class _HomeFragmentState extends State<Home>
                   CompanyListFragment(pageType: "HomeFragment"),
                   SellerListFragment(pageType: "SellerFragment"),
                   AppStatusScreen(),
-                  /*attachments.isEmpty
-                      ? Center(child: Text("No attachments found"))
-                      : AttachmentWidget(
-                    attachments: attachments,
-                    userId: '-1',
-                    currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                    onDelete: (index) {},
-                    index: 0,
-                  ),*/
                 ],
               ),
             ),

@@ -10,12 +10,14 @@ import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as img;
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:image/image.dart' as img;
 
 class UploadFileScreen extends StatefulWidget {
+  const UploadFileScreen({super.key});
+
   @override
   State<UploadFileScreen> createState() => _UploadFileScreenState();
 }
@@ -24,11 +26,27 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
   List<_UploadFile> files = [];
   final uuid = Uuid();
 
-  void pickFiles() async {
+  void pickMultipleFiles() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'mp4', 'docx', 'jpg', 'png'],
+      allowedExtensions: ['pdf', 'mp4', 'docx', 'jpg', 'png', 'jpeg'],
+    );
+
+    if (result != null) {
+      for (var file in result.files) {
+        File selectedFile = File(file.path!);
+        files.add(_UploadFile(file: selectedFile, name: file.name));
+      }
+      setState(() {});
+    }
+  }
+
+  void pickSingleFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png', 'jpeg'],
     );
 
     if (result != null) {
@@ -51,20 +69,28 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
     final originalImage = img.decodeImage(bytes);
     if (originalImage == null) return file;
 
-    final resized = img.copyResize(originalImage,
-        width: (originalImage.width * 0.5).toInt(),
-        height: (originalImage.height * 0.5).toInt());
+    final resized = img.copyResize(
+      originalImage,
+      width: (originalImage.width * 0.5).toInt(),
+      height: (originalImage.height * 0.5).toInt(),
+    );
 
     final compressedPath = file.path.replaceFirst(
-        RegExp(r'(.jpg|.jpeg|.png)$'), '_compressed.jpg');
+      RegExp(r'(.jpg|.jpeg|.png)$'),
+      '_compressed.jpg',
+    );
     final compressedFile = File(compressedPath)
       ..writeAsBytesSync(img.encodeJpg(resized, quality: 85));
 
     return compressedFile;
   }
 
-  Future<void> uploadFile(_UploadFile fileData, String referenceFrom,
-      String referenceUUID, String fileName) async {
+  Future<void> uploadFile(
+    _UploadFile fileData,
+    String referenceFrom,
+    String referenceUUID,
+    String fileName,
+  ) async {
     final dio = Dio();
     File file = fileData.file;
 
@@ -86,7 +112,7 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
     final userUUID = prefs.getString(AppStrings.prefUserUUID) ?? '';
     final authUUID = prefs.getString(AppStrings.prefAuthID) ?? '';
     final language = prefs.getString(AppStrings.prefLanguage) ?? 'en';
-    final sessionID = prefs.getString(AppStrings.prefSessionID) ?? '';
+    final sessionID = prefs.getString(AppStrings.prefAppSessionID) ?? '';
 
     logger.d("Uploading file: ${basename(file.path)}");
     logger.d("User ID: $userId, UUID: $userUUID, Auth UUID: $authUUID");
@@ -184,21 +210,24 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final String referenceUUID = args?['reference_uuid'] ?? '';
     final String referenceFrom = args?['reference_from'] ?? '';
-    final String pageType = args?['pageType'] ?? '';
+    final bool isSingleFilePick = args?['isSingleFilePick'] ?? '';
 
     logger.e('$referenceFrom $referenceUUID');
     return Scaffold(
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60.0),
-          child: MyAppBar(title: AppStrings.uploadFile)),
+        preferredSize: Size.fromHeight(60.0),
+        child: MyAppBar(title: AppStrings.uploadFile),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            DottedBorderBox(onTap: pickFiles),
+            DottedBorderBox(
+              onTap: isSingleFilePick ? pickSingleFile : pickMultipleFiles,
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -206,22 +235,32 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                 itemBuilder: (_, index) {
                   final file = files[index];
                   return GestureDetector(
-                    onTap: (file.status == UploadStatus.initial ||
-                        file.status == UploadStatus.failed)
+                    onTap:
+                        (file.status == UploadStatus.initial ||
+                            file.status == UploadStatus.failed)
                         ? () => uploadFile(
-                        file, referenceFrom, referenceUUID, file.name)
+                            file,
+                            referenceFrom,
+                            referenceUUID,
+                            file.name,
+                          )
                         : null,
                     child: Card(
                       elevation: 0.0,
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
-                        side:
-                        BorderSide(color: AppColors.primaryColor, width: 1),
+                        side: BorderSide(
+                          color: AppColors.primaryColor,
+                          width: 1,
+                        ),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(
-                            left: 15.0, bottom: 10.0, right: 5.0),
+                          left: 15.0,
+                          bottom: 10.0,
+                          right: 5.0,
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -230,41 +269,49 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height: 10.0),
-                                  Text(file.name,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  Text(
+                                    file.name,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   SizedBox(height: 5),
                                   Text(_formatFileSize(file.file.lengthSync())),
                                   SizedBox(height: 5),
                                   if (file.status == UploadStatus.initial)
                                     Text(
                                       "Upload pending, Click to upload",
-                                      style: TextStyle(
-                                        color: Colors.orange,
-                                      ),
+                                      style: TextStyle(color: Colors.orange),
                                     )
-                                  else if (file.status == UploadStatus.compressing)
+                                  else if (file.status ==
+                                      UploadStatus.compressing)
                                     Text(
                                       "File upload in progress...",
-                                      style: TextStyle(
-                                        color: Colors.blue,
+                                      style: TextStyle(color: Colors.blue),
+                                    )
+                                  else if (file.status ==
+                                      UploadStatus.uploading)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 15.0,
+                                        top: 5.0,
+                                        bottom: 5.0,
+                                      ),
+                                      child: LinearProgressIndicator(
+                                        value: file.progress,
+                                        color: Colors.green.shade600,
                                       ),
                                     )
-                                  else if (file.status == UploadStatus.uploading)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 15.0, top: 5.0, bottom: 5.0),
-                                        child: LinearProgressIndicator(
-                                          value: file.progress,
-                                          color: Colors.green.shade600,
-                                        ),
-                                      )
-                                    else if (file.status == UploadStatus.success)
-                                        Text("File Uploaded Successfully!!",
-                                            style: TextStyle(color: Colors.green))
-                                      else if (file.status == UploadStatus.failed)
-                                          Text("Upload failed",
-                                              style: TextStyle(color: Colors.red)),
+                                  else if (file.status == UploadStatus.success)
+                                    Text(
+                                      "File Uploaded Successfully!!",
+                                      style: TextStyle(color: Colors.green),
+                                    )
+                                  else if (file.status == UploadStatus.failed)
+                                    Text(
+                                      "Upload failed",
+                                      style: TextStyle(color: Colors.red),
+                                    ),
                                 ],
                               ),
                             ),
@@ -277,18 +324,32 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                                   size: 30,
                                 ),
                                 onPressed: () => uploadFile(
-                                    file, referenceFrom, referenceUUID, file.name),
+                                  file,
+                                  referenceFrom,
+                                  referenceUUID,
+                                  file.name,
+                                ),
                               ),
                             if (file.status == UploadStatus.failed)
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.refresh, color: Colors.orange),
+                                    icon: Icon(
+                                      Icons.refresh,
+                                      color: Colors.orange,
+                                    ),
                                     onPressed: () => uploadFile(
-                                        file, referenceFrom, referenceUUID, file.name),
+                                      file,
+                                      referenceFrom,
+                                      referenceUUID,
+                                      file.name,
+                                    ),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete_forever, color: Colors.red),
+                                    icon: Icon(
+                                      Icons.delete_forever,
+                                      color: Colors.red,
+                                    ),
                                     onPressed: () =>
                                         setState(() => files.removeAt(index)),
                                   ),
@@ -296,7 +357,10 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
                               ),
                             if (file.status == UploadStatus.initial)
                               IconButton(
-                                icon: Icon(Icons.delete_forever, color: Colors.red),
+                                icon: Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.red,
+                                ),
                                 onPressed: () =>
                                     setState(() => files.removeAt(index)),
                               ),
@@ -349,8 +413,11 @@ class DottedBorderBox extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_upload_outlined,
-                  size: 40, color: AppColors.primaryColor),
+              Icon(
+                Icons.cloud_upload_outlined,
+                size: 40,
+                color: AppColors.primaryColor,
+              ),
               SizedBox(height: 10),
               Column(
                 children: [
@@ -364,9 +431,10 @@ class DottedBorderBox extends StatelessWidget {
                     "(Maximum file size is 20MB)".toUpperCase(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.red.shade700,
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.red.shade700,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

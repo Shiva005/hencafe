@@ -49,7 +49,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -74,7 +74,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -102,7 +102,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -114,6 +114,42 @@ class AuthServices {
     return ValidateOtpModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
+  }
+
+  Future<SuccessModel> appSessionStart(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile_number': prefs.getString(AppStrings.prefMobileNumber),
+      'session_uuid': prefs.getString(AppStrings.prefAppSessionID),
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.START_APP_SESSION),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(payload),
+    );
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<SuccessModel> appSessionEnd(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'mobile_number': prefs.getString(AppStrings.prefMobileNumber),
+      'session_uuid': prefs.getString(AppStrings.prefAppSessionID),
+    };
+
+    final response = await http.put(
+      Uri.parse(ServiceNames.END_APP_SESSION),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(payload),
+    );
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
   Future<ValidateOtpModel> companyUpdate(
@@ -150,7 +186,7 @@ class AuthServices {
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -187,7 +223,7 @@ class AuthServices {
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -220,7 +256,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -242,7 +278,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -265,7 +301,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -305,7 +341,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -346,7 +382,7 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -387,7 +423,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -421,7 +457,7 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -449,7 +485,7 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage) ?? 'en',
         'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
         'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
-        'session-id': prefs.getString(AppStrings.prefSessionID) ?? '',
+        'session-id': prefs.getString(AppStrings.prefAppSessionID) ?? '',
       },
     );
 
@@ -482,7 +518,7 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage) ?? 'en',
         'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
         'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
-        'session-id': prefs.getString(AppStrings.prefSessionID) ?? '',
+        'session-id': prefs.getString(AppStrings.prefAppSessionID) ?? '',
         'user-id': prefs.getString(AppStrings.prefUserID)!,
       },
     );
@@ -502,7 +538,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'language': prefs.getString(AppStrings.prefLanguage)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -528,7 +564,7 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
         'user-id': prefs.getString(AppStrings.prefUserID)!,
       },
       body: jsonEncode(payload),
@@ -563,7 +599,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -608,7 +644,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -654,7 +690,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -708,7 +744,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -764,7 +800,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -822,7 +858,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -876,7 +912,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -918,7 +954,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -974,7 +1010,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -1034,7 +1070,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -1089,7 +1125,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -1146,7 +1182,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -1174,7 +1210,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1203,7 +1239,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1229,7 +1265,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1252,7 +1288,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1281,7 +1317,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1306,7 +1342,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1330,7 +1366,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1359,7 +1395,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1387,7 +1423,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1416,7 +1452,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1447,7 +1483,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1478,7 +1514,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1504,7 +1540,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1528,7 +1564,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1552,7 +1588,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1576,7 +1612,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1600,7 +1636,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1624,7 +1660,7 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
         'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
 
@@ -1648,7 +1684,7 @@ class AuthServices {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'language': prefs.getString(AppStrings.prefLanguage)!,
-        'session-id': prefs.getString(AppStrings.prefSessionID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
     );
@@ -1684,7 +1720,7 @@ class AuthServices {
       'user-id': prefs.getString(AppStrings.prefUserID) ?? '',
       'user-uuid': prefs.getString(AppStrings.prefUserUUID) ?? '',
       'auth-uuid': prefs.getString(AppStrings.prefAuthID) ?? '',
-      'session-id': prefs.getString(AppStrings.prefSessionID)!,
+      'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
     });
 
     try {
@@ -1754,12 +1790,12 @@ class StatusCodeHandler {
           var mb = prefs.getString(AppStrings.prefMobileNumber);
           var language = prefs.getString(AppStrings.prefLanguage);
           var countryCode = prefs.getString(AppStrings.prefCountryCode);
-          var sessionID = prefs.getString(AppStrings.prefSessionID);
+          var sessionID = prefs.getString(AppStrings.prefAppSessionID);
           prefs.clear();
           prefs.setString(AppStrings.prefLanguage, language!);
           prefs.setString(AppStrings.prefMobileNumber, mb!);
           prefs.setString(AppStrings.prefCountryCode, countryCode!);
-          prefs.setString(AppStrings.prefSessionID, sessionID!);
+          prefs.setString(AppStrings.prefAppSessionID, sessionID!);
           NavigationHelper.pushReplacementNamedUntil(AppRoutes.loginMobile);
         }
       },

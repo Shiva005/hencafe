@@ -509,13 +509,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                           var countryCode =
                               prefs.getString(AppStrings.prefCountryCode);
                           var sessionID =
-                              prefs.getString(AppStrings.prefSessionID);
+                              prefs.getString(AppStrings.prefAppSessionID);
                           prefs.clear();
                           prefs.setString(AppStrings.prefLanguage, language);
                           prefs.setString(AppStrings.prefMobileNumber, mb);
                           prefs.setString(
                               AppStrings.prefCountryCode, countryCode);
-                          prefs.setString(AppStrings.prefSessionID, sessionID);
+                          prefs.setString(AppStrings.prefAppSessionID, sessionID);
                           NavigationHelper.pushReplacementNamedUntil(
                               AppRoutes.loginMobile);
                         },

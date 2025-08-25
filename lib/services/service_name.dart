@@ -60,4 +60,6 @@ class ServiceNames {
       '${BASE_URL}v1/chicken-sale/delete?chickensale_uuid=';
   static String DELETE_LIFTING_SALE =
       '${BASE_URL}v1/lifting-sale/delete?liftingsale_uuid=';
+  static String START_APP_SESSION = '${BASE_URL}v1/session-track/start';
+  static String END_APP_SESSION = '${BASE_URL}v1/session-track/end';
 }

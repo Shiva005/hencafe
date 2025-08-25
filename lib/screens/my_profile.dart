@@ -111,7 +111,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade300,
                                   border: Border.all(
-                                    width: 3,
+                                    width: 0,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -120,8 +120,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                     (user.userBannerImg != null &&
                                         user.userBannerImg!.isNotEmpty)
                                     ? Image.network(
+                                        width: MediaQuery.of(
+                                          context,
+                                        ).size.width,
+                                        height: 100,
                                         user.userBannerImg![0].attachmentPath!,
-                                        fit: BoxFit.fitWidth,
+                                        fit: BoxFit.cover,
                                       )
                                     : Image.asset(
                                         AppIconsData.noImage,
@@ -227,18 +231,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     supplyList: detailsModel.apiResponse![0].supplyInfo ?? [],
                     pageType: AppRoutes.myProfileScreen,
                     userCompanyUUID: user.userUuid,
+                    createdByUserID: user.userId,
                   ),
                   FavouriteStateWidget(
                     favStateList: user.userFavouriteStateInfo ?? [],
                     userID: user.userId ?? '',
                   ),
-                  AddressWidget(addressList: user.addressDetails ?? [],
-                    pageType: AppRoutes.myProfileScreen,),
+                  AddressWidget(
+                    addressList: user.addressDetails ?? [],
+                    pageType: AppRoutes.myProfileScreen,
+                  ),
                   AttachmentWidget(
                     attachments: attachments,
                     userId: user.userId ?? '',
                     currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
-                    referenceFrom:"USER",
+                    referenceFrom: "USER",
                     referenceUUID: user.userUuid ?? '',
                     onDelete: (index) {
                       showDeleteAttachmentDialog(
