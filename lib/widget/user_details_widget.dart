@@ -177,7 +177,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                         arguments: {
                           'reference_from': "USER_BANNER",
                           'reference_uuid':
-                          widget.detailsModel.apiResponse![0].userUuid,
+                              widget.detailsModel.apiResponse![0].userUuid,
                           'isSingleFilePick': true,
                         },
                       )?.then((value) {
@@ -186,7 +186,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                           arguments: {
                             'pageType': AppRoutes.dashboardScreen,
                             'userID':
-                            widget.detailsModel.apiResponse![0].userId,
+                                widget.detailsModel.apiResponse![0].userId,
                           },
                         );
                       });
@@ -257,7 +257,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                           'reference_from': "USER",
                           'reference_uuid':
                               widget.detailsModel.apiResponse![0].userUuid,
-                          'pageType': AppRoutes.addressDetailsScreen,
+                          'isSingleFilePick': false,
                         },
                       )?.then((value) {
                         NavigationHelper.pushReplacementNamed(
@@ -271,7 +271,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
+                      backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 35),
                       shape: RoundedRectangleBorder(
@@ -313,7 +313,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Text("Edit Details"),
+                        Text("Update Details"),
                         SizedBox(width: 8),
                         Icon(Icons.arrow_right_alt, color: Colors.white),
                       ],

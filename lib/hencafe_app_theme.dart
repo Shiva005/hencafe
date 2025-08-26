@@ -20,20 +20,24 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  late final AppLifecycleObserver _lifecycleObserver = AppLifecycleObserver(context);
+  late final AppLifecycleObserver _lifecycleObserver = AppLifecycleObserver(
+    context,
+  );
 
   @override
   void initState() {
     super.initState();
     _lifecycleObserver.start();
     SessionManager.generateNewSessionId();
-    startSession();
+    Future.delayed(const Duration(seconds: 2), () {
+      startSession();
+    });
   }
 
   @override
   void dispose() {
     _lifecycleObserver.stop();
-    //endSession();
+    endSession();
     super.dispose();
   }
 

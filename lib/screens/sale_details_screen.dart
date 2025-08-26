@@ -620,6 +620,102 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                             ),
                                           ),
                                           const SizedBox(height: 20),
+
+                                          if (priceModel
+                                                  .apiResponse![0]
+                                                  .userBasicInfo![0]
+                                                  .userId ==
+                                              prefs.getString(
+                                                AppStrings.prefUserID,
+                                              ))
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                if (pageType ==
+                                                    AppRoutes.eggPriceScreen) {
+                                                  NavigationHelper.pushNamed(
+                                                    AppRoutes.uploadFileScreen,
+                                                    arguments: {
+                                                      'reference_from':
+                                                          'EGG_SALE',
+                                                      'reference_uuid':
+                                                          referenceUUID,
+                                                      'isSingleFilePick': false,
+                                                    },
+                                                  )?.then((value) {
+                                                    loadData();
+                                                  });
+                                                } else if (pageType ==
+                                                    AppRoutes
+                                                        .chickPriceScreen) {
+                                                  NavigationHelper.pushNamed(
+                                                    AppRoutes.uploadFileScreen,
+                                                    arguments: {
+                                                      'reference_from':
+                                                          'CHICK_SALE',
+                                                      'reference_uuid':
+                                                          referenceUUID,
+                                                      'isSingleFilePick': false,
+                                                    },
+                                                  )?.then((value) {
+                                                    loadData();
+                                                  });
+                                                } else if (pageType ==
+                                                    AppRoutes
+                                                        .chickenPriceScreen) {
+                                                  NavigationHelper.pushNamed(
+                                                    AppRoutes.uploadFileScreen,
+                                                    arguments: {
+                                                      'reference_from':
+                                                          'CHICKEN_SALE',
+                                                      'reference_uuid':
+                                                          referenceUUID,
+                                                      'isSingleFilePick': false,
+                                                    },
+                                                  )?.then((value) {
+                                                    loadData();
+                                                  });
+                                                } else if (pageType ==
+                                                    AppRoutes
+                                                        .liftingPriceScreen) {
+                                                  NavigationHelper.pushNamed(
+                                                    AppRoutes.uploadFileScreen,
+                                                    arguments: {
+                                                      'reference_from':
+                                                          'LIFTING_SALE',
+                                                      'reference_uuid':
+                                                          referenceUUID,
+                                                      'isSingleFilePick': false,
+                                                    },
+                                                  )?.then((value) {
+                                                    loadData();
+                                                  });
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                                foregroundColor: Colors.white,
+                                                minimumSize: const Size(
+                                                  double.infinity,
+                                                  35,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: const [
+                                                  Text("Add Attachment"),
+                                                  SizedBox(width: 8),
+                                                  Icon(
+                                                    Icons.arrow_right_alt,
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           if (priceModel
                                                   .apiResponse![0]
                                                   .userBasicInfo![0]
@@ -707,7 +803,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: const [
-                                                  Text("Edit Sale details"),
+                                                  Text("Update Sale details"),
                                                   SizedBox(width: 8),
                                                   Icon(
                                                     Icons.arrow_right_alt,

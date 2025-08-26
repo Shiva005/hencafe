@@ -240,7 +240,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
               arguments: {
                 'reference_from': "ADDRESS",
                 'reference_uuid': address.addressUuid,
-                'pageType': AppRoutes.addressDetailsScreen,
+                'isSingleFilePick': false,
               },
             )?.then((value) {
               if (widget.pageType == AppRoutes.companyDetailsScreen) {

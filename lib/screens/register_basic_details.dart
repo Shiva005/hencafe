@@ -357,6 +357,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     'FAR': 'Farmer',
     'SUP': 'Supplier',
     'TR': 'Trader',
+    'RET': 'Retailer',
     'DOC': 'Doctor',
     'OTH': 'Others',
   };
@@ -376,7 +377,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, bottom: 20.0),
                 child: Text(
-                  'Address Type',
+                  'Work Type',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                 ),
               ),

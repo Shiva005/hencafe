@@ -215,7 +215,6 @@ class _UploadFileScreenState extends State<UploadFileScreen> {
     final String referenceFrom = args?['reference_from'] ?? '';
     final bool isSingleFilePick = args?['isSingleFilePick'] ?? '';
 
-    logger.e('$referenceFrom $referenceUUID');
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),

@@ -865,15 +865,13 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                                           arguments: {
                                             'reference_from': 'CHICKEN_SALE',
                                             'reference_uuid': uuids,
-                                            'pageType':
-                                                AppRoutes.sellChickenScreen,
+                                            'isSingleFilePick': false,
                                           },
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper
-                                            .pushReplacementNamedUntil(
-                                          AppRoutes.dashboardScreen,
+                                        NavigationHelper.pushReplacementNamed(
+                                          AppRoutes.chickenPriceScreen,
                                         );
                                       },
                                       btnOkText: 'Yes',

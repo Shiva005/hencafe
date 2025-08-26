@@ -46,7 +46,7 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
         // Do nothing (inactive is just temporary, e.g., phone call, lock screen)
         break;
       case AppLifecycleState.hidden:
-        throw UnimplementedError();
+        break;
     }
   }
 }

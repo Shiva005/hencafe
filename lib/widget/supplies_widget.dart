@@ -202,49 +202,60 @@ class _SuppliesWidgetState extends State<SuppliesWidget> {
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () async {
-                      var prefs = await SharedPreferences.getInstance();
-                      var updateSupplyRes;
-                      if (widget.pageType == AppRoutes.companyDetailsScreen) {
-                        updateSupplyRes = await AuthServices().updateSupplies(
-                          context,
-                          'COMPANY',
-                          _selectedSupplyIDs.join(","),
-                          userCompanyUUID,
-                        );
-                      } else if (widget.pageType == AppRoutes.myProfileScreen) {
-                        updateSupplyRes = await AuthServices().updateSupplies(
-                          context,
-                          'USER',
-                          _selectedSupplyIDs.join(","),
-                          userCompanyUUID,
-                        );
-                      }
-                      Navigator.pop(context);
-                      SnackbarHelper.showSnackBar(
-                        updateSupplyRes.apiResponse![0].responseDetails,
-                      );
-                      if (widget.pageType == AppRoutes.companyDetailsScreen) {
-                        NavigationHelper.pushReplacementNamed(
-                          AppRoutes.companyDetailsScreen,
-                          arguments: {
-                            'companyUUID': userCompanyUUID,
-                            'companyPromotionStatus': 'true',
-                          },
-                        );
-                      } else if (widget.pageType == AppRoutes.myProfileScreen) {
-                        NavigationHelper.pushReplacementNamed(
-                          AppRoutes.myProfileScreen,
-                          arguments: {
-                            'pageType': AppRoutes.dashboardScreen,
-                            'userID': prefs.getString(AppStrings.prefUserID),
-                          },
-                        );
-                      }
-                    },
-
+                    onPressed: _selectedSupplyIDs.isNotEmpty
+                        ? () async {
+                            var prefs = await SharedPreferences.getInstance();
+                            var updateSupplyRes;
+                            if (widget.pageType ==
+                                AppRoutes.companyDetailsScreen) {
+                              updateSupplyRes = await AuthServices()
+                                  .updateSupplies(
+                                    context,
+                                    'COMPANY',
+                                    _selectedSupplyIDs.join(","),
+                                    userCompanyUUID,
+                                  );
+                            } else if (widget.pageType ==
+                                AppRoutes.myProfileScreen) {
+                              updateSupplyRes = await AuthServices()
+                                  .updateSupplies(
+                                    context,
+                                    'USER',
+                                    _selectedSupplyIDs.join(","),
+                                    userCompanyUUID,
+                                  );
+                            }
+                            Navigator.pop(context);
+                            SnackbarHelper.showSnackBar(
+                              updateSupplyRes.apiResponse![0].responseDetails,
+                            );
+                            if (widget.pageType ==
+                                AppRoutes.companyDetailsScreen) {
+                              NavigationHelper.pushReplacementNamed(
+                                AppRoutes.companyDetailsScreen,
+                                arguments: {
+                                  'companyUUID': userCompanyUUID,
+                                  'companyPromotionStatus': 'true',
+                                },
+                              );
+                            } else if (widget.pageType ==
+                                AppRoutes.myProfileScreen) {
+                              NavigationHelper.pushReplacementNamed(
+                                AppRoutes.myProfileScreen,
+                                arguments: {
+                                  'pageType': AppRoutes.dashboardScreen,
+                                  'userID': prefs.getString(
+                                    AppStrings.prefUserID,
+                                  ),
+                                },
+                              );
+                            }
+                          }
+                        : null, // disabled if no supply selected
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
+                      backgroundColor: _selectedSupplyIDs.isNotEmpty
+                          ? AppColors.primaryColor
+                          : Colors.grey,
                     ),
                     child: const Text(
                       "Save",

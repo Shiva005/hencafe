@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../services/services.dart';
@@ -396,7 +397,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                   ),
                   IconButton(
                     onPressed: () => NavigationHelper.pushReplacementNamed(
-                      AppRoutes.chickenPriceScreen,
+                      AppRoutes.liftingPriceScreen,
                     ),
                     icon: const Icon(Icons.refresh, color: Colors.black54),
                   ),
@@ -585,8 +586,17 @@ class LiftingSaleCard extends StatelessWidget {
                               size: 18,
                             ),
                             const SizedBox(width: 3),
-                            Text(
-                              "${liftingPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${liftingPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}",
+                            Expanded(
+                              child: TextScroll(
+                                "${liftingPriceModel.apiResponse![index].addressDetails![0].cityNameLanguage!}, ${liftingPriceModel.apiResponse![index].addressDetails![0].stateNameLanguage!}",
+                                intervalSpaces: 10,
+                                velocity: const Velocity(
+                                  pixelsPerSecond: Offset(30, 0),
+                                ),
+                                fadedBorder: true,
+                                fadeBorderVisibility: FadeBorderVisibility.auto,
+                                fadeBorderSide: FadeBorderSide.both,
+                              ),
                             ),
                           ],
                         ),

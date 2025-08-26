@@ -53,387 +53,479 @@ class _DashboardScreenState extends State<DashboardScreen>
     prefs = await SharedPreferences.getInstance();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _packageName = packageInfo.packageName;
-    getProfileRes = await AuthServices()
-        .getProfile(context, prefs.getString(AppStrings.prefUserID));
+    getProfileRes = await AuthServices().getProfile(
+      context,
+      prefs.getString(AppStrings.prefUserID),
+    );
     if (getProfileRes.errorCount == 0) {
-      prefs.setString(AppStrings.prefFirstName,
-          getProfileRes.apiResponse![0].userFirstName);
       prefs.setString(
-          AppStrings.prefLastName, getProfileRes.apiResponse![0].userLastName);
-      prefs.setString(AppStrings.prefIsUserVerified,
-          getProfileRes.apiResponse![0].userIsVerfied);
+        AppStrings.prefFirstName,
+        getProfileRes.apiResponse![0].userFirstName,
+      );
       prefs.setString(
-          AppStrings.prefFavStateMaxCount,
-          getProfileRes
-              .apiResponse![0].userMembershipInfo[0].userFavStateMaxCount);
+        AppStrings.prefLastName,
+        getProfileRes.apiResponse![0].userLastName,
+      );
+      prefs.setString(
+        AppStrings.prefIsUserVerified,
+        getProfileRes.apiResponse![0].userIsVerfied,
+      );
+      prefs.setString(
+        AppStrings.prefFavStateMaxCount,
+        getProfileRes
+            .apiResponse![0]
+            .userMembershipInfo[0]
+            .userFavStateMaxCount,
+      );
       if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
-        prefs.setString(AppStrings.prefUserImage,
-            getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath);
+        prefs.setString(
+          AppStrings.prefUserImage,
+          getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath,
+        );
       }
       prefs.setString(
-          AppStrings.prefEmail, getProfileRes.apiResponse![0].userEmail);
+        AppStrings.prefEmail,
+        getProfileRes.apiResponse![0].userEmail,
+      );
     }
     if (getProfileRes.apiResponse![0].userFavouriteStateInfo!.isEmpty) {
       prefs.setBool(AppStrings.prefIsFavStateSelected, false);
-      NavigationHelper.pushNamed(
-        AppRoutes.stateSelection,
-      );
+      NavigationHelper.pushNamed(AppRoutes.stateSelection);
     } else {
       prefs.setBool(AppStrings.prefIsFavStateSelected, true);
     }
     setState(() {});
   }
 
+  Future<bool> _onWillPop() async {
+    bool? exitApp = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Exit App"),
+        content: const Text("Do you really want to exit the app?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // stay
+            child: const Text("No"),
+          ),
+          TextButton(
+            onPressed: () async => {
+              await AuthServices().appSessionEnd(context),
+              Navigator.of(context).pop(true),
+            }, // exit
+            child: const Text("Yes"),
+          ),
+        ],
+      ),
+    );
+    return exitApp ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          title: Text(
-            prefs != null
-                ? '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}'
-                : "",
-            style: AppTheme.appbarTextStyle,
-          ),
-          centerTitle: false,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.format_align_left,
-              color: Colors.black54,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.0),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            title: Text(
+              prefs != null
+                  ? '${prefs.getString(AppStrings.prefLastName)} ${prefs.getString(AppStrings.prefFirstName)}'
+                  : "",
+              style: AppTheme.appbarTextStyle,
             ),
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.notifications_active_outlined,
-                color: Colors.black54,
-              ),
+            centerTitle: false,
+            leading: IconButton(
+              icon: const Icon(Icons.format_align_left, color: Colors.black54),
               onPressed: () {
-                NavigationHelper.pushNamed(
-                  AppRoutes.notificationsScreen,
-                );
+                _scaffoldKey.currentState?.openDrawer();
               },
             ),
-          ],
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.notifications_active_outlined,
+                  color: Colors.black54,
+                ),
+                onPressed: () {
+                  NavigationHelper.pushNamed(AppRoutes.notificationsScreen);
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      drawer: Drawer(
-        backgroundColor: Colors.grey.shade100,
-        child: FutureBuilder(
-          future: Future.delayed(const Duration(milliseconds: 1000)),
-          builder: (context, snapshot) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blueGrey.shade100),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(18),
-                          bottomRight: Radius.circular(18),
+        drawer: Drawer(
+          backgroundColor: Colors.grey.shade100,
+          child: FutureBuilder(
+            future: Future.delayed(const Duration(milliseconds: 1000)),
+            builder: (context, snapshot) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.blueGrey.shade100),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(18),
+                            bottomRight: Radius.circular(18),
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 30.0, left: 10, right: 10, bottom: 15),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 30,
-                              backgroundImage: NetworkImage(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 30.0,
+                            left: 10,
+                            right: 10,
+                            bottom: 15,
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(
                                   prefs.getString(AppStrings.prefUserImage) ??
-                                      ''),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 15.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Wrap(
-                                    children: [
-                                      Text(/*${prefs.getString(AppStrings.prefLastName)} \n*/
-                                        '${prefs.getString(AppStrings.prefFirstName)}',
-                                        style: AppTheme.primaryColorTextStyle,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    prefs
-                                        .getString(AppStrings.prefMobileNumber),
-                                    style: AppTheme.secondaryHeadingDrawer,
-                                  ),
-                                ],
+                                      '',
+                                ),
                               ),
-                            ),
-                          ],
+                              Padding(
+                                padding: const EdgeInsets.only(left: 15.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Wrap(
+                                      children: [
+                                        Text(
+                                          /*${prefs.getString(AppStrings.prefLastName)} \n*/
+                                          '${prefs.getString(AppStrings.prefFirstName)}',
+                                          style: AppTheme.primaryColorTextStyle,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      prefs.getString(
+                                        AppStrings.prefMobileNumber,
+                                      ),
+                                      style: AppTheme.secondaryHeadingDrawer,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 15),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blueGrey.shade100),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Home'),
-                            leading: SizedBox(
+                      SizedBox(height: 15),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.blueGrey.shade100),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Home'),
+                              leading: SizedBox(
                                 width: 23,
                                 height: 23,
                                 child: Icon(
                                   Icons.home_outlined,
                                   color: AppColors.primaryColor,
-                                )),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.myProfileScreen,
-                                arguments: {
-                                  'pageType': AppRoutes.dashboardScreen,
-                                },
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('My Profile'),
-                            leading: SizedBox(
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.myProfileScreen,
+                                  arguments: {
+                                    'pageType': AppRoutes.dashboardScreen,
+                                  },
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('My Profile'),
+                              leading: SizedBox(
                                 width: 23,
                                 height: 23,
-                                child: Icon(Icons.person_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.changePassword,
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Change Password'),
-                            leading: SizedBox(
+                                child: Icon(
+                                  Icons.person_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.changePassword,
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Change Password'),
+                              leading: SizedBox(
                                 width: 23,
                                 height: 23,
-                                child: Icon(Icons.lock_open,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.changeMobileScreen,
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Change Mobile Number'),
-                            leading: SizedBox(
+                                child: Icon(
+                                  Icons.lock_open,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.changeMobileScreen,
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Change Mobile Number'),
+                              leading: SizedBox(
                                 width: 23,
                                 height: 23,
-                                child: Icon(Icons.perm_phone_msg_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blueGrey.shade100),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Change Language'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.language,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.stateSelection,
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Favourite States'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.location_on_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              NavigationHelper.pushNamed(
-                                AppRoutes.referralBonusScreen,
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Referral Bonus'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.card_giftcard,
-                                    color: AppColors.primaryColor)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blueGrey.shade100),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            onTap: () {
-                              NavigationHelper.pushNamed(
-                                AppRoutes.deleteAccountScreen,
-                              );
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Delete Account'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.delete_outline,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              Utils.openLink(
-                                  "https://svpfarms.in/privacy_policy.html");
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Privacy Policy'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.privacy_tip_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              SharePlus.instance.share(ShareParams(
-                                  text: AppStrings.shareText + _packageName));
-                              _scaffoldKey.currentState?.closeDrawer();
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Share App'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.share_outlined,
-                                    color: AppColors.primaryColor)),
-                          ),
-                          ListTile(
-                            onTap: () {
-                              _scaffoldKey.currentState?.closeDrawer();
-                              rateApp();
-                            },
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -3),
-                            title: const Text('Rate App'),
-                            leading: SizedBox(
-                                width: 23,
-                                height: 23,
-                                child: Icon(Icons.star_purple500,
-                                    color: AppColors.primaryColor)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: TextButton(
-                      onPressed: () {
-                        _scaffoldKey.currentState?.closeDrawer();
-                        showLogoutDialog(context);
-                      },
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(30.0),
-                            bottom: Radius.circular(30.0),
-                          ),
-                        ),
-                        side: BorderSide(
-                          color: Colors.red, // Black border color
-                          width: 1, // Border width
+                                child: Icon(
+                                  Icons.perm_phone_msg_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.logout,
-                            color: Colors.red,
+                      SizedBox(height: 5),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.blueGrey.shade100),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Change Language'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.language,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.stateSelection,
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Favourite States'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.location_on_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.referralBonusScreen,
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Referral Bonus'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.card_giftcard,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.blueGrey.shade100),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.deleteAccountScreen,
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Delete Account'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                Utils.openLink(
+                                  "https://svpfarms.in/privacy_policy.html",
+                                );
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Privacy Policy'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.privacy_tip_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                SharePlus.instance.share(
+                                  ShareParams(
+                                    text: AppStrings.shareText + _packageName,
+                                  ),
+                                );
+                                _scaffoldKey.currentState?.closeDrawer();
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Share App'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.share_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                _scaffoldKey.currentState?.closeDrawer();
+                                rateApp();
+                              },
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -3,
+                              ),
+                              title: const Text('Rate App'),
+                              leading: SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: Icon(
+                                  Icons.star_purple500,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: TextButton(
+                        onPressed: () {
+                          _scaffoldKey.currentState?.closeDrawer();
+                          showLogoutDialog(context);
+                        },
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(30.0),
+                              bottom: Radius.circular(30.0),
+                            ),
                           ),
-                          SizedBox(
-                            width: 10,
+                          side: BorderSide(
+                            color: Colors.red, // Black border color
+                            width: 1, // Border width
                           ),
-                          Text(
-                            AppStrings.logout,
-                            style: AppTheme.rejectedTitle,
-                          ),
-                        ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.logout, color: Colors.red),
+                            SizedBox(width: 10),
+                            Text(
+                              AppStrings.logout,
+                              style: AppTheme.rejectedTitle,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
+        body: HomeFragment(),
       ),
-      body: HomeFragment(),
     );
   }
 
@@ -451,8 +543,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           backgroundColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -466,11 +559,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     shape: BoxShape.circle,
                     color: Colors.red.shade50, // Light red background
                   ),
-                  child: Icon(
-                    Icons.logout,
-                    color: Colors.red,
-                    size: 30,
-                  ),
+                  child: Icon(Icons.logout, color: Colors.red, size: 30),
                 ),
                 const SizedBox(height: 15),
                 // Logout Text
@@ -504,20 +593,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         onPressed: () {
                           var mb = prefs.getString(AppStrings.prefMobileNumber);
-                          var language =
-                              prefs.getString(AppStrings.prefLanguage);
-                          var countryCode =
-                              prefs.getString(AppStrings.prefCountryCode);
-                          var sessionID =
-                              prefs.getString(AppStrings.prefAppSessionID);
+                          var language = prefs.getString(
+                            AppStrings.prefLanguage,
+                          );
+                          var countryCode = prefs.getString(
+                            AppStrings.prefCountryCode,
+                          );
+                          var sessionID = prefs.getString(
+                            AppStrings.prefAppSessionID,
+                          );
                           prefs.clear();
                           prefs.setString(AppStrings.prefLanguage, language);
                           prefs.setString(AppStrings.prefMobileNumber, mb);
                           prefs.setString(
-                              AppStrings.prefCountryCode, countryCode);
-                          prefs.setString(AppStrings.prefAppSessionID, sessionID);
+                            AppStrings.prefCountryCode,
+                            countryCode,
+                          );
+                          prefs.setString(
+                            AppStrings.prefAppSessionID,
+                            sessionID,
+                          );
                           NavigationHelper.pushReplacementNamedUntil(
-                              AppRoutes.loginMobile);
+                            AppRoutes.loginMobile,
+                          );
                         },
                         child: Text("Yes, Logout"),
                       ),

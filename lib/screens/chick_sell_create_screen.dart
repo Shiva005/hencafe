@@ -991,14 +991,13 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                           arguments: {
                                             'reference_from': 'CHICK_SALE',
                                             'reference_uuid': uuids,
-                                            'pageType':
-                                                AppRoutes.sellChickScreen,
+                                            'isSingleFilePick': false,
                                           },
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamedUntil(
-                                          AppRoutes.dashboardScreen,
+                                        NavigationHelper.pushReplacementNamed(
+                                          AppRoutes.chickPriceScreen,
                                         );
                                       },
                                       btnOkText: 'Yes',

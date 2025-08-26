@@ -226,8 +226,6 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                 ),
                 const SizedBox(height: 20),
                 RoundedLoadingButton(
-                  width: double.infinity,
-                  height: 50.0,
                   controller: _btnVerifyController,
                   onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {

@@ -150,7 +150,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                 left: 16,
                                 bottom: -50,
                                 child: GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     logger.w("message");
                                     Navigator.push(
                                       context,
@@ -159,8 +159,8 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                           imageUrl: company
                                               .attachmentLogoInfo![0]
                                               .attachmentPath!,
-                                          pageType: AppRoutes
-                                              .companyDetailsScreen,
+                                          pageType:
+                                              AppRoutes.companyDetailsScreen,
                                         ),
                                       ),
                                     );
@@ -171,15 +171,27 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                       Card(
                                         elevation: 3.0,
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(6),
-                                          child: Image.network(
-                                            company
-                                                .attachmentLogoInfo![0]
-                                                .attachmentPath!,
-                                            width: 70,
-                                            height: 70,
-                                            fit: BoxFit.cover,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
                                           ),
+                                          child:
+                                              company
+                                                  .attachmentLogoInfo!
+                                                  .isNotEmpty
+                                              ? Image.network(
+                                                  company
+                                                      .attachmentLogoInfo![0]
+                                                      .attachmentPath!,
+                                                  width: 70,
+                                                  height: 70,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  AppIconsData.noImage,
+                                                  width: 70,
+                                                  height: 70,
+                                                  fit: BoxFit.cover,
+                                                ),
                                         ),
                                       ),
                                       const SizedBox(width: 10),

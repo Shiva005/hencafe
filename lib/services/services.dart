@@ -52,10 +52,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Registration Check: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return RegistrationCheckModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -77,11 +73,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG OTP Generate: $payload');
-    logger.d(
-      'TAG OTP Generate: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return OtpGenerateModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
@@ -106,11 +97,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG OTP Validate: $payload');
-    logger.d(
-      'TAG OTP Validate: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return ValidateOtpModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -131,6 +117,7 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
+    logger.w(prefs.getString(AppStrings.prefAppSessionID));
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -149,6 +136,7 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
+    logger.w(prefs.getString(AppStrings.prefAppSessionID));
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -190,9 +178,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('Company Update: $payload');
-    logger.d('Company Update: ${json.decode(utf8.decode(response.bodyBytes))}');
     return ValidateOtpModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -227,11 +212,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Change Number: $payload');
-    logger.d(
-      'TAG Change Number: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -260,9 +240,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Login: $payload');
-    logger.d('TAG Login: ${json.decode(utf8.decode(response.bodyBytes))}');
     return LoginPinCheckModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -280,10 +257,6 @@ class AuthServices {
         'language': prefs.getString(AppStrings.prefLanguage)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG State List: ${ServiceNames.GET_STATE_LIST}/${prefs.getString(AppStrings.prefCountryCode)}/states',
     );
     return StateModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -304,8 +277,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d('TAG City List: ${json.decode(utf8.decode(response.bodyBytes))}');
     return CityListModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -345,9 +316,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Register: $payload');
-    logger.d('TAG Register: ${json.decode(utf8.decode(response.bodyBytes))}');
     return RegistrationCreateModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -386,11 +354,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Update Details: $payload');
-    logger.d(
-      'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -427,10 +390,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d(
-      'TAG Delete Profile: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -461,11 +420,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Update Details: $payload');
-    logger.d(
-      'TAG Update Details: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -490,7 +444,6 @@ class AuthServices {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      logger.d('Response Body: ${response.body}');
       return ProfileModel.fromJson(
         json.decode(utf8.decode(response.bodyBytes)),
       );
@@ -522,8 +475,6 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
       },
     );
-
-    logger.d('TAG Get Users List: ${response.body}');
     return ProfileModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -541,8 +492,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d('TAG Supplies: ${json.decode(utf8.decode(response.bodyBytes))}');
     return SupplyModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -568,11 +517,6 @@ class AuthServices {
         'user-id': prefs.getString(AppStrings.prefUserID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Update State: $payload');
-    logger.d(
-      'TAG Update State: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -602,11 +546,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Update Supplies: $payload');
-    logger.d(
-      'TAG Update Supplies: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -648,11 +587,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Create Address: $payload');
-    logger.d(
-      'TAG Create Address: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -693,11 +627,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Update Address: $payload');
-    logger.d(
-      'TAG Update Address: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -747,11 +676,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d(
-      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -803,11 +727,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d(
-      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -862,11 +781,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Create Sell Chick: $payload');
-    logger.d(
-      'TAG Create Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -916,11 +830,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Create Lifting Sale: $payload');
-    logger.d(
-      'TAG Create Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -957,11 +866,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Create Support: $payload');
-    logger.d(
-      'TAG Create Support: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1013,11 +917,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Update Lifting Sale: $payload');
-    logger.d(
-      'TAG Update Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1074,11 +973,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Update Sell Chick: $payload');
-    logger.d(
-      'TAG Update Sell Chick: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1128,11 +1022,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
       body: jsonEncode(payload),
-    );
-
-    logger.d('TAG Create Sell Chicken: $payload');
-    logger.d(
-      'TAG Create Sell Chicken: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1186,11 +1075,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Create Sell Egg: $payload');
-    logger.d(
-      'TAG Create Sell Egg: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1212,10 +1096,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Fav State: ${ServiceNames.GET_FAV_STATE_LIST}/${prefs.getString(AppStrings.prefUserID)}/favourite-states?profile_id=$thirdPartUserID',
     );
     return UserFavouriteStateModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
@@ -1242,13 +1122,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.w(
-      'TAG Get Contact History: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
-    logger.w(
-      'TAG Get Contact History: ${ServiceNames.GET_CONTACT_HISTORY}$communicationType&&assigned_user_id=${prefs.getString(AppStrings.prefUserID)!}&&communication_id=$communicationID',
-    );
     return ContactHistoryModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1268,10 +1141,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Bird Breed: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return BirdBreedModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1290,10 +1159,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Company List: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return CompanyListModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
@@ -1320,10 +1185,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return CompanyProvidersModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1345,10 +1206,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return ReferralModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1368,10 +1225,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Company providers List: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return MedicineModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1398,10 +1251,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return EggPriceModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1425,10 +1274,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Egg Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return AddressModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1454,10 +1299,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Chick Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return ChickPriceModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
@@ -1486,10 +1327,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Chicken Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return ChickenPriceModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1517,10 +1354,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return LiftingPriceModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1543,10 +1376,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Delete Address: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1566,10 +1395,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Get Lifting Price List: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1591,10 +1416,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Delete Egg Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1614,10 +1435,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Delete Chick Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1639,10 +1456,6 @@ class AuthServices {
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
     );
-
-    logger.d(
-      'TAG Delete Chicken Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
-    );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
@@ -1662,10 +1475,6 @@ class AuthServices {
         'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
         'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
       },
-    );
-
-    logger.d(
-      'TAG Delete Lifting Sale: ${json.decode(utf8.decode(response.bodyBytes))}',
     );
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
@@ -1688,9 +1497,6 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-
-    logger.d('TAG Forget Pin: $payload');
-    logger.d('TAG Forget Pin: ${json.decode(utf8.decode(response.bodyBytes))}');
     return ForgetPinModel.fromJson(
       json.decode(utf8.decode(response.bodyBytes)),
     );
@@ -1727,9 +1533,6 @@ class AuthServices {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      logger.d('Request Data: ${request.fields}');
-      logger.d('Response: ${response.statusCode}');
-      logger.d('Response Body: ${response.body}');
       return SuccessModel.fromJson(
         json.decode(utf8.decode(response.bodyBytes)),
       );
