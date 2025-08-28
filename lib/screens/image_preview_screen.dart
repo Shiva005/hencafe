@@ -5,22 +5,20 @@ import '../utils/appbar_widget.dart';
 import '../values/app_strings.dart';
 
 class ImagePreviewScreen extends StatelessWidget {
-  final String imageUrl;
-  final String pageType;
-
-  const ImagePreviewScreen(
-      {super.key, required this.imageUrl, required this.pageType});
+  const ImagePreviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    String imageUrl = args['imageUrl'] ?? '';
+    var pageType = args['pageType'] ?? '';
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      appBar: pageType == "AppStatus"
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(60.0),
-              child: MyAppBar(title: AppStrings.imagePreview),
-            ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: MyAppBar(title: AppStrings.imagePreview),
+      ),
       body: Center(
         child: PhotoView(
           imageProvider: NetworkImage(imageUrl),

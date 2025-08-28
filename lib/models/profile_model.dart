@@ -1,6 +1,4 @@
-import 'package:hencafe/models/state_model.dart';
 import 'package:hencafe/models/user_fav_state_info.dart';
-import 'package:hencafe/models/user_favourite_state_model.dart';
 
 import 'address_details_model.dart';
 import 'attachment_model.dart';
@@ -178,12 +176,14 @@ class ApiResponse {
     map['user_login_status'] = userLoginStatus;
     map['user_is_verfied'] = userIsVerfied;
     if (userFavouriteStateInfo != null) {
-      map['user_favourite_state_info'] =
-          userFavouriteStateInfo?.map((v) => v.toJson()).toList();
+      map['user_favourite_state_info'] = userFavouriteStateInfo
+          ?.map((v) => v.toJson())
+          .toList();
     }
     if (userMembershipInfo != null) {
-      map['user_membership_info'] =
-          userMembershipInfo?.map((v) => v.toJson()).toList();
+      map['user_membership_info'] = userMembershipInfo
+          ?.map((v) => v.toJson())
+          .toList();
     }
     if (attachmentInfo != null) {
       map['attachment_info'] = attachmentInfo?.map((v) => v.toJson()).toList();
@@ -397,10 +397,7 @@ class UserProfileImg {
 }
 
 class UserWorkType {
-  UserWorkType({
-    this.code,
-    this.value,
-  });
+  UserWorkType({this.code, this.value});
 
   UserWorkType.fromJson(dynamic json) {
     code = json['code'];

@@ -300,6 +300,10 @@ class _LoginPageOtpState extends State<LoginPageOtp> {
                           prefs.setString(
                               AppStrings.prefRole,
                               loginPinRes.apiResponse![0].userLoginInfo!
+                                  .userRoleType!);;
+                          prefs.setString(
+                              AppStrings.prefRole,
+                              loginPinRes.apiResponse![0].userLoginInfo!
                                   .userRoleType!);
                           prefs.setString(
                               AppStrings.prefAuthID,

@@ -16,6 +16,7 @@ import 'package:hencafe/screens/egg_price_screen.dart';
 import 'package:hencafe/screens/egg_sell_create_screen.dart';
 import 'package:hencafe/screens/fragments/company_list_fragment.dart';
 import 'package:hencafe/screens/fragments/sellers_list_fragment.dart';
+import 'package:hencafe/screens/image_preview_screen.dart';
 import 'package:hencafe/screens/lifting_price_screen.dart';
 import 'package:hencafe/screens/lifting_sell_create_screen.dart';
 import 'package:hencafe/screens/login_screen_mobile.dart';
@@ -31,7 +32,9 @@ import 'package:hencafe/screens/sale_details_screen.dart';
 import 'package:hencafe/screens/state_selection_screen.dart';
 import 'package:hencafe/screens/update_company_details.dart';
 import 'package:hencafe/screens/upload_file_screen.dart';
+import 'package:hencafe/screens/video_player_screen.dart';
 import 'package:hencafe/screens/welcome_screen.dart';
+import 'package:hencafe/widget/docs_preview_widget.dart';
 
 import 'invalid_route.dart';
 import 'values/app_routes.dart';
@@ -302,6 +305,30 @@ class Routes {
             mobile: UpdateCompanyDetailsScreen(),
             tablet: UpdateCompanyDetailsScreen(),
             desktop: UpdateCompanyDetailsScreen(),
+          ),
+        );
+      case AppRoutes.imagePreviewScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: ImagePreviewScreen(),
+            tablet: ImagePreviewScreen(),
+            desktop: ImagePreviewScreen(),
+          ),
+        );
+      case AppRoutes.videoPlayerScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: VideoPlayerScreen(),
+            tablet: VideoPlayerScreen(),
+            desktop: VideoPlayerScreen(),
+          ),
+        );
+      case AppRoutes.docPreviewScreen:
+        return getRoute(
+          widget: ResponsiveScaffold(
+            mobile: DocumentPreviewScreen(),
+            tablet: DocumentPreviewScreen(),
+            desktop: DocumentPreviewScreen(),
           ),
         );
       default:

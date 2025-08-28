@@ -77,6 +77,14 @@ class _DashboardScreenState extends State<DashboardScreen>
             .userMembershipInfo[0]
             .userFavStateMaxCount,
       );
+      prefs.setString(
+        AppStrings.prefMembershipType,
+        getProfileRes
+            .apiResponse![0]
+            .userMembershipInfo[0]
+            .userMembershipType
+            .value,
+      );
       if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
         prefs.setString(
           AppStrings.prefUserImage,

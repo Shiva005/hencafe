@@ -60,6 +60,7 @@ class AppStrings {
   static const String prefUserUUID = 'user_uuid';
   static const String prefAuthID = 'auth_id';
   static const String prefRole = 'role';
+  static const String prefMembershipType = 'membership_type';
   static const String prefFavStateMaxCount = 'fav_state_max_count';
   static const String prefIsUserVerified = 'is_user_verified';
   static const String prefAppSessionID = 'app_session_id';

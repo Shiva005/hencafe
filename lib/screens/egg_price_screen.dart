@@ -290,7 +290,8 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
             actions: [
               GestureDetector(
                 onTap: () async {
-                  if (prefs.getString(AppStrings.prefRole) != "U") {
+                  if (prefs.getString(AppStrings.prefMembershipType) !=
+                      "Trial") {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellEggScreen,
                       arguments: {'pageType': AppRoutes.eggPriceScreen},
@@ -303,7 +304,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       dialogBackgroundColor: Colors.white,
                       titleTextStyle: AppTheme.appBarText,
                       title:
-                          'Your role (${Utils.getUserRoleName(prefs.getString(AppStrings.prefRole))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
+                          'Your membership (${Utils.getUserRoleName(prefs.getString(AppStrings.prefMembershipType))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
                       btnOkOnPress: () async {},
                       btnOkText: 'OK',
                       btnOkColor: Colors.yellow.shade700,

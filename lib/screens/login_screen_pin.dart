@@ -32,8 +32,6 @@ class _LoginPagePinState extends State<LoginPagePin> {
 
   final RoundedLoadingButtonController _btnLoginController =
       RoundedLoadingButtonController();
-  final RoundedLoadingButtonController _btnLoginWithOtpController =
-      RoundedLoadingButtonController();
 
   void initializeControllers() {
     mobileController = TextEditingController()..addListener(controllerListener);

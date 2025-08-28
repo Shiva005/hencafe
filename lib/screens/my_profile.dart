@@ -1,5 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/navigation_helper.dart';
 import 'package:hencafe/models/attachment_model.dart';
 import 'package:hencafe/services/services.dart';
 import 'package:hencafe/utils/appbar_widget.dart';
@@ -15,8 +16,6 @@ import 'package:hencafe/widget/membership_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:hencafe/widget/user_details_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'image_preview_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -91,111 +90,107 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 /// Profile header
                 SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 160,
-                    child: Card(
-                      margin: EdgeInsets.zero,
-                      elevation: 0.2,
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade300,
-                                  border: Border.all(
-                                    width: 0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                alignment: Alignment.center,
-                                child:
-                                    (user.userBannerImg != null &&
-                                        user.userBannerImg!.isNotEmpty)
-                                    ? Image.network(
-                                        width: MediaQuery.of(
-                                          context,
-                                        ).size.width,
-                                        height: 100,
-                                        user.userBannerImg![0].attachmentPath!,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        AppIconsData.noImage,
-                                        width: 70,
-                                        height: 70,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                              Positioned(
-                                left: 16,
-                                bottom: -50,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ImagePreviewScreen(
-                                          imageUrl: user
-                                              .userProfileImg![0]
+                  child: Container(
+                    color: Colors.white,
+                    height: 150,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Container(
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              border: Border.all(width: 0, color: Colors.white),
+                            ),
+                            alignment: Alignment.center,
+                            child:
+                                (user.userBannerImg != null &&
+                                    user.userBannerImg!.isNotEmpty)
+                                ? GestureDetector(
+                                    onTap: () {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.imagePreviewScreen,
+                                        arguments: {
+                                          'imageUrl': user
+                                              .userBannerImg![0]
                                               .attachmentPath!,
-                                          pageType: AppRoutes.myProfileScreen,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Card(
-                                        elevation: 3.0,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            6,
+                                          'pageType': AppRoutes.myProfileScreen,
+                                        },
+                                      );
+                                    },
+                                    child: Image.network(
+                                      user.userBannerImg![0].attachmentPath!,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Image.asset(
+                                    AppIconsData.noImage,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
+
+                        // Profile image + name
+                        Positioned(
+                          left: 16,
+                          bottom: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              NavigationHelper.pushNamed(
+                                AppRoutes.imagePreviewScreen,
+                                arguments: {
+                                  'imageUrl':
+                                      user.userProfileImg![0].attachmentPath!,
+                                  'pageType': AppRoutes.myProfileScreen,
+                                },
+                              );
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Card(
+                                  elevation: 3.0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: user.userProfileImg!.isNotEmpty
+                                        ? Image.network(
+                                            user
+                                                .userProfileImg![0]
+                                                .attachmentPath!,
+                                            width: 70,
+                                            height: 70,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            AppIconsData.noImage,
+                                            width: 70,
+                                            height: 70,
+                                            fit: BoxFit.cover,
                                           ),
-                                          child: user.userProfileImg!.isNotEmpty
-                                              ? Image.network(
-                                                  user
-                                                      .userProfileImg![0]
-                                                      .attachmentPath!,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Image.asset(
-                                                  AppIconsData.noImage,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 5.0,
-                                          bottom: 15,
-                                        ),
-                                        child: Text(
-                                          user.userFirstName ?? 'No Name',
-                                          style: const TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 10),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 5.0,
+                                    bottom: 15,
+                                  ),
+                                  child: Text(
+                                    user.userFirstName ?? 'No Name',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

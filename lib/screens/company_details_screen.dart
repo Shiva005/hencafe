@@ -7,16 +7,15 @@ import 'package:hencafe/widget/company_details_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/navigation_helper.dart';
 import '../models/attachment_model.dart';
 import '../services/services.dart';
 import '../utils/appbar_widget.dart';
-import '../utils/my_logger.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
 import '../values/app_strings.dart';
 import '../values/app_theme.dart';
 import '../widget/attachment_widget.dart';
-import 'image_preview_screen.dart';
 
 class CompanyDetailsScreen extends StatefulWidget {
   const CompanyDetailsScreen({super.key});
@@ -37,17 +36,18 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     super.didChangeDependencies();
     if (referenceUUID.isEmpty) {
       final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
       referenceUUID = args['companyUUID'] ?? '';
       companyPromotionStatus = args['companyPromotionStatus'] ?? '';
       companyData = _fetchCompanyDetails(referenceUUID, companyPromotionStatus);
     }
   }
 
-  Future<CompanyProvidersModel> _fetchCompanyDetails(
-    String referenceUUID,
-    String companyPromotionStatus,
-  ) async {
+  Future<CompanyProvidersModel> _fetchCompanyDetails(String referenceUUID,
+      String companyPromotionStatus,) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getCompanyProvidersList(
       context,
@@ -92,10 +92,125 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           return DefaultTabController(
             length: 4,
             child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              headerSliverBuilder: (context, innerBoxIsScrolled) =>
+              [
                 // Your header card inside a sliver
                 SliverToBoxAdapter(
-                  child: SizedBox(
+                  child: Container(
+                    color: Colors.white,
+                    height: 150,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Container(
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              border: Border.all(width: 0, color: Colors.white),
+                            ),
+                            alignment: Alignment.center,
+                            child:
+                            (company.attachmentBannerInfo != null &&
+                                company.attachmentBannerInfo!.isNotEmpty)
+                                ? GestureDetector(
+                              onTap: () {
+                                NavigationHelper.pushNamed(
+                                  AppRoutes.imagePreviewScreen,
+                                  arguments: {
+                                    'imageUrl': company
+                                        .attachmentBannerInfo![0]
+                                        .attachmentPath!,
+                                    'pageType': AppRoutes.myProfileScreen,
+                                  },
+                                );
+                              },
+                              child: Image.network(
+                                company
+                                    .attachmentBannerInfo![0]
+                                    .attachmentPath!,
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                                : Image.asset(
+                              AppIconsData.noImage,
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+
+                        // Profile image + name
+                        Positioned(
+                          left: 16,
+                          bottom: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              NavigationHelper.pushNamed(
+                                AppRoutes.imagePreviewScreen,
+                                arguments: {
+                                  'imageUrl': company
+                                      .attachmentLogoInfo![0]
+                                      .attachmentPath!,
+                                  'pageType': AppRoutes.myProfileScreen,
+                                },
+                              );
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Card(
+                                  elevation: 3.0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child:
+                                    (company.attachmentBannerInfo != null &&
+                                        company
+                                            .attachmentBannerInfo!
+                                            .isNotEmpty)
+                                        ? Image.network(
+                                      company
+                                          .attachmentLogoInfo![0]
+                                          .attachmentPath!,
+                                      width: 70,
+                                      height: 70,
+                                      fit: BoxFit.cover,
+                                    )
+                                        : Image.asset(
+                                      AppIconsData.noImage,
+                                      width: 70,
+                                      height: 70,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 5.0,
+                                    bottom: 15,
+                                  ),
+                                  child: Text(
+                                    company.companyName ?? 'No Name',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /*SizedBox(
                     height: 160,
                     child: Card(
                       margin: const EdgeInsets.symmetric(
@@ -151,18 +266,14 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                 bottom: -50,
                                 child: GestureDetector(
                                   onTap: () {
-                                    logger.w("message");
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ImagePreviewScreen(
-                                          imageUrl: company
-                                              .attachmentLogoInfo![0]
-                                              .attachmentPath!,
-                                          pageType:
-                                              AppRoutes.companyDetailsScreen,
-                                        ),
-                                      ),
+                                    NavigationHelper.pushNamed(
+                                      AppRoutes.imagePreviewScreen,
+                                      arguments: {
+                                        'imageUrl': company
+                                            .attachmentLogoInfo![0]
+                                            .attachmentPath!,
+                                        'pageType':AppRoutes.companyDetailsScreen,
+                                      },
                                     );
                                   },
                                   child: Row(
@@ -214,7 +325,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                         ],
                       ),
                     ),
-                  ),
+                  ),*/
                 ),
 
                 // Pinned TabBar inside SliverPersistentHeader
@@ -249,7 +360,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     pageType: AppRoutes.companyDetailsScreen,
                     userCompanyUUID: referenceUUID,
                     createdByUserID:
-                        detailsModel.apiResponse![0].userBasicInfo![0].userId,
+                    detailsModel.apiResponse![0].userBasicInfo![0].userId,
                   ),
 
                   AddressWidget(
@@ -261,7 +372,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   AttachmentWidget(
                     attachments: attachments,
                     userId:
-                        detailsModel.apiResponse![0].userBasicInfo![0].userId ??
+                    detailsModel.apiResponse![0].userBasicInfo![0].userId ??
                         '',
                     currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
                     referenceFrom: "COMPANY",
@@ -333,11 +444,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => _tabBar.preferredSize.height;
 
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context,
+      double shrinkOffset,
+      bool overlapsContent,) {
     return Container(
       color: Colors.white, // background color for tab bar
       child: _tabBar,

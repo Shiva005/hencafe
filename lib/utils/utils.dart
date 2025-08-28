@@ -1,14 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../values/app_strings.dart';
 
 class Utils {
   static String formatDate(DateTime date) {
@@ -68,8 +60,11 @@ class Utils {
     }
     return age;
   }
+
   static int calculateTotalDays(String endDate) {
-    DateTime fromDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
+    DateTime fromDate = DateTime.parse(
+      DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    );
     DateTime toDate = DateTime.parse(endDate);
 
     int totalDays = toDate.difference(fromDate).inDays;
@@ -96,6 +91,7 @@ class Utils {
         return "User";
       case 'A':
         return "Admin";
+      case 'SA':
       case 'S':
         return "Super Admin";
       default:

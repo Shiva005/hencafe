@@ -1,15 +1,14 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:hencafe/widget/docs_preview_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../helpers/navigation_helper.dart';
 import '../models/attachment_model.dart';
-import '../screens/image_preview_screen.dart';
-import '../screens/video_player_screen.dart';
 import '../values/app_colors.dart';
 import '../values/app_icons.dart';
+import '../values/app_routes.dart';
 
 class AttachmentWidget extends StatefulWidget {
   final List<AttachmentInfo> attachments;
@@ -56,7 +55,7 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
   Future<void> _initializeVideo(int index, String url) async {
     if (_videoControllers.containsKey(index)) return; // Already initialized
 
-    final videoController = VideoPlayerController.network(url);
+    final videoController = VideoPlayerController.networkUrl(Uri.parse(url));
     await videoController.initialize();
 
     final chewieController = ChewieController(
@@ -271,42 +270,24 @@ class _AttachmentWidgetState extends State<AttachmentWidget> {
         return GestureDetector(
           onTap: () {
             if (att.attachmentType == 'image') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ImagePreviewScreen(
-                    imageUrl: path,
-                    pageType: "AttachmentWidget",
-                  ),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.imagePreviewScreen,
+                arguments: {'imageUrl': path, 'pageType': "AttachmentWidget"},
               );
             } else if (att.attachmentType == 'youtube') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      VideoPlayerScreen(videoUrl: path, pageType: "attachment"),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.videoPlayerScreen,
+                arguments: {'videoUrl': path, 'pageType': "attachment"},
               );
             } else if (att.attachmentType == 'video') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => VideoPlayerScreen(
-                    videoUrl: path,
-                    pageType: "AttachmentWidget",
-                  ),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.videoPlayerScreen,
+                arguments: {'videoUrl': path, 'pageType': "AttachmentWidget"},
               );
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DocumentPreviewScreen(
-                    url: path,
-                    pageType: "AttachmentWidget",
-                  ),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.docPreviewScreen,
+                arguments: {'url': path, 'pageType': "AttachmentWidget"},
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

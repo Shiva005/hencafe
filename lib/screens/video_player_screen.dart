@@ -8,14 +8,7 @@ import '../utils/appbar_widget.dart';
 import '../values/app_strings.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
-  final String videoUrl;
-  final String pageType;
-
-  const VideoPlayerScreen({
-    super.key,
-    required this.videoUrl,
-    required this.pageType,
-  });
+  const VideoPlayerScreen({super.key});
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
@@ -25,39 +18,49 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
   YoutubePlayerController? _youtubeController;
-  late bool isShorts;
+  bool isShorts = false;
+
+  String? videoUrl;
+  String? pageType;
 
   bool get isYoutube =>
-      widget.videoUrl.contains("youtube.com") ||
-      widget.videoUrl.contains("youtu.be");
+      videoUrl != null &&
+      (videoUrl!.contains("youtube.com") || videoUrl!.contains("youtu.be"));
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    videoUrl = args['videoUrl'] ?? '';
+    pageType = args['pageType'] ?? '';
+
+    _initializePlayer();
+  }
+
+  void _initializePlayer() {
+    if (videoUrl == null || videoUrl!.isEmpty) return;
 
     if (isYoutube) {
-      if (widget.videoUrl.contains("shorts")) {
-        isShorts = true;
-      } else {
-        isShorts = false;
+      isShorts = videoUrl!.contains("shorts");
+      String? videoId = YoutubePlayer.convertUrlToId(videoUrl!);
+      if (videoId != null) {
+        _youtubeController = YoutubePlayerController(
+          initialVideoId: videoId,
+          flags: const YoutubePlayerFlags(
+            mute: false,
+            autoPlay: true,
+            disableDragSeek: false,
+            loop: false,
+            isLive: false,
+            forceHD: false,
+            enableCaption: true,
+          ),
+        );
       }
-      String videoId = YoutubePlayer.convertUrlToId(widget.videoUrl)!;
-      _youtubeController = YoutubePlayerController(
-        initialVideoId: videoId,
-        flags: const YoutubePlayerFlags(
-          mute: false,
-          autoPlay: true,
-          disableDragSeek: false,
-          loop: false,
-          isLive: false,
-          forceHD: false,
-          enableCaption: true,
-        ),
-      );
     } else {
-      // ✅ Normal video
       _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl),
+        Uri.parse(videoUrl!),
       );
 
       _videoPlayerController!.initialize().then((_) {
@@ -79,7 +82,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
     }
 
-    logger.d("Video URL: ${widget.videoUrl}");
+    logger.d("Video URL: $videoUrl");
   }
 
   @override
@@ -94,12 +97,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: widget.pageType == "AppStatus"
-          ? null
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(60.0),
-              child: MyAppBar(title: AppStrings.videoPreview),
-            ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: MyAppBar(title: AppStrings.videoPreview),
+      ),
       body: Center(
         child: isYoutube
             ? (_youtubeController != null
@@ -107,7 +108,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       aspectRatio: isShorts ? 9 / 16 : 16 / 9,
                       child: YoutubePlayer(
                         controller: _youtubeController!,
-                        bottomActions: [
+                        bottomActions: const [
                           CurrentPosition(),
                           ProgressBar(isExpanded: true),
                           FullScreenButton(),

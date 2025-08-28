@@ -4,14 +4,11 @@ import 'package:hencafe/screens/fragments/company_list_fragment.dart';
 import 'package:hencafe/screens/fragments/more_fragment.dart';
 import 'package:hencafe/screens/fragments/sale_fragment.dart';
 import 'package:hencafe/screens/fragments/sellers_list_fragment.dart';
-import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/services.dart';
-import '../../values/app_strings.dart';
-import '../../widget/attachment_widget.dart';
 import 'app_status_fragment.dart';
 
 class HomeFragment extends StatelessWidget {
@@ -46,13 +43,12 @@ class HomeFragment extends StatelessWidget {
           ),
         ),
       ],
-      navBarBuilder: (navBarConfig) =>
-          Style1BottomNavBar(
-            navBarConfig: navBarConfig,
-            navBarDecoration: NavBarDecoration(
-              color: Colors.white, // <-- This sets the background color
-            ),
-          ),
+      navBarBuilder: (navBarConfig) => Style1BottomNavBar(
+        navBarConfig: navBarConfig,
+        navBarDecoration: NavBarDecoration(
+          color: Colors.white, // <-- This sets the background color
+        ),
+      ),
     );
   }
 }
@@ -80,8 +76,11 @@ class _HomeFragmentState extends State<Home>
   Future<void> fetchStatusHistory() async {
     prefs = await SharedPreferences.getInstance();
     setState(() => isLoading = true);
-    contactData =
-    await AuthServices().getContactHistory(context, "APP_STATUS", "");
+    contactData = await AuthServices().getContactHistory(
+      context,
+      "APP_STATUS",
+      "",
+    );
 
     setState(() {
       attachments = contactData.apiResponse![0].attachmentInfo ?? [];

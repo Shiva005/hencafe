@@ -1,7 +1,9 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hencafe/helpers/navigation_helper.dart';
 import 'package:hencafe/models/contact_history_model.dart';
 import 'package:hencafe/services/services.dart';
+import 'package:hencafe/values/app_routes.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -10,8 +12,6 @@ import '../../models/attachment_model.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_icons.dart';
 import '../../widget/docs_preview_widget.dart';
-import '../image_preview_screen.dart';
-import '../video_player_screen.dart';
 
 class AppStatusScreen extends StatefulWidget {
   const AppStatusScreen({super.key});
@@ -207,7 +207,8 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                   alignment: Alignment.center,
                   children: [
                     Image.network(
-                      "https://img.youtube.com/vi/$videoId/0.jpg", // YouTube thumbnail
+                      "https://img.youtube.com/vi/$videoId/0.jpg",
+                      // YouTube thumbnail
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 150,
@@ -270,36 +271,27 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
         return GestureDetector(
           onTap: () {
             if (att.attachmentType == 'image') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      ImagePreviewScreen(imageUrl: path, pageType: "AppStatus"),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.imagePreviewScreen,
+                arguments: {'imageUrl': path, 'pageType': "AppStatus"},
               );
             } else if (att.attachmentType == 'video') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      VideoPlayerScreen(videoUrl: path, pageType: "AppStatus"),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.videoPlayerScreen,
+                arguments: {'videoUrl': path, 'pageType': "AppStatus"},
               );
             } else if (att.attachmentType == 'youtube') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      VideoPlayerScreen(videoUrl: path, pageType: "AppStatus"),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.videoPlayerScreen,
+                arguments: {'videoUrl': path, 'pageType': "AppStatus"},
               );
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      DocumentPreviewScreen(url: path, pageType: "AppStatus"),
-                ),
+              NavigationHelper.pushNamed(
+                AppRoutes.docPreviewScreen,
+                arguments: {
+                  'url': path,
+                  'pageType':"AppStatus",
+                },
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

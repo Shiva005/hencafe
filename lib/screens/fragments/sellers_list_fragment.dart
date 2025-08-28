@@ -8,13 +8,12 @@ import '../../services/services.dart';
 import '../../utils/appbar_widget.dart';
 import '../../utils/utils.dart';
 import '../../values/app_routes.dart';
-import '../image_preview_screen.dart';
 
 class SellerListFragment extends StatefulWidget {
   final String pageType;
 
   const SellerListFragment({Key? key, required this.pageType})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<SellerListFragment> createState() => _SellerListFragmentState();
@@ -78,7 +77,9 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                         },
                         child: Card(
                           margin: const EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 8),
+                            horizontal: 12.0,
+                            vertical: 8,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -96,42 +97,46 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                       color: Colors.grey.shade300,
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
-                                          width: 3, color: Colors.white),
+                                        width: 3,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     alignment: Alignment.center,
-                                    child: (seller.userBannerImg != null &&
+                                    child:
+                                        (seller.userBannerImg != null &&
                                             seller.userBannerImg!.isNotEmpty)
                                         ? Image.network(
-                                      width: MediaQuery.of(
-                                        context,
-                                      ).size.width,
-                                      height: 100,
-                                            seller.userBannerImg![0]
+                                            width: MediaQuery.of(
+                                              context,
+                                            ).size.width,
+                                            height: 100,
+                                            seller
+                                                .userBannerImg![0]
                                                 .attachmentPath!,
                                             fit: BoxFit.fitWidth,
                                           )
                                         : Image.asset(
                                             fit: BoxFit.fitWidth,
-                                            AppIconsData.noImage),
+                                            AppIconsData.noImage,
+                                          ),
                                   ),
                                   Positioned(
                                     left: 16,
                                     bottom: -50,
                                     child: GestureDetector(
                                       onTap: () {
-                                        if (seller.userProfileImg![0]
-                                            .attachmentPath!.isNotEmpty) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  ImagePreviewScreen(
-                                                imageUrl: seller
-                                                    .userProfileImg![0]
-                                                    .attachmentPath!,
-                                                pageType: 'SellerListFragment',
-                                              ),
-                                            ),
+                                        if (seller
+                                            .userProfileImg![0]
+                                            .attachmentPath!
+                                            .isNotEmpty) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.imagePreviewScreen,
+                                            arguments: {
+                                              'imageUrl': seller
+                                                  .userProfileImg![0]
+                                                  .attachmentPath!,
+                                              'pageType': 'SellerListFragment',
+                                            },
                                           );
                                         }
                                       },
@@ -144,39 +149,46 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(6),
-                                              child: (seller.userProfileImg !=
+                                              child:
+                                                  (seller.userProfileImg !=
                                                           null &&
-                                                      seller.userProfileImg!
+                                                      seller
+                                                          .userProfileImg!
                                                           .isNotEmpty)
                                                   ? (seller.attachmentInfo !=
-                                                              null &&
-                                                          seller.attachmentInfo!
-                                                              .isNotEmpty)
-                                                      ? Image.network(
-                                                          seller
-                                                              .attachmentInfo![
-                                                                  0]
-                                                              .attachmentPath!,
-                                                          width: 70,
-                                                          height: 70,
-                                                          fit: BoxFit.cover,
-                                                        )
-                                                      : Image.asset(
-                                                          width: 70,
-                                                          height: 70,
-                                                          fit: BoxFit.cover,
-                                                          AppIconsData.noImage)
+                                                                null &&
+                                                            seller
+                                                                .attachmentInfo!
+                                                                .isNotEmpty)
+                                                        ? Image.network(
+                                                            seller
+                                                                .attachmentInfo![0]
+                                                                .attachmentPath!,
+                                                            width: 70,
+                                                            height: 70,
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        : Image.asset(
+                                                            width: 70,
+                                                            height: 70,
+                                                            fit: BoxFit.cover,
+                                                            AppIconsData
+                                                                .noImage,
+                                                          )
                                                   : Image.asset(
                                                       width: 70,
                                                       height: 70,
                                                       fit: BoxFit.cover,
-                                                      AppIconsData.noImage),
+                                                      AppIconsData.noImage,
+                                                    ),
                                             ),
                                           ),
                                           const SizedBox(width: 10),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 5.0, bottom: 15),
+                                              left: 5.0,
+                                              bottom: 15,
+                                            ),
                                             child: Row(
                                               children: [
                                                 Text(
@@ -193,8 +205,9 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                                         size: 18,
                                                         Icons.verified_outlined,
                                                         color: Colors
-                                                            .green.shade700,
-                                                      )
+                                                            .green
+                                                            .shade700,
+                                                      ),
                                                     ],
                                                   ),
                                               ],
@@ -217,36 +230,46 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: seller.supplyInfo!
-                                            .map((e) =>
-                                                e.supplytypeNameLanguage ?? '')
+                                            .map(
+                                              (e) =>
+                                                  e.supplytypeNameLanguage ??
+                                                  '',
+                                            )
                                             .where((name) => name.isNotEmpty)
                                             .map((name) {
-                                          final color =
-                                              Utils.getRandomColor(name);
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 5.0),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.transparent,
-                                                border:
-                                                    Border.all(color: color),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                name,
-                                                style: TextStyle(
-                                                    color: Colors.black54,
-                                                    fontSize: 14.0),
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
+                                              final color =
+                                                  Utils.getRandomColor(name);
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  left: 5.0,
+                                                ),
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.transparent,
+                                                    border: Border.all(
+                                                      color: color,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 14.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            })
+                                            .toList(),
                                       ),
                                     ),
                                     const SizedBox(height: 12),
@@ -254,60 +277,78 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: seller.addressDetails!
-                                            .expand((address) =>
-                                                address.locationInfo!)
+                                            .expand(
+                                              (address) =>
+                                                  address.locationInfo!,
+                                            )
                                             .map((location) {
-                                          var addressAddress = '', zipCode = '';
-                                          try {
-                                            addressAddress = seller
-                                                    .addressDetails![index]
-                                                    .addressAddress ??
-                                                '';
-                                            zipCode = seller
-                                                    .addressDetails![index]
-                                                    .addressZipcode ??
-                                                '';
-                                          } catch (e) {
-                                            addressAddress = '';
-                                            zipCode = '';
-                                          }
-                                          final city =
-                                              location.cityNameLanguage ?? '';
-                                          final state =
-                                              location.stateNameLanguage ?? '';
-                                          final addressText =
-                                              '$addressAddress, $city, $state, $zipCode'
-                                                  .trim()
-                                                  .replaceAll(
-                                                      RegExp(r'^,|,$'), '');
+                                              var addressAddress = '',
+                                                  zipCode = '';
+                                              try {
+                                                addressAddress =
+                                                    seller
+                                                        .addressDetails![index]
+                                                        .addressAddress ??
+                                                    '';
+                                                zipCode =
+                                                    seller
+                                                        .addressDetails![index]
+                                                        .addressZipcode ??
+                                                    '';
+                                              } catch (e) {
+                                                addressAddress = '';
+                                                zipCode = '';
+                                              }
+                                              final city =
+                                                  location.cityNameLanguage ??
+                                                  '';
+                                              final state =
+                                                  location.stateNameLanguage ??
+                                                  '';
+                                              final addressText =
+                                                  '$addressAddress, $city, $state, $zipCode'
+                                                      .trim()
+                                                      .replaceAll(
+                                                        RegExp(r'^,|,$'),
+                                                        '',
+                                                      );
 
-                                          return Container(
-                                            margin:
-                                                const EdgeInsets.only(right: 8),
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.grey.shade300),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.location_on_outlined,
-                                                    size: 18,
-                                                    color: Colors.black54),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  addressText.isNotEmpty
-                                                      ? addressText
-                                                      : 'No Address',
-                                                  style: TextStyle(
-                                                      color: Colors.black54),
+                                              return Container(
+                                                margin: const EdgeInsets.only(
+                                                  right: 8,
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
+                                                padding: const EdgeInsets.all(
+                                                  12,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: Colors.grey.shade300,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .location_on_outlined,
+                                                      size: 18,
+                                                      color: Colors.black54,
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Text(
+                                                      addressText.isNotEmpty
+                                                          ? addressText
+                                                          : 'No Address',
+                                                      style: TextStyle(
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            })
+                                            .toList(),
                                       ),
                                     ),
                                   ],

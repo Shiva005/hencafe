@@ -632,8 +632,7 @@ class LiftingSaleCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                              '${liftingPriceModel.apiResponse![index].liftingsaleTotalBirds} Bird for sale' ??
-                                  '',
+                              '${liftingPriceModel.apiResponse![index].liftingsaleTotalBirds} Bird for sale',
                             ),
                           ],
                         ),

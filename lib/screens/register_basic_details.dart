@@ -179,7 +179,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           ),
                           onChanged: (query) {
                             setModalState(() {
-                              filteredStates = (_states ?? [])
+                              filteredStates = (_states)
                                   .where((item) =>
                                       (item.stateNameLanguage ?? '')
                                           .toLowerCase()
@@ -295,7 +295,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
                           ),
                           onChanged: (query) {
                             setModalState(() {
-                              filteredCities = (_city ?? [])
+                              filteredCities = (_city)
                                   .where((item) => (item.cityNameLanguage ?? '')
                                       .toLowerCase()
                                       .contains(query.toLowerCase()))
@@ -359,6 +359,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     'TR': 'Trader',
     'RET': 'Retailer',
     'DOC': 'Doctor',
+    'SOW': 'Shop Owner',
     'OTH': 'Others',
   };
 
@@ -366,6 +367,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
+      isScrollControlled: true, // ✅ allows dynamic height with scrolling
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -373,45 +375,49 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min, // ✅ shrink to fit content
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, bottom: 20.0),
                 child: Text(
                   'Work Type',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                 ),
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: workTypes.entries.map((entry) {
-                  final String key = entry.key;
-                  final String value = entry.value;
+              Flexible( // ✅ ensures it scrolls if too many items
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: workTypes.length,
+                  itemBuilder: (context, index) {
+                    final String key = workTypes.keys.elementAt(index);
+                    final String value = workTypes.values.elementAt(index);
 
-                  return ListTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          value,
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: Divider(
-                            height: 1,
-                            color: Colors.grey.shade300,
+                    return ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            value,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(fontSize: 16),
                           ),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      workTypeController.text = workTypes[key] ?? '';
-                      _selectedWorkType = key;
-                      Navigator.pop(context);
-                    },
-                  );
-                }).toList(),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15.0),
+                            child: Divider(
+                              height: 1,
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        workTypeController.text = value;
+                        _selectedWorkType = key;
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -419,6 +425,7 @@ class _RegisterBasicDetailsState extends State<RegisterBasicDetails> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

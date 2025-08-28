@@ -285,8 +285,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        ListView(
                           children: [
                             Card(
                               color: Colors.white,
@@ -446,7 +445,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
                                         Icons.calendar_today_outlined,
-                                        'Sale Start:',
+                                        'Sale Start',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -457,7 +456,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
                                         Icons.calendar_today_outlined,
-                                        'Sale Start:',
+                                        'Sale Start',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -469,7 +468,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                         AppRoutes.chickenPriceScreen)
                                       buildRow(
                                         Icons.calendar_today_outlined,
-                                        'Sale Start:',
+                                        'Sale Start',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -480,7 +479,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     if (pageType == AppRoutes.eggPriceScreen)
                                       buildRow(
                                         Icons.calendar_month,
-                                        'Sale End:',
+                                        'Sale End',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -491,7 +490,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                     if (pageType == AppRoutes.chickPriceScreen)
                                       buildRow(
                                         Icons.calendar_month,
-                                        'Sale End:',
+                                        'Sale End',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -503,7 +502,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                         AppRoutes.chickenPriceScreen)
                                       buildRow(
                                         Icons.calendar_month,
-                                        'Sale End:',
+                                        'Sale End',
                                         Utils.threeLetterDateFormatted(
                                           priceModel
                                                   .apiResponse![0]
@@ -551,11 +550,14 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                         'Comment',
                                         '${priceModel.apiResponse![0].liftingsaleComment ?? ''}',
                                       ),
+
                                     Padding(
                                       padding: const EdgeInsets.all(15.0),
                                       child: Column(
                                         children: [
                                           // Change Banner Image
+                                          if (pageType !=
+                                              AppRoutes.liftingPriceScreen)
                                           ElevatedButton.icon(
                                             onPressed: () {
                                               NavigationHelper.pushNamed(
@@ -813,12 +815,16 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                               ),
                                             ),
                                           if (priceModel
-                                                  .apiResponse![0]
-                                                  .userBasicInfo![0]
-                                                  .userId ==
+                                                      .apiResponse![0]
+                                                      .userBasicInfo![0]
+                                                      .userId ==
+                                                  prefs.getString(
+                                                    AppStrings.prefUserID,
+                                                  ) ||
                                               prefs.getString(
-                                                AppStrings.prefUserID,
-                                              ))
+                                                    AppStrings.prefRole,
+                                                  ) ==
+                                                  "SA")
                                             ElevatedButton.icon(
                                               onPressed: () {
                                                 AwesomeDialog(
@@ -1027,7 +1033,7 @@ Widget buildRow(IconData icon, String label, String value) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 4.0),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -1054,10 +1060,13 @@ Widget buildRow(IconData icon, String label, String value) {
                     ),
                   ),
                 )
-              : Text(
-                  value,
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(fontSize: 15, color: Colors.black),
+              : Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(fontSize: 15, color: Colors.black),
+                  ),
                 ),
         ),
       ],

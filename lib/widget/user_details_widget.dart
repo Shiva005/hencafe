@@ -75,7 +75,7 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -300,7 +300,16 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                           'pageType': AppRoutes.myProfileScreen,
                           'profileModel': widget.detailsModel.apiResponse![0],
                         },
-                      );
+                      )?.then((value) {
+                        NavigationHelper.pushReplacementNamed(
+                          AppRoutes.myProfileScreen,
+                          arguments: {
+                            'pageType': AppRoutes.dashboardScreen,
+                            'userID':
+                                widget.detailsModel.apiResponse![0].userId,
+                          },
+                        );
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,

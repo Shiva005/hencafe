@@ -184,161 +184,161 @@ class CompanyDetailsWidget extends StatelessWidget {
                   // Change Banner Image
                   if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
                       prefs.getString(AppStrings.prefUserID))
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      NavigationHelper.pushNamed(
-                        AppRoutes.uploadFileScreen,
-                        arguments: {
-                          'reference_from': "COMPANY_BANNER",
-                          'reference_uuid':
-                          detailsModel.apiResponse![0].companyUuid,
-                          'isSingleFilePick': true,
-                        },
-                      )?.then((value) {
-                        NavigationHelper.pushReplacementNamed(
-                          AppRoutes.companyDetailsScreen,
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.uploadFileScreen,
                           arguments: {
-                            'companyUUID':
-                            detailsModel.apiResponse![0].companyUuid,
-                            'companyPromotionStatus': 'true',
+                            'reference_from': "COMPANY_BANNER",
+                            'reference_uuid':
+                                detailsModel.apiResponse![0].companyUuid,
+                            'isSingleFilePick': true,
                           },
-                        );
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.camera_alt_outlined,
-                      color: Colors.white,
-                    ),
-                    label: const Text("Change Banner Image"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade300,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 35),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        )?.then((value) {
+                          NavigationHelper.pushReplacementNamed(
+                            AppRoutes.companyDetailsScreen,
+                            arguments: {
+                              'companyUUID':
+                                  detailsModel.apiResponse![0].companyUuid,
+                              'companyPromotionStatus': 'true',
+                            },
+                          );
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                        color: Colors.white,
+                      ),
+                      label: const Text("Change Banner Image"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange.shade300,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
                     ),
-                  ),
 
                   // Change Profile Image
                   if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
                       prefs.getString(AppStrings.prefUserID))
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      NavigationHelper.pushNamed(
-                        AppRoutes.uploadFileScreen,
-                        arguments: {
-                          'reference_from': "COMPANY_LOGO",
-                          'reference_uuid':
-                          detailsModel.apiResponse![0].companyUuid,
-                          'isSingleFilePick': true,
-                        },
-                      )?.then((value) {
-                        NavigationHelper.pushReplacementNamed(
-                          AppRoutes.companyDetailsScreen,
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.uploadFileScreen,
                           arguments: {
-                            'companyUUID':
-                            detailsModel.apiResponse![0].companyUuid,
-                            'companyPromotionStatus': 'true',
+                            'reference_from': "COMPANY_LOGO",
+                            'reference_uuid':
+                                detailsModel.apiResponse![0].companyUuid,
+                            'isSingleFilePick': true,
                           },
-                        );
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.camera_alt_outlined,
-                      color: Colors.white,
-                    ),
-                    label: const Text("Change Profile Image"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink.shade300,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 35),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        )?.then((value) {
+                          NavigationHelper.pushReplacementNamed(
+                            AppRoutes.companyDetailsScreen,
+                            arguments: {
+                              'companyUUID':
+                                  detailsModel.apiResponse![0].companyUuid,
+                              'companyPromotionStatus': 'true',
+                            },
+                          );
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                        color: Colors.white,
+                      ),
+                      label: const Text("Change Profile Image"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink.shade300,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
                     ),
-                  ),
                   const SizedBox(height: 20),
                   if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
                       prefs.getString(AppStrings.prefUserID))
-                  ElevatedButton(
-                    onPressed: () {
-                      NavigationHelper.pushNamed(
-                        AppRoutes.uploadFileScreen,
-                        arguments: {
-                          'reference_from': "COMPANY",
-                          'reference_uuid':
-                              detailsModel.apiResponse![0].companyUuid,
-                          'pageType': AppRoutes.addressDetailsScreen,
-                        },
-                      )?.then((value) {
+                    ElevatedButton(
+                      onPressed: () {
                         NavigationHelper.pushNamed(
-                          AppRoutes.companyDetailsScreen,
+                          AppRoutes.uploadFileScreen,
                           arguments: {
-                            'companyUUID':
+                            'reference_from': "COMPANY",
+                            'reference_uuid':
                                 detailsModel.apiResponse![0].companyUuid,
-                            'companyPromotionStatus': 'true',
+                            'pageType': AppRoutes.addressDetailsScreen,
                           },
-                        );
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 35),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        )?.then((value) {
+                          NavigationHelper.pushNamed(
+                            AppRoutes.companyDetailsScreen,
+                            arguments: {
+                              'companyUUID':
+                                  detailsModel.apiResponse![0].companyUuid,
+                              'companyPromotionStatus': 'true',
+                            },
+                          );
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text("Upload Attachment"),
+                          SizedBox(width: 8),
+                          Icon(Icons.file_upload_outlined, color: Colors.white),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text("Upload Attachment"),
-                        SizedBox(width: 8),
-                        Icon(Icons.file_upload_outlined, color: Colors.white),
-                      ],
-                    ),
-                  ),
                   // Update button with arrow
                   if (detailsModel.apiResponse![0].userBasicInfo![0].userId ==
                       prefs.getString(AppStrings.prefUserID))
-                  ElevatedButton(
-                    onPressed: () {
-                      NavigationHelper.pushNamed(
-                        AppRoutes.updateCompanyDetailsScreen,
-                        arguments: {
-                          'companyUUID':
-                              detailsModel.apiResponse![0].companyUuid,
-                          'companyPromotionStatus': 'true',
-                        },
-                      )?.then((result) {
-                        NavigationHelper.pushReplacementNamed(
-                          AppRoutes.companyDetailsScreen,
+                    ElevatedButton(
+                      onPressed: () {
+                        NavigationHelper.pushNamed(
+                          AppRoutes.updateCompanyDetailsScreen,
                           arguments: {
                             'companyUUID':
                                 detailsModel.apiResponse![0].companyUuid,
                             'companyPromotionStatus': 'true',
                           },
-                        );
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 35),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        )?.then((result) {
+                          NavigationHelper.pushReplacementNamed(
+                            AppRoutes.companyDetailsScreen,
+                            arguments: {
+                              'companyUUID':
+                                  detailsModel.apiResponse![0].companyUuid,
+                              'companyPromotionStatus': 'true',
+                            },
+                          );
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text("Update"),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_right_alt, color: Colors.white),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text("Update"),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_right_alt, color: Colors.white),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),

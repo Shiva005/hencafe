@@ -13,12 +13,11 @@ class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String? title;
 
   const MyAppBar(
-      {Key? key,
+      {super.key,
       this.title = '',
       this.centerTitle = false,
       this.titleStyle,
-      this.actions})
-      : super(key: key);
+      this.actions});
 
   @override
   State<MyAppBar> createState() => _MyAppBarState();
@@ -28,9 +27,6 @@ class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _MyAppBarState extends State<MyAppBar> {
-  var availPoints;
-  var prfs;
-
   @override
   void initState() {
     super.initState();
