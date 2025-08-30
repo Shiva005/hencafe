@@ -559,6 +559,7 @@ class AuthServices {
     String stateID,
     String cityID,
     String zipCode,
+    String referenceUUID,
   ) async {
     var prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> payload = {
@@ -571,7 +572,7 @@ class AuthServices {
       'reference_from': referenceFrom,
       'user_id': prefs.getString(AppStrings.prefUserID)!,
       'country_id': prefs.getString(AppStrings.prefCountryCode)!,
-      'reference_uuid': prefs.getString(AppStrings.prefUserUUID)!,
+      'reference_uuid': referenceUUID,
     };
 
     final response = await http.post(

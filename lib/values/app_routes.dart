@@ -14,7 +14,7 @@ class AppRoutes {
   static const String liftingPriceScreen = 'lifting_price_screen';
   static const String companyListScreen = 'company_list_Screen';
   static const String sellersListScreen = 'sellers_list_Screen';
-  static const String companyDetailsScreen = 'lifting_details_screen';
+  static const String companyDetailsScreen = 'company_details_screen';
   static const String forgotPassword = 'forgot_password';
   static const String verifyOtp = 'verify_otp';
   static const String dashboardScreen = 'dashboard_screen';

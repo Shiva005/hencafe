@@ -54,7 +54,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
   int selectedTab = 0;
   final PageController _attachmentController = PageController();
   var prefs;
-  String referenceFrom = "";
+  String referenceFrom = "", referenceFromButton = "";
 
   @override
   void initState() {
@@ -155,20 +155,37 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             prefs.getString(AppStrings.prefUserID))
           ElevatedButton(
             onPressed: () {
+              if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                referenceFromButton = "UpdateCompanyAddress";
+              } else if (widget.pageType == AppRoutes.myProfileScreen) {
+                referenceFromButton = "UpdateProfileAddress";
+              }
               NavigationHelper.pushNamed(
                 AppRoutes.createAddressScreen,
                 arguments: {
                   'addressModel': address,
-                  'pageType': "UpdateAddressScreen",
+                  'pageType': "UpdateCompanyAddressScreen",
+                  'referenceFromButton': referenceFromButton,
                 },
               )?.then((value) {
-                NavigationHelper.pushReplacementNamed(
-                  AppRoutes.myProfileScreen,
-                  arguments: {
-                    'pageType': AppRoutes.dashboardScreen,
-                    'userID': prefs.getString(AppStrings.prefUserID),
-                  },
-                );
+                if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.companyDetailsScreen,
+                    arguments: {
+                      'companyUUID': address.addressReferenceUuid,
+                      'companyPromotionStatus': '',
+                    },
+                  );
+                }
+                if (widget.pageType == AppRoutes.myProfileScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.myProfileScreen,
+                    arguments: {
+                      'pageType': AppRoutes.dashboardScreen,
+                      'userID': prefs.getString(AppStrings.prefUserID),
+                    },
+                  );
+                }
               });
             },
             style: ElevatedButton.styleFrom(
@@ -182,7 +199,7 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                Text("Edit Address"),
+                Text("Update Address"),
                 SizedBox(width: 8),
                 Icon(Icons.arrow_right_alt, color: Colors.white),
               ],
@@ -233,73 +250,91 @@ class _AddressWidgetDataState extends State<AddressWidgetData> {
           ),
         if (address.userBasicInfo![0].userId ==
             prefs.getString(AppStrings.prefUserID))
-        ElevatedButton(
-          onPressed: () {
-            NavigationHelper.pushNamed(
-              AppRoutes.uploadFileScreen,
-              arguments: {
-                'reference_from': "ADDRESS",
-                'reference_uuid': address.addressUuid,
-                'isSingleFilePick': false,
-              },
-            )?.then((value) {
-              if (widget.pageType == AppRoutes.companyDetailsScreen) {
-                NavigationHelper.pushReplacementNamed(
-                  AppRoutes.companyDetailsScreen,
-                  arguments: {
-                    'companyUUID': address.addressReferenceUuid,
-                    'companyPromotionStatus': '',
-                  },
-                );
-              }
-              if (widget.pageType == AppRoutes.myProfileScreen) {
-                NavigationHelper.pushReplacementNamed(
-                  AppRoutes.myProfileScreen,
-                  arguments: {
-                    'pageType': AppRoutes.dashboardScreen,
-                    'userID': prefs.getString(AppStrings.prefUserID),
-                  },
-                );
-              }
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.pink,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 35),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+          ElevatedButton(
+            onPressed: () {
+              NavigationHelper.pushNamed(
+                AppRoutes.uploadFileScreen,
+                arguments: {
+                  'reference_from': "ADDRESS",
+                  'reference_uuid': address.addressUuid,
+                  'isSingleFilePick': false,
+                },
+              )?.then((value) {
+                if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.companyDetailsScreen,
+                    arguments: {
+                      'companyUUID': address.addressReferenceUuid,
+                      'companyPromotionStatus': '',
+                    },
+                  );
+                }
+                if (widget.pageType == AppRoutes.myProfileScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.myProfileScreen,
+                    arguments: {
+                      'pageType': AppRoutes.dashboardScreen,
+                      'userID': prefs.getString(AppStrings.prefUserID),
+                    },
+                  );
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 35),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text("Upload Attachment"),
+                SizedBox(width: 8),
+                Icon(Icons.file_upload_outlined, color: Colors.white),
+              ],
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text("Upload Attachment"),
-              SizedBox(width: 8),
-              Icon(Icons.file_upload_outlined, color: Colors.white),
-            ],
-          ),
-        ),
 
         SizedBox(height: 20),
         if (address.userBasicInfo![0].userId ==
             prefs.getString(AppStrings.prefUserID))
           ElevatedButton(
             onPressed: () {
+              if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                referenceFromButton = "CreateCompanyAddress";
+              } else if (widget.pageType == AppRoutes.myProfileScreen) {
+                referenceFromButton = "CreateProfileAddress";
+              }
               NavigationHelper.pushNamed(
                 AppRoutes.createAddressScreen,
                 arguments: {
                   'addressModel': address,
                   'pageType': AppRoutes.createAddressScreen,
+                  'referenceFromButton': referenceFromButton,
+                  'referenceUUID': address.addressReferenceUuid,
                 },
               )?.then((value) {
-                NavigationHelper.pushReplacementNamed(
-                  AppRoutes.myProfileScreen,
-                  arguments: {
-                    'pageType': AppRoutes.dashboardScreen,
-                    'userID': prefs.getString(AppStrings.prefUserID),
-                  },
-                );
+                if (widget.pageType == AppRoutes.companyDetailsScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.companyDetailsScreen,
+                    arguments: {
+                      'companyUUID': address.addressReferenceUuid,
+                      'companyPromotionStatus': '',
+                    },
+                  );
+                }
+                if (widget.pageType == AppRoutes.myProfileScreen) {
+                  NavigationHelper.pushReplacementNamed(
+                    AppRoutes.myProfileScreen,
+                    arguments: {
+                      'pageType': AppRoutes.dashboardScreen,
+                      'userID': prefs.getString(AppStrings.prefUserID),
+                    },
+                  );
+                }
               });
             },
             style: ElevatedButton.styleFrom(

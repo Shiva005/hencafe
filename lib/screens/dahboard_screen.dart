@@ -85,10 +85,10 @@ class _DashboardScreenState extends State<DashboardScreen>
             .userMembershipType
             .value,
       );
-      if (getProfileRes.apiResponse![0].attachmentInfo!.length != 0) {
+      if (getProfileRes.apiResponse![0].userProfileImg!.length != 0) {
         prefs.setString(
           AppStrings.prefUserImage,
-          getProfileRes.apiResponse![0].attachmentInfo![0].attachmentPath,
+          getProfileRes.apiResponse![0].userProfileImg![0].attachmentPath!,
         );
       }
       prefs.setString(
@@ -153,6 +153,14 @@ class _DashboardScreenState extends State<DashboardScreen>
               },
             ),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.black54),
+                onPressed: () {
+                  NavigationHelper.pushReplacementNamedUntil(
+                    AppRoutes.dashboardScreen,
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(
                   Icons.notifications_active_outlined,

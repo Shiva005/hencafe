@@ -131,66 +131,74 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                             AppIconsData.noImage,
                                           ),
                                   ),
-                                  if (company.attachmentLogoInfo != null &&
-                                      company.attachmentLogoInfo!.isNotEmpty)
-                                    Positioned(
-                                      left: 16,
-                                      bottom: -50,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          if (company
-                                              .attachmentLogoInfo![0]
-                                              .attachmentPath!
-                                              .isNotEmpty) {
-                                            NavigationHelper.pushNamed(
-                                              AppRoutes.imagePreviewScreen,
-                                              arguments: {
-                                                'imageUrl': company
+                                  Positioned(
+                                    left: 16,
+                                    bottom: -50,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (company
+                                            .attachmentLogoInfo![0]
+                                            .attachmentPath!
+                                            .isNotEmpty) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.imagePreviewScreen,
+                                            arguments: {
+                                              'imageUrl': company
+                                                  .attachmentLogoInfo![0]
+                                                  .attachmentPath!,
+                                              'pageType': 'CompanyListFragment',
+                                            },
+                                          );
+                                        }
+                                      },
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Card(
+                                            elevation: 3.0,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(6),
+                                              child:
+                                              (company.attachmentLogoInfo !=
+                                                  null &&
+                                                  company
+                                                      .attachmentLogoInfo!
+                                                      .isNotEmpty)
+                                                  ? Image.network(
+                                                company
                                                     .attachmentLogoInfo![0]
                                                     .attachmentPath!,
-                                                'pageType':
-                                                    'CompanyListFragment',
-                                              },
-                                            );
-                                          }
-                                        },
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Card(
-                                              elevation: 3.0,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                child: Image.network(
-                                                  company
-                                                      .attachmentLogoInfo![0]
-                                                      .attachmentPath!,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                ),
+                                                width: 70,
+                                                height: 70,
+                                                fit: BoxFit.cover,
+                                              )
+                                                  : Image.asset(
+                                                width: 70,
+                                                height: 70,
+                                                fit: BoxFit.cover,
+                                                AppIconsData.noImage,
                                               ),
                                             ),
-                                            const SizedBox(width: 10),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 5.0,
-                                                bottom: 15,
-                                              ),
-                                              child: Text(
-                                                company.companyName ??
-                                                    'No Name',
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 5.0,
+                                              bottom: 15,
+                                            ),
+                                            child: Text(
+                                              company.companyName ?? 'No Name',
+                                              style: const TextStyle(
+                                                fontSize: 18,
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 40),
@@ -251,76 +259,71 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: company.addressDetails!
-                                            .expand(
-                                              (address) =>
-                                                  address.locationInfo!,
-                                            )
-                                            .map((location) {
-                                              var addressAddress = '',
-                                                  zipCode = '';
-                                              try {
-                                                addressAddress =
-                                                    company
-                                                        .addressDetails![index]
-                                                        .addressAddress ??
-                                                    '';
-                                                zipCode =
-                                                    company
-                                                        .addressDetails![index]
-                                                        .addressZipcode ??
-                                                    '';
-                                              } catch (e) {
-                                                addressAddress = '';
-                                                zipCode = '';
-                                              }
-                                              final city =
-                                                  location.cityNameLanguage ??
-                                                  '';
-                                              final state =
-                                                  location.stateNameLanguage ??
-                                                  '';
-                                              final addressText =
-                                                  '$addressAddress, $city, $state, $zipCode'
-                                                      .trim()
-                                                      .replaceAll(
-                                                        RegExp(r'^,|,$'),
-                                                        '',
-                                                      );
+                                            .asMap()
+                                            .entries
+                                            .expand((entry) {
+                                              final address = entry.value;
+                                              final addressAddress =
+                                                  address.addressAddress ?? '';
+                                              final zipCode =
+                                                  address.addressZipcode ?? '';
 
-                                              return Container(
-                                                margin: const EdgeInsets.only(
-                                                  right: 8,
-                                                ),
-                                                padding: const EdgeInsets.all(
-                                                  12,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.grey.shade300,
+                                              return address.locationInfo!.map((
+                                                location,
+                                              ) {
+                                                final city =
+                                                    location.cityNameLanguage ??
+                                                    '';
+                                                final state =
+                                                    location
+                                                        .stateNameLanguage ??
+                                                    '';
+                                                final addressText =
+                                                    '$addressAddress, $city, $state, $zipCode'
+                                                        .trim()
+                                                        .replaceAll(
+                                                          RegExp(r'^,|,$'),
+                                                          '',
+                                                        );
+
+                                                return Container(
+                                                  margin: const EdgeInsets.only(
+                                                    right: 8,
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .location_on_outlined,
-                                                      size: 18,
-                                                      color: Colors.black54,
+                                                  padding: const EdgeInsets.all(
+                                                    12,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color:
+                                                          Colors.grey.shade300,
                                                     ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      addressText.isNotEmpty
-                                                          ? addressText
-                                                          : 'No Address',
-                                                      style: TextStyle(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons
+                                                            .location_on_outlined,
+                                                        size: 18,
                                                         color: Colors.black54,
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        addressText.isNotEmpty
+                                                            ? addressText
+                                                            : 'No Address',
+                                                        style: const TextStyle(
+                                                          color: Colors.black54,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              });
                                             })
                                             .toList(),
                                       ),

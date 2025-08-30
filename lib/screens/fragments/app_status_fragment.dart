@@ -11,7 +11,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../models/attachment_model.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_icons.dart';
-import '../../widget/docs_preview_widget.dart';
 
 class AppStatusScreen extends StatefulWidget {
   const AppStatusScreen({super.key});
@@ -70,7 +69,6 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.symmetric(
                       vertical: 12,
-                      horizontal: 15,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -80,11 +78,14 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isExpanded || !isLongText
-                              ? fullText
-                              : "${fullText.substring(0, 160)}...",
-                          style: const TextStyle(fontSize: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            isExpanded || !isLongText
+                                ? fullText
+                                : "${fullText.substring(0, 160)}...",
+                            style: const TextStyle(fontSize: 16),
+                          ),
                         ),
                         if (isLongText) ...[
                           const SizedBox(height: 5),
@@ -124,7 +125,6 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(10),
       itemCount: data.length,
       itemBuilder: (context, index) {
         final att = data[index];
@@ -288,10 +288,7 @@ class _AppStatusScreenState extends State<AppStatusScreen> {
             } else if (['pdf', 'doc', 'docx'].contains(att.attachmentType)) {
               NavigationHelper.pushNamed(
                 AppRoutes.docPreviewScreen,
-                arguments: {
-                  'url': path,
-                  'pageType':"AppStatus",
-                },
+                arguments: {'url': path, 'pageType': "AppStatus"},
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/helpers/snackbar_helper.dart';
 import 'package:hencafe/models/supply_Info.dart';
 import 'package:hencafe/services/services.dart';
+import 'package:hencafe/utils/my_logger.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:hencafe/values/app_colors.dart';
 import 'package:hencafe/values/app_routes.dart';
@@ -46,6 +47,7 @@ class _SuppliesWidgetState extends State<SuppliesWidget> {
   Future<void> _loadData() async {
     prefs = await SharedPreferences.getInstance();
     final getSuppliesRes = await AuthServices().getSupplies(context);
+    logger.w(getSuppliesRes.apiResponse![0].supplytypeLanguage);
 
     if (getSuppliesRes.errorCount == 0 && mounted) {
       setState(() {
@@ -185,7 +187,7 @@ class _SuppliesWidgetState extends State<SuppliesWidget> {
                       final supplyId = supply.supplytypeId.toString();
 
                       return CheckboxListTile(
-                        title: Text(supply.supplytypeName ?? ''),
+                        title: Text(supply.supplytypeLanguage ?? ''),
                         value: _selectedSupplyIDs.contains(supplyId),
                         activeColor: AppColors.primaryColor,
                         onChanged: (checked) {

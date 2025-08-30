@@ -69,7 +69,20 @@ class _ChangeMobileScreenState extends State<ChangeMobileScreen> {
             ),
             child: ListView(
               children: [
-                Image.asset(AppIconsData.changeMobileIcon, height: 160),
+                Image.asset(AppIconsData.changeMobileIcon, height: 120),
+                const SizedBox(height: 16),
+                Center(
+                  child: const Text(
+                    "Change Mobile Number",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Please enter your current password to continue.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
                 const SizedBox(height: 40),
                 AppTextFormField(
                   keyboardType: TextInputType.number,

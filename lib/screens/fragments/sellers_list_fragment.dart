@@ -155,26 +155,14 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                                       seller
                                                           .userProfileImg!
                                                           .isNotEmpty)
-                                                  ? (seller.attachmentInfo !=
-                                                                null &&
-                                                            seller
-                                                                .attachmentInfo!
-                                                                .isNotEmpty)
-                                                        ? Image.network(
-                                                            seller
-                                                                .attachmentInfo![0]
-                                                                .attachmentPath!,
-                                                            width: 70,
-                                                            height: 70,
-                                                            fit: BoxFit.cover,
-                                                          )
-                                                        : Image.asset(
-                                                            width: 70,
-                                                            height: 70,
-                                                            fit: BoxFit.cover,
-                                                            AppIconsData
-                                                                .noImage,
-                                                          )
+                                                  ? Image.network(
+                                                      seller
+                                                          .userProfileImg![0]
+                                                          .attachmentPath!,
+                                                      width: 70,
+                                                      height: 70,
+                                                      fit: BoxFit.cover,
+                                                    )
                                                   : Image.asset(
                                                       width: 70,
                                                       height: 70,
@@ -277,76 +265,71 @@ class _SellerListFragmentState extends State<SellerListFragment> {
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: seller.addressDetails!
-                                            .expand(
-                                              (address) =>
-                                                  address.locationInfo!,
-                                            )
-                                            .map((location) {
-                                              var addressAddress = '',
-                                                  zipCode = '';
-                                              try {
-                                                addressAddress =
-                                                    seller
-                                                        .addressDetails![index]
-                                                        .addressAddress ??
-                                                    '';
-                                                zipCode =
-                                                    seller
-                                                        .addressDetails![index]
-                                                        .addressZipcode ??
-                                                    '';
-                                              } catch (e) {
-                                                addressAddress = '';
-                                                zipCode = '';
-                                              }
-                                              final city =
-                                                  location.cityNameLanguage ??
-                                                  '';
-                                              final state =
-                                                  location.stateNameLanguage ??
-                                                  '';
-                                              final addressText =
-                                                  '$addressAddress, $city, $state, $zipCode'
-                                                      .trim()
-                                                      .replaceAll(
-                                                        RegExp(r'^,|,$'),
-                                                        '',
-                                                      );
+                                            .asMap()
+                                            .entries
+                                            .expand((entry) {
+                                              final address = entry.value;
+                                              final addressAddress =
+                                                  address.addressAddress ?? '';
+                                              final zipCode =
+                                                  address.addressZipcode ?? '';
 
-                                              return Container(
-                                                margin: const EdgeInsets.only(
-                                                  right: 8,
-                                                ),
-                                                padding: const EdgeInsets.all(
-                                                  12,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.grey.shade300,
+                                              return address.locationInfo!.map((
+                                                location,
+                                              ) {
+                                                final city =
+                                                    location.cityNameLanguage ??
+                                                    '';
+                                                final state =
+                                                    location
+                                                        .stateNameLanguage ??
+                                                    '';
+                                                final addressText =
+                                                    '$addressAddress, $city, $state, $zipCode'
+                                                        .trim()
+                                                        .replaceAll(
+                                                          RegExp(r'^,|,$'),
+                                                          '',
+                                                        );
+
+                                                return Container(
+                                                  margin: const EdgeInsets.only(
+                                                    right: 8,
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .location_on_outlined,
-                                                      size: 18,
-                                                      color: Colors.black54,
+                                                  padding: const EdgeInsets.all(
+                                                    12,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color:
+                                                          Colors.grey.shade300,
                                                     ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      addressText.isNotEmpty
-                                                          ? addressText
-                                                          : 'No Address',
-                                                      style: TextStyle(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons
+                                                            .location_on_outlined,
+                                                        size: 18,
                                                         color: Colors.black54,
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        addressText.isNotEmpty
+                                                            ? addressText
+                                                            : 'No Address',
+                                                        style: const TextStyle(
+                                                          color: Colors.black54,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              });
                                             })
                                             .toList(),
                                       ),

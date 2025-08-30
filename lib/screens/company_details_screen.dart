@@ -36,18 +36,17 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
     super.didChangeDependencies();
     if (referenceUUID.isEmpty) {
       final args =
-      ModalRoute
-          .of(context)!
-          .settings
-          .arguments as Map<String, dynamic>;
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       referenceUUID = args['companyUUID'] ?? '';
       companyPromotionStatus = args['companyPromotionStatus'] ?? '';
       companyData = _fetchCompanyDetails(referenceUUID, companyPromotionStatus);
     }
   }
 
-  Future<CompanyProvidersModel> _fetchCompanyDetails(String referenceUUID,
-      String companyPromotionStatus,) async {
+  Future<CompanyProvidersModel> _fetchCompanyDetails(
+    String referenceUUID,
+    String companyPromotionStatus,
+  ) async {
     prefs = await SharedPreferences.getInstance();
     return await AuthServices().getCompanyProvidersList(
       context,
@@ -92,8 +91,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
           return DefaultTabController(
             length: 4,
             child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) =>
-              [
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 // Your header card inside a sliver
                 SliverToBoxAdapter(
                   child: Container(
@@ -112,38 +110,35 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                             ),
                             alignment: Alignment.center,
                             child:
-                            (company.attachmentBannerInfo != null &&
-                                company.attachmentBannerInfo!.isNotEmpty)
+                                (company.attachmentBannerInfo != null &&
+                                    company.attachmentBannerInfo!.isNotEmpty)
                                 ? GestureDetector(
-                              onTap: () {
-                                NavigationHelper.pushNamed(
-                                  AppRoutes.imagePreviewScreen,
-                                  arguments: {
-                                    'imageUrl': company
-                                        .attachmentBannerInfo![0]
-                                        .attachmentPath!,
-                                    'pageType': AppRoutes.myProfileScreen,
-                                  },
-                                );
-                              },
-                              child: Image.network(
-                                company
-                                    .attachmentBannerInfo![0]
-                                    .attachmentPath!,
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            )
+                                    onTap: () {
+                                      NavigationHelper.pushNamed(
+                                        AppRoutes.imagePreviewScreen,
+                                        arguments: {
+                                          'imageUrl': company
+                                              .attachmentBannerInfo![0]
+                                              .attachmentPath!,
+                                          'pageType': AppRoutes.myProfileScreen,
+                                        },
+                                      );
+                                    },
+                                    child: Image.network(
+                                      company
+                                          .attachmentBannerInfo![0]
+                                          .attachmentPath!,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
                                 : Image.asset(
-                              AppIconsData.noImage,
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.cover,
-                            ),
+                                    AppIconsData.noImage,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
 
@@ -171,24 +166,24 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(6),
                                     child:
-                                    (company.attachmentBannerInfo != null &&
-                                        company
-                                            .attachmentBannerInfo!
-                                            .isNotEmpty)
+                                        (company.attachmentBannerInfo != null &&
+                                            company
+                                                .attachmentBannerInfo!
+                                                .isNotEmpty)
                                         ? Image.network(
-                                      company
-                                          .attachmentLogoInfo![0]
-                                          .attachmentPath!,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    )
+                                            company
+                                                .attachmentLogoInfo![0]
+                                                .attachmentPath!,
+                                            width: 70,
+                                            height: 70,
+                                            fit: BoxFit.cover,
+                                          )
                                         : Image.asset(
-                                      AppIconsData.noImage,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    ),
+                                            AppIconsData.noImage,
+                                            width: 70,
+                                            height: 70,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -360,7 +355,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                     pageType: AppRoutes.companyDetailsScreen,
                     userCompanyUUID: referenceUUID,
                     createdByUserID:
-                    detailsModel.apiResponse![0].userBasicInfo![0].userId,
+                        detailsModel.apiResponse![0].userBasicInfo![0].userId,
                   ),
 
                   AddressWidget(
@@ -372,7 +367,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                   AttachmentWidget(
                     attachments: attachments,
                     userId:
-                    detailsModel.apiResponse![0].userBasicInfo![0].userId ??
+                        detailsModel.apiResponse![0].userBasicInfo![0].userId ??
                         '',
                     currentUserId: prefs.getString(AppStrings.prefUserID) ?? '',
                     referenceFrom: "COMPANY",
@@ -444,9 +439,11 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => _tabBar.preferredSize.height;
 
   @override
-  Widget build(BuildContext context,
-      double shrinkOffset,
-      bool overlapsContent,) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       color: Colors.white, // background color for tab bar
       child: _tabBar,

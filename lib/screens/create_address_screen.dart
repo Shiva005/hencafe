@@ -42,7 +42,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
   String? _selectedStateID;
   String? _selectedCityID;
   bool _isInitialized = false;
-  late final AddressDetails addressDetailsModel;
+  late AddressDetails addressDetailsModel;
 
   late SharedPreferences prefs;
 
@@ -416,9 +416,12 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final String pageType = args?['pageType'] ?? '';
+    final String referenceFromButton = args?['referenceFromButton'] ?? '';
+    var referenceUUID = args?['referenceUUID'] ?? '';
 
-    if (!_isInitialized && pageType != AppRoutes.createAddressScreen) {
+    if (!_isInitialized &&
+        (referenceFromButton == "UpdateCompanyAddress" ||
+            referenceFromButton == "UpdateProfileAddress")) {
       addressDetailsModel = args!['addressModel'];
       addressController.text = addressDetailsModel.addressAddress!;
       addressTypeController.text = addressDetailsModel.addressType!;
@@ -437,9 +440,11 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: MyAppBar(
-          title: pageType == AppRoutes.createAddressScreen
-              ? 'Create Address'
-              : 'Update Address',
+          title:
+              referenceFromButton == "UpdateCompanyAddress" ||
+                  referenceFromButton == "UpdateProfileAddress"
+              ? 'Update Address'
+              : 'Create Address',
         ),
       ),
       body: Padding(
@@ -634,18 +639,37 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
                                 var createAddressRes;
+                                var userCompanyType;
                                 var uuids = uuid.v1();
-                                if (pageType == AppRoutes.createAddressScreen) {
+                                if (referenceFromButton ==
+                                        "UpdateProfileAddress" ||
+                                    referenceFromButton ==
+                                        "CreateProfileAddress") {
+                                  userCompanyType = "USER";
+                                  referenceUUID = prefs.getString(
+                                    AppStrings.prefUserUUID,
+                                  )!;
+                                } else if (referenceFromButton ==
+                                        "UpdateCompanyAddress" ||
+                                    referenceFromButton ==
+                                        "CreateCompanyAddress") {
+                                  userCompanyType = "COMPANY";
+                                }
+                                if (referenceFromButton ==
+                                        "CreateCompanyAddress" ||
+                                    referenceFromButton ==
+                                        "CreateProfileAddress") {
                                   createAddressRes = await AuthServices()
                                       .createAddress(
                                         context,
                                         uuids,
-                                        'USER',
+                                        userCompanyType,
                                         addressTypeController.text,
                                         addressController.text,
                                         _selectedStateID!,
                                         _selectedCityID!,
                                         zipCodeController.text,
+                                        referenceUUID,
                                       );
                                   if (createAddressRes
                                           .apiResponse![0]
@@ -673,7 +697,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamedUntil(
+                                        NavigationHelper.pushReplacementNamed(
                                           AppRoutes.dashboardScreen,
                                         );
                                       },
@@ -688,7 +712,7 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                                         context,
                                         addressDetailsModel.addressId!,
                                         addressDetailsModel.addressUuid!,
-                                        'USER',
+                                        userCompanyType,
                                         addressTypeController.text,
                                         addressController.text,
                                         _selectedStateID!,
@@ -709,7 +733,10 @@ class _CreateAddressScreenState extends State<CreateAddressScreen> {
                             child: Row(
                               children: [
                                 Text(
-                                  pageType == AppRoutes.createAddressScreen
+                                  referenceFromButton ==
+                                              "CreateCompanyAddress" ||
+                                          referenceFromButton ==
+                                              "CreateProfileAddress"
                                       ? 'Create Address'
                                       : 'Update Address',
                                   style: TextStyle(color: Colors.white),

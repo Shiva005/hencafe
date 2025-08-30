@@ -270,6 +270,7 @@ class CompanyDetailsWidget extends StatelessWidget {
                             'reference_uuid':
                                 detailsModel.apiResponse![0].companyUuid,
                             'pageType': AppRoutes.addressDetailsScreen,
+                            'isSingleFilePick': false,
                           },
                         )?.then((value) {
                           NavigationHelper.pushNamed(
