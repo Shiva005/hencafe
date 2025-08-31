@@ -32,6 +32,8 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
   String _selectedLanguage = 'English';
   String versionName = "Unknown";
   var prfs;
+  bool? isChecked = true;
+  final List<String> languages = ['English', 'తెలుగు', 'हिन्दी'];
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
@@ -64,6 +66,7 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
 
   Future<void> fetchAppInfo() async {
     prfs = await SharedPreferences.getInstance();
+    final savedLang = prfs.getString(AppStrings.prefLanguage) ?? "en";
     if (prfs.containsKey(AppStrings.prefMobileNumber)) {
       setState(() {
         _rememberMe = true;
@@ -79,6 +82,13 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       versionName = packageInfo.version;
+      if (savedLang == "hi") {
+        _selectedLanguage = "हिन्दी";
+      } else if (savedLang == "te") {
+        _selectedLanguage = "తెలుగు";
+      } else {
+        _selectedLanguage = "English";
+      }
     });
   }
 
@@ -87,12 +97,6 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
     disposeControllers();
     super.dispose();
   }
-
-  final List<String> languages = [
-    'English',
-    'తెలుగు',
-    'हिन्दी',
-  ];
 
   void _showLanguageBottomSheet() {
     showModalBottomSheet(
@@ -161,32 +165,33 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 GestureDetector(
-                    onTap: _showLanguageBottomSheet,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.primaryColor, // Border color
-                          width: 1.0, // Border width
+                  onTap: _showLanguageBottomSheet,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: AppColors.primaryColor, // Border color
+                        width: 1.0, // Border width
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        20.0,
+                      ), // Rounded corners
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 6.0,
+                    ), // Inner padding
+                    child: Row(
+                      children: [
+                        Icon(Icons.language, color: AppColors.primaryColor),
+                        SizedBox(width: 5.0),
+                        Text(
+                          _selectedLanguage,
+                          style: TextStyle(color: AppColors.primaryColor),
                         ),
-                        borderRadius:
-                            BorderRadius.circular(20.0), // Rounded corners
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 6.0), // Inner padding
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.language,
-                            color: AppColors.primaryColor,
-                          ),
-                          SizedBox(width: 5.0),
-                          Text(
-                            _selectedLanguage,
-                            style: TextStyle(color: AppColors.primaryColor),
-                          ),
-                        ],
-                      ),
-                    )),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -197,7 +202,11 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                   key: _formKey,
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 30, bottom: 20),
+                      left: 20,
+                      right: 20,
+                      top: 30,
+                      bottom: 20,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -263,70 +272,88 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
                               width: MediaQuery.of(context).size.width * 0.4,
                               height: 40.0,
                               controller: _btnController,
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() == true) {
-                                  if (_rememberMe) {
-                                    setState(() {
-                                      prfs.setString(
-                                          AppStrings.prefMobileNumber,
-                                          mobileController.text);
-                                      prfs.setString(
-                                          AppStrings.prefCountryCode, '101');
-                                    });
-                                  } else {
-                                    prfs.remove(AppStrings.prefMobileNumber);
-                                  }
+                              onPressed: isChecked!
+                                  ? () async {
+                                      if (_formKey.currentState?.validate() ==
+                                          true) {
+                                        if (_rememberMe) {
+                                          setState(() {
+                                            prfs.setString(
+                                              AppStrings.prefMobileNumber,
+                                              mobileController.text,
+                                            );
+                                            prfs.setString(
+                                              AppStrings.prefCountryCode,
+                                              '101',
+                                            );
+                                          });
+                                        } else {
+                                          prfs.remove(
+                                            AppStrings.prefMobileNumber,
+                                          );
+                                        }
 
-                                  var registrationCheckRes =
-                                      await AuthServices().userExists(
-                                          context, mobileController.text);
+                                        var registrationCheckRes =
+                                            await AuthServices().userExists(
+                                              context,
+                                              mobileController.text,
+                                            );
 
-                                  if (registrationCheckRes
-                                          .apiResponse![0].registrationStatus ==
-                                      true) {
-                                    NavigationHelper.pushNamed(
-                                      AppRoutes.loginPin,
-                                      arguments: {
-                                        'mobileNumber': mobileController.text
-                                      },
-                                    );
-                                  } else {
-                                    AwesomeDialog(
-                                      context: context,
-                                      animType: AnimType.bottomSlide,
-                                      dialogType: DialogType.warning,
-                                      dialogBackgroundColor: Colors.white,
-                                      title: registrationCheckRes
-                                          .apiResponse![0].responseDetails,
-                                      titleTextStyle: AppTheme.appBarText,
-                                      descTextStyle: AppTheme.appBarText,
-                                      btnOkOnPress: () {
-                                        NavigationHelper.pushNamed(
-                                          AppRoutes.registerBasicDetails,
-                                          arguments: {
-                                            'mobileNumber':
-                                                mobileController.text,
-                                            'pageType':
-                                                AppRoutes.registerBasicDetails
-                                          },
-                                        );
-                                      },
-                                      btnOkText: 'Start Registration',
-                                      btnOkColor: Colors.yellow.shade700,
-                                    ).show();
-                                  }
-                                }
-                                _btnController.reset();
-                              },
-                              color: AppColors.primaryColor,
+                                        if (registrationCheckRes
+                                                .apiResponse![0]
+                                                .registrationStatus ==
+                                            true) {
+                                          NavigationHelper.pushNamed(
+                                            AppRoutes.loginPin,
+                                            arguments: {
+                                              'mobileNumber':
+                                                  mobileController.text,
+                                            },
+                                          );
+                                        } else {
+                                          AwesomeDialog(
+                                            context: context,
+                                            animType: AnimType.bottomSlide,
+                                            dialogType: DialogType.warning,
+                                            dialogBackgroundColor: Colors.white,
+                                            title: registrationCheckRes
+                                                .apiResponse![0]
+                                                .responseDetails,
+                                            titleTextStyle: AppTheme.appBarText,
+                                            descTextStyle: AppTheme.appBarText,
+                                            btnOkOnPress: () {
+                                              NavigationHelper.pushNamed(
+                                                AppRoutes.registerBasicDetails,
+                                                arguments: {
+                                                  'mobileNumber':
+                                                      mobileController.text,
+                                                  'pageType': AppRoutes
+                                                      .registerBasicDetails,
+                                                },
+                                              );
+                                            },
+                                            btnOkText: 'Start Registration',
+                                            btnOkColor: Colors.yellow.shade700,
+                                          ).show();
+                                        }
+                                      }
+                                      _btnController.reset();
+                                    }
+                                  : null,
+                              // disable button if unchecked
+                              color: isChecked!
+                                  ? AppColors.primaryColor
+                                  : Colors.grey,
+                              // update color
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     AppStrings.continueNext,
-                                    style: TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  SizedBox(width: 5.0),
-                                  Icon(
+                                  const SizedBox(width: 5.0),
+                                  const Icon(
                                     Icons.arrow_forward_rounded,
                                     color: Colors.white,
                                   ),
@@ -344,24 +371,50 @@ class _LoginPageMobileState extends State<LoginPageMobile> {
           ),
           Column(
             children: [
-              TextButton(
-                child: Text(AppStrings.privacyPolicy,
-                    style: TextStyle(color: AppColors.primaryColor)),
-                onPressed: () {
-                  Utils.openLink(AppStrings.privacyPolicyLink);
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (bool? newValue) {
+                      setState(() {
+                        isChecked = newValue ?? false;
+                      });
+                    },
+                  ),
+                  Text("I accept the", style: AppTheme.informationString),
+                  TextButton(
+                    child: Text(
+                      AppStrings.privacyPolicy,
+                      style: TextStyle(color: AppColors.primaryColor),
+                    ),
+                    onPressed: () {
+                      Utils.openLink(AppStrings.privacyPolicyLink);
+                    },
+                  ),
+                  Text("&", style: AppTheme.informationString),
+                  TextButton(
+                    child: Text(
+                      AppStrings.termsOfUse,
+                      style: TextStyle(color: AppColors.primaryColor),
+                    ),
+                    onPressed: () {
+                      Utils.openLink(AppStrings.privacyPolicyLink);
+                    },
+                  ),
+                ],
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('© 2024 SV Poultry Farms | v',
-                      style: AppTheme.informationString),
+                  Text(
+                    '© 2024 SV Poultry Farms | v',
+                    style: AppTheme.informationString,
+                  ),
                   Text(versionName, style: AppTheme.informationString),
                 ],
               ),
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 20.0),
             ],
           ),
         ],

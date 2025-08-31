@@ -28,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   int _tabIndex = 1;
   var prefs;
   String _packageName = '';
+  String _selectedLanguage = 'English';
 
   int get tabIndex => _tabIndex;
 
@@ -40,6 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     pageController = PageController(initialPage: _tabIndex);
     loadProfile();
+    _loadLanguagePreference();
     super.initState();
   }
 
@@ -127,6 +129,79 @@ class _DashboardScreenState extends State<DashboardScreen>
       ),
     );
     return exitApp ?? false;
+  }
+
+  final List<String> languages = ['English', 'తెలుగు', 'हिन्दी'];
+
+  Future<void> _loadLanguagePreference() async {
+    prefs = await SharedPreferences.getInstance();
+    final savedLang = prefs.getString(AppStrings.prefLanguage) ?? "en";
+
+    setState(() {
+      if (savedLang == "hi") {
+        _selectedLanguage = "हिन्दी";
+      } else if (savedLang == "te") {
+        _selectedLanguage = "తెలుగు";
+      } else {
+        _selectedLanguage = "English";
+      }
+    });
+  }
+
+  void _showLanguageBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Change Language",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ListView.separated(
+                shrinkWrap: true,
+                itemCount: languages.length,
+                separatorBuilder: (_, __) =>
+                    Divider(height: 2, color: Colors.grey.shade200),
+                itemBuilder: (context, index) {
+                  final lang = languages[index];
+                  return ListTile(
+                    leading: Radio<String>(
+                      value: lang,
+                      groupValue: _selectedLanguage,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedLanguage = value!;
+                          if (value == 'हिन्दी') {
+                            prefs.setString(AppStrings.prefLanguage, "hi");
+                          } else if (value == 'తెలుగు') {
+                            prefs.setString(AppStrings.prefLanguage, "te");
+                          } else {
+                            prefs.setString(AppStrings.prefLanguage, "en");
+                          }
+                          NavigationHelper.pushReplacementNamedUntil(
+                            AppRoutes.welcome,
+                          );
+                        });
+                      },
+                    ),
+                    title: Text(lang),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -343,6 +418,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           children: [
                             ListTile(
                               onTap: () {
+                                _showLanguageBottomSheet();
                                 _scaffoldKey.currentState?.closeDrawer();
                               },
                               visualDensity: const VisualDensity(

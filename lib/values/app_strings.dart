@@ -27,6 +27,7 @@ class AppStrings {
   static const String verify = 'Verify';
   static const String forgetPin = 'Forget Pin?';
   static const String privacyPolicy = 'Privacy Policy';
+  static const String termsOfUse = 'Terms & Conditions';
   static const String privacyPolicyLink =
       'https://svpfarms.in/privacy_policy.html';
   static const String shareText =
