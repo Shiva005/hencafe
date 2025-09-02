@@ -299,7 +299,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                                       children: [
                                         Text(
                                           /*${prefs.getString(AppStrings.prefLastName)} \n*/
-                                          '${prefs.getString(AppStrings.prefFirstName)}',
+                                          prefs
+                                              .getString(
+                                                AppStrings.prefFirstName,
+                                              )
+                                              .substring(
+                                                0,
+                                                (prefs
+                                                            .getString(
+                                                              AppStrings
+                                                                  .prefFirstName,
+                                                            )
+                                                            ?.length ??
+                                                        0)
+                                                    .clamp(0, 20),
+                                              ),
                                           style: AppTheme.primaryColorTextStyle,
                                         ),
                                       ],
