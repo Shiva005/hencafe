@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hencafe/screens/fragments/home_fragment.dart';
 import 'package:hencafe/values/app_strings.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -121,7 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           TextButton(
             onPressed: () async => {
               await AuthServices().appSessionEnd(context),
-              Navigator.of(context).pop(true),
+              SystemNavigator.pop(),
             }, // exit
             child: const Text("Yes"),
           ),
@@ -207,7 +208,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop: () {
+        return showLogoutDialog(
+          context,
+          "Exit App",
+          "Are you sure you want to exit App?",
+        );
+      },
       child: Scaffold(
         key: _scaffoldKey,
         appBar: PreferredSize(
@@ -583,7 +590,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                       child: TextButton(
                         onPressed: () {
                           _scaffoldKey.currentState?.closeDrawer();
-                          showLogoutDialog(context);
+                          showLogoutDialog(
+                            context,
+                            "Logout",
+                            "Are you sure you want to logout?",
+                          );
                         },
                         style: TextButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -630,8 +641,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
-  void showLogoutDialog(BuildContext context) {
-    showDialog(
+  Future<bool> showLogoutDialog(
+    BuildContext context,
+    String title,
+    String desc,
+  ) async {
+    final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -656,14 +671,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                 const SizedBox(height: 15),
                 // Logout Text
                 Text(
-                  "Logout",
+                  title,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
 
                 // Description Text
                 Text(
-                  "Are you sure you want to logout?",
+                  desc,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                 ),
@@ -684,32 +699,38 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                         ),
                         onPressed: () {
-                          var mb = prefs.getString(AppStrings.prefMobileNumber);
-                          var language = prefs.getString(
-                            AppStrings.prefLanguage,
-                          );
-                          var countryCode = prefs.getString(
-                            AppStrings.prefCountryCode,
-                          );
-                          var sessionID = prefs.getString(
-                            AppStrings.prefAppSessionID,
-                          );
-                          prefs.clear();
-                          prefs.setString(AppStrings.prefLanguage, language);
-                          prefs.setString(AppStrings.prefMobileNumber, mb);
-                          prefs.setString(
-                            AppStrings.prefCountryCode,
-                            countryCode,
-                          );
-                          prefs.setString(
-                            AppStrings.prefAppSessionID,
-                            sessionID,
-                          );
-                          NavigationHelper.pushReplacementNamedUntil(
-                            AppRoutes.loginMobile,
-                          );
+                          if (title == "Logout") {
+                            var mb = prefs.getString(
+                              AppStrings.prefMobileNumber,
+                            );
+                            var language = prefs.getString(
+                              AppStrings.prefLanguage,
+                            );
+                            var countryCode = prefs.getString(
+                              AppStrings.prefCountryCode,
+                            );
+                            var sessionID = prefs.getString(
+                              AppStrings.prefAppSessionID,
+                            );
+                            prefs.clear();
+                            prefs.setString(AppStrings.prefLanguage, language);
+                            prefs.setString(AppStrings.prefMobileNumber, mb);
+                            prefs.setString(
+                              AppStrings.prefCountryCode,
+                              countryCode,
+                            );
+                            prefs.setString(
+                              AppStrings.prefAppSessionID,
+                              sessionID,
+                            );
+                            NavigationHelper.pushReplacementNamedUntil(
+                              AppRoutes.loginMobile,
+                            );
+                          } else if (title == "Exit App") {
+                            SystemNavigator.pop();
+                          }
                         },
-                        child: Text("Yes, Logout"),
+                        child: Text("Yes, $title"),
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -726,7 +747,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context);
                         },
                         child: Text("Cancel"),
                       ),
@@ -739,5 +760,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         );
       },
     );
+    return result ?? false;
   }
 }

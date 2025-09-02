@@ -825,39 +825,41 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                         maxLines: 2,
                         prefixIcon: Icon(Icons.comment),
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Is Special Sale?",
-                              style: AppTheme.informationString,
+                      if (prefs.getString(AppStrings.prefMembershipType) ==
+                          "Platinum")
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Is Special Sale?",
+                                style: AppTheme.informationString,
+                              ),
                             ),
-                          ),
-                          Transform.scale(
-                            alignment: Alignment.centerRight,
-                            scale: 0.7, // Adjust the scale to reduce the size
-                            child: Switch(
-                              value: isSpecialSale,
-                              onChanged: (value) {
-                                setState(() {
-                                  isSpecialSale = value;
-                                  if (value) {
-                                    saleType = "Y";
-                                  } else {
-                                    saleType = "N";
-                                  }
-                                });
-                              },
-                              activeColor: AppColors.primaryColor,
-                              // Color when the switch is "on"
-                              inactiveThumbColor: Colors.black,
-                              // Thumb color when "off"
-                              inactiveTrackColor:
-                                  Colors.white, // Track color when "off"
+                            Transform.scale(
+                              alignment: Alignment.centerRight,
+                              scale: 0.7, // Adjust the scale to reduce the size
+                              child: Switch(
+                                value: isSpecialSale,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isSpecialSale = value;
+                                    if (value) {
+                                      saleType = "Y";
+                                    } else {
+                                      saleType = "N";
+                                    }
+                                  });
+                                },
+                                activeColor: AppColors.primaryColor,
+                                // Color when the switch is "on"
+                                inactiveThumbColor: Colors.black,
+                                // Thumb color when "off"
+                                inactiveTrackColor:
+                                    Colors.white, // Track color when "off"
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

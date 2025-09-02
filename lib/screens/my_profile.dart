@@ -16,6 +16,7 @@ import 'package:hencafe/widget/membership_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:hencafe/widget/user_details_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -176,14 +177,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 5.0,
-                                    bottom: 15,
-                                  ),
-                                  child: Text(
-                                    user.userFirstName ?? 'No Name',
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 15),
+                                  width: 250,
+                                  child: TextScroll(
+                                    '${user.userFirstName} ${user.userLastName}',
                                     style: const TextStyle(fontSize: 18),
+                                    intervalSpaces: 10,
+                                    velocity: const Velocity(
+                                      pixelsPerSecond: Offset(30, 0),
+                                    ),
+                                    fadedBorder: true,
+                                    fadeBorderVisibility:
+                                        FadeBorderVisibility.auto,
+                                    fadeBorderSide: FadeBorderSide.both,
                                   ),
                                 ),
                               ],

@@ -864,6 +864,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                         maxLines: 2,
                         prefixIcon: Icon(Icons.comment),
                       ),
+                      if (prefs.getString(AppStrings.prefMembershipType) ==
+                          "Platinum")
                       Row(
                         children: [
                           Expanded(

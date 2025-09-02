@@ -31,9 +31,9 @@ class AppStrings {
   static const String privacyPolicyLink =
       'https://svpfarms.in/privacy_policy.html';
   static const String shareText =
-      'Please, Check out HenCafe App for price details & more https://play.google.com/store/apps/details?';
+      'Please, Check out HenCafe App for price details & more https://play.google.com/store/apps/details?id=';
   static const String playStoreLink =
-      'https://play.google.com/store/apps/details?';
+      'https://play.google.com/store/apps/details?id=';
 
   ///Headers
   static const String createAccount = 'Create Account';

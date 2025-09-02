@@ -286,7 +286,8 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
             actions: [
               GestureDetector(
                 onTap: () async {
-                  if (prefs.getString(AppStrings.prefRole) != "U") {
+                  if (prefs.getString(AppStrings.prefMembershipType) !=
+                      "Trial") {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellChickenScreen,
                       arguments: {'pageType': AppRoutes.chickenPriceScreen},
@@ -299,7 +300,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
                       dialogBackgroundColor: Colors.white,
                       titleTextStyle: AppTheme.appBarText,
                       title:
-                          'Your role (${Utils.getUserRoleName(prefs.getString(AppStrings.prefRole))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
+                          'Your membership (${prefs.getString(AppStrings.prefMembershipType)}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
                       btnOkOnPress: () async {},
                       btnOkText: 'OK',
                       btnOkColor: Colors.yellow.shade700,

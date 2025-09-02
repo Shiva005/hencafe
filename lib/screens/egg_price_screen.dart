@@ -304,7 +304,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                       dialogBackgroundColor: Colors.white,
                       titleTextStyle: AppTheme.appBarText,
                       title:
-                          'Your membership (${Utils.getUserRoleName(prefs.getString(AppStrings.prefMembershipType))}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
+                          'Your membership (${prefs.getString(AppStrings.prefMembershipType)}) does not have permission to create new sale.\n\nPlease contact HenCafe Team to get this access.',
                       btnOkOnPress: () async {},
                       btnOkText: 'OK',
                       btnOkColor: Colors.yellow.shade700,

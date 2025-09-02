@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/utils/appbar_widget.dart';
 import 'package:hencafe/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../../helpers/navigation_helper.dart';
 import '../../models/company_providers_model.dart';
@@ -22,20 +23,59 @@ class CompanyListFragment extends StatefulWidget {
 class _CompanyListFragmentState extends State<CompanyListFragment> {
   late SharedPreferences prefs;
   late Future<CompanyProvidersModel> companyListData;
+  List<ApiResponse> _allCompanies = []; // keep all companies
+  List<ApiResponse> _filteredCompanies = []; // filtered companies
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     companyListData = _fetchData();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<CompanyProvidersModel> _fetchData() async {
     prefs = await SharedPreferences.getInstance();
+    CompanyProvidersModel result;
     if (widget.pageType == AppRoutes.companyListScreen) {
-      return await AuthServices().getCompanyProvidersList(context, '', 'false');
+      result = await AuthServices().getCompanyProvidersList(
+        context,
+        '',
+        'false',
+      );
     } else {
-      return await AuthServices().getCompanyProvidersList(context, '', 'true');
+      result = await AuthServices().getCompanyProvidersList(
+        context,
+        '',
+        'true',
+      );
     }
+
+    if (result.apiResponse != null) {
+      _allCompanies = result.apiResponse!
+          .where((c) => c.companyId != "100")
+          .toList();
+      _filteredCompanies = _allCompanies;
+    }
+
+    return result;
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredCompanies = _allCompanies.where((company) {
+        final name = company.companyName?.toLowerCase() ?? '';
+        return name.contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -45,31 +85,64 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
       appBar: widget.pageType == AppRoutes.companyListScreen
           ? MyAppBar(title: "Companies")
           : null,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            companyListData = _fetchData();
-          });
-        },
-        child: FutureBuilder<CompanyProvidersModel>(
-          future: companyListData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search Company by Name...",
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          // Company List
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  companyListData = _fetchData();
+                  _searchController.text = "";
+                });
+              },
+              child: FutureBuilder<CompanyProvidersModel>(
+                future: companyListData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-            final companies = (snapshot.data?.apiResponse ?? [])
-                .where((c) => c.companyId != "100")
-                .toList();
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  }
 
-            return companies.isNotEmpty
-                ? ListView.builder(
-                    itemCount: companies.length,
+                  // Populate _allCompanies and _filteredCompanies if not already done
+                  if (snapshot.hasData && _allCompanies.isEmpty) {
+                    final companies = (snapshot.data?.apiResponse ?? [])
+                        .where((c) => c.companyId != "100")
+                        .toList();
+                    _allCompanies = companies;
+                    _filteredCompanies = companies;
+                  }
+
+                  if (_filteredCompanies.isEmpty) {
+                    return const Center(child: Text("No companies available"));
+                  }
+                  return ListView.builder(
+                    itemCount: _filteredCompanies.length,
                     itemBuilder: (context, index) {
-                      final company = companies[index];
+                      final company = _filteredCompanies[index];
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
                       return GestureDetector(
                         onTap: () {
                           NavigationHelper.pushNamed(
@@ -86,7 +159,6 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                             vertical: 8,
                           ),
                           shape: RoundedRectangleBorder(
-                            //side: BorderSide(color: AppColors.primaryColor),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 0.2,
@@ -94,6 +166,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Banner & Logo
                               Stack(
                                 clipBehavior: Clip.none,
                                 children: [
@@ -114,89 +187,79 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                 .attachmentBannerInfo!
                                                 .isNotEmpty)
                                         ? Image.network(
+                                            company
+                                                .attachmentBannerInfo![0]
+                                                .attachmentPath!,
                                             width: MediaQuery.of(
                                               context,
                                             ).size.width,
                                             height: 100,
-
-                                            company
-                                                .attachmentBannerInfo![0]
-                                                .attachmentPath!,
                                             fit: BoxFit.fitWidth,
                                           )
                                         : Image.asset(
+                                            AppIconsData.noImage,
                                             width: 70,
                                             height: 70,
                                             fit: BoxFit.cover,
-                                            AppIconsData.noImage,
                                           ),
                                   ),
                                   Positioned(
                                     left: 16,
                                     bottom: -50,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (company
-                                            .attachmentLogoInfo![0]
-                                            .attachmentPath!
-                                            .isNotEmpty) {
-                                          NavigationHelper.pushNamed(
-                                            AppRoutes.imagePreviewScreen,
-                                            arguments: {
-                                              'imageUrl': company
-                                                  .attachmentLogoInfo![0]
-                                                  .attachmentPath!,
-                                              'pageType': 'CompanyListFragment',
-                                            },
-                                          );
-                                        }
-                                      },
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Card(
-                                            elevation: 3.0,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                              BorderRadius.circular(6),
-                                              child:
-                                              (company.attachmentLogoInfo !=
-                                                  null &&
-                                                  company
-                                                      .attachmentLogoInfo!
-                                                      .isNotEmpty)
-                                                  ? Image.network(
-                                                company
-                                                    .attachmentLogoInfo![0]
-                                                    .attachmentPath!,
-                                                width: 70,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                              )
-                                                  : Image.asset(
-                                                width: 70,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                                AppIconsData.noImage,
-                                              ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Card(
+                                          elevation: 3.0,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              6,
                                             ),
+                                            child:
+                                                (company.attachmentLogoInfo !=
+                                                        null &&
+                                                    company
+                                                        .attachmentLogoInfo!
+                                                        .isNotEmpty)
+                                                ? Image.network(
+                                                    company
+                                                        .attachmentLogoInfo![0]
+                                                        .attachmentPath!,
+                                                    width: 70,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : Image.asset(
+                                                    AppIconsData.noImage,
+                                                    width: 70,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                           ),
-                                          const SizedBox(width: 10),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 5.0,
-                                              bottom: 15,
-                                            ),
-                                            child: Text(
-                                              company.companyName ?? 'No Name',
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                              ),
-                                            ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 15,
                                           ),
-                                        ],
-                                      ),
+                                          width: 250,
+                                          child: TextScroll(
+                                            company.companyName ?? 'No Name',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            ),
+                                            intervalSpaces: 10,
+                                            velocity: const Velocity(
+                                              pixelsPerSecond: Offset(30, 0),
+                                            ),
+                                            fadedBorder: true,
+                                            fadeBorderVisibility:
+                                                FadeBorderVisibility.auto,
+                                            fadeBorderSide: FadeBorderSide.both,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -208,6 +271,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(height: 8),
+                                    // Supply Info
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -243,7 +307,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                                   ),
                                                   child: Text(
                                                     name,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.black54,
                                                       fontSize: 14.0,
                                                     ),
@@ -255,6 +319,7 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                                       ),
                                     ),
                                     const SizedBox(height: 12),
+                                    // Address Info
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -336,10 +401,12 @@ class _CompanyListFragmentState extends State<CompanyListFragment> {
                         ),
                       );
                     },
-                  )
-                : const Center(child: Text("No companies available"));
-          },
-        ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

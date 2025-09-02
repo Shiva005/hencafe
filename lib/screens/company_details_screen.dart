@@ -6,6 +6,7 @@ import 'package:hencafe/widget/address_widget.dart';
 import 'package:hencafe/widget/company_details_widget.dart';
 import 'package:hencafe/widget/supplies_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 import '../helpers/navigation_helper.dart';
 import '../models/attachment_model.dart';
@@ -192,9 +193,20 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                                     left: 5.0,
                                     bottom: 15,
                                   ),
-                                  child: Text(
-                                    company.companyName ?? 'No Name',
-                                    style: const TextStyle(fontSize: 18),
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: TextScroll(
+                                      company.companyName ?? 'No Name',
+                                      style: const TextStyle(fontSize: 18),
+                                      intervalSpaces: 10,
+                                      velocity: const Velocity(
+                                        pixelsPerSecond: Offset(30, 0),
+                                      ),
+                                      fadedBorder: true,
+                                      fadeBorderVisibility:
+                                          FadeBorderVisibility.auto,
+                                      fadeBorderSide: FadeBorderSide.both,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -204,123 +216,6 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> {
                       ],
                     ),
                   ),
-
-                  /*SizedBox(
-                    height: 160,
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      elevation: 0.2,
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade300,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                alignment: Alignment.center,
-                                child:
-                                    (company.attachmentBannerInfo != null &&
-                                        company
-                                            .attachmentBannerInfo!
-                                            .isNotEmpty)
-                                    ? Image.network(
-                                        company
-                                            .attachmentBannerInfo![0]
-                                            .attachmentPath!,
-                                        width: MediaQuery.of(
-                                          context,
-                                        ).size.width,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        width: 70,
-                                        height: 70,
-                                        fit: BoxFit.cover,
-                                        AppIconsData.noImage,
-                                      ),
-                              ),
-                              Positioned(
-                                left: 16,
-                                bottom: -50,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    NavigationHelper.pushNamed(
-                                      AppRoutes.imagePreviewScreen,
-                                      arguments: {
-                                        'imageUrl': company
-                                            .attachmentLogoInfo![0]
-                                            .attachmentPath!,
-                                        'pageType':AppRoutes.companyDetailsScreen,
-                                      },
-                                    );
-                                  },
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Card(
-                                        elevation: 3.0,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                          child:
-                                              company
-                                                  .attachmentLogoInfo!
-                                                  .isNotEmpty
-                                              ? Image.network(
-                                                  company
-                                                      .attachmentLogoInfo![0]
-                                                      .attachmentPath!,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Image.asset(
-                                                  AppIconsData.noImage,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 5.0,
-                                          bottom: 15,
-                                        ),
-                                        child: Text(
-                                          company.companyName ?? 'No Name',
-                                          style: const TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),*/
                 ),
 
                 // Pinned TabBar inside SliverPersistentHeader

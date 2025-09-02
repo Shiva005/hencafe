@@ -355,6 +355,7 @@ Widget buildRow(IconData icon, String label, String value) {
     padding: const EdgeInsets.symmetric(vertical: 4.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -366,6 +367,7 @@ Widget buildRow(IconData icon, String label, String value) {
             ),
           ],
         ),
+        SizedBox(width: 5),
         Expanded(
           child: label == "Website Url"
               ? GestureDetector(
