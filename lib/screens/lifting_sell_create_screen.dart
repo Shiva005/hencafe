@@ -101,11 +101,17 @@ class _LiftingSellCreateScreenState extends State<LiftingSellCreateScreen> {
 
   @override
   void initState() {
+    _initPrefs();
     initializeControllers();
     startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _fetchStates();
     getBirdBreedData();
     super.initState();
+  }
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
   }
 
   @override
@@ -858,9 +864,10 @@ class _LiftingSellCreateScreenState extends State<LiftingSellCreateScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamed(
+                                        NavigationHelper.pop(context);
+                                        /*NavigationHelper.pushReplacementNamed(
                                           AppRoutes.liftingPriceScreen,
-                                        );
+                                        );*/
                                       },
                                       btnOkText: 'Yes',
                                       btnCancelText: 'No',

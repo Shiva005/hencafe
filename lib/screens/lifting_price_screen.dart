@@ -52,7 +52,7 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
 
         await Share.shareXFiles([
           XFile(imagePath),
-        ], text: '${AppStrings.shareText}$_packageName}');
+        ], text: '${AppStrings.shareText}$_packageName');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),
@@ -286,7 +286,11 @@ class _LiftingPriceScreenState extends State<LiftingPriceScreen> {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellLiftingScreen,
                       arguments: {'pageType': AppRoutes.liftingPriceScreen},
-                    );
+                    )?.then((value) {
+                      NavigationHelper.pushReplacementNamed(
+                        AppRoutes.liftingPriceScreen,
+                      );
+                    });
                   } else {
                     AwesomeDialog(
                       context: context,

@@ -102,6 +102,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
 
   @override
   void initState() {
+    _initPrefs();
     initializeControllers();
     startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _fetchStates();
@@ -110,6 +111,10 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
     super.initState();
   }
 
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void dispose() {
     disposeControllers();
@@ -998,9 +1003,10 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamed(
+                                        NavigationHelper.pop(context);
+                                        /*NavigationHelper.pushReplacementNamed(
                                           AppRoutes.chickPriceScreen,
-                                        );
+                                        );*/
                                       },
                                       btnOkText: 'Yes',
                                       btnCancelText: 'No',

@@ -57,7 +57,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
 
         await Share.shareXFiles([
           XFile(imagePath),
-        ], text: '${AppStrings.shareText}$_packageName}');
+        ], text: '${AppStrings.shareText}$_packageName');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),

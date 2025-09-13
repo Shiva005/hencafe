@@ -62,4 +62,6 @@ class ServiceNames {
       '${BASE_URL}v1/lifting-sale/delete?liftingsale_uuid=';
   static String START_APP_SESSION = '${BASE_URL}v1/session-track/start';
   static String END_APP_SESSION = '${BASE_URL}v1/session-track/end';
+  static String GET_PLAY_STORE_APP_VERSION = '${BASE_URL}v1/app-version?app_name=HENCAFE';
+  static String USER_INSTALLED_VERSION = '${BASE_URL}v1/app-version/user-use-version/create';
 }

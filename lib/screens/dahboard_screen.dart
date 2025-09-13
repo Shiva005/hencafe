@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../helpers/navigation_helper.dart';
+import '../models/playstore_model.dart';
 import '../services/services.dart';
 import '../utils/utils.dart';
 import '../values/app_colors.dart';
@@ -25,10 +26,10 @@ class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late PageController pageController;
-  var getProfileRes;
+  var getProfileRes, getPlayStoreVersion;
   int _tabIndex = 1;
   var prefs;
-  String _packageName = '';
+  String _packageName = '', appVersion = '';
   String _selectedLanguage = 'English';
 
   int get tabIndex => _tabIndex;
@@ -43,6 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     pageController = PageController(initialPage: _tabIndex);
     loadProfile();
     _loadLanguagePreference();
+    getPlayStoreAppVersion();
     super.initState();
   }
 
@@ -52,10 +54,23 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
+  Future<PlayStoreModel> getPlayStoreAppVersion() async {
+    getPlayStoreVersion = await AuthServices().getPlayStoreAppVersion(context);
+    if (getPlayStoreVersion.apiResponse![0].version != appVersion) {
+      showLogoutDialog(
+        context,
+        "Update Now",
+        "Current version is $appVersion\nLatest version is ${getPlayStoreVersion.apiResponse![0].version}\n\n${getPlayStoreVersion.apiResponse![0].detailsLanguage}",
+      );
+    }
+    return getPlayStoreVersion;
+  }
+
   Future<void> loadProfile() async {
     prefs = await SharedPreferences.getInstance();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _packageName = packageInfo.packageName;
+    appVersion = packageInfo.version;
     getProfileRes = await AuthServices().getProfile(
       context,
       prefs.getString(AppStrings.prefUserID),
@@ -106,30 +121,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       prefs.setBool(AppStrings.prefIsFavStateSelected, true);
     }
     setState(() {});
-  }
-
-  Future<bool> _onWillPop() async {
-    bool? exitApp = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Exit App"),
-        content: const Text("Do you really want to exit the app?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false), // stay
-            child: const Text("No"),
-          ),
-          TextButton(
-            onPressed: () async => {
-              await AuthServices().appSessionEnd(context),
-              SystemNavigator.pop(),
-            }, // exit
-            child: const Text("Yes"),
-          ),
-        ],
-      ),
-    );
-    return exitApp ?? false;
   }
 
   final List<String> languages = ['English', 'తెలుగు', 'हिन्दी'];
@@ -680,7 +671,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                     shape: BoxShape.circle,
                     color: Colors.red.shade50, // Light red background
                   ),
-                  child: Icon(Icons.logout, color: Colors.red, size: 30),
+                  child: Icon(
+                    title == "Update Now"
+                        ? Icons.install_mobile_outlined
+                        : Icons.logout_outlined,
+                    color: Colors.red,
+                    size: 30,
+                  ),
                 ),
                 const SizedBox(height: 15),
                 // Logout Text
@@ -742,6 +739,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                             );
                           } else if (title == "Exit App") {
                             SystemNavigator.pop();
+                          } else if (title == "Update Now") {
+                            rateApp();
                           }
                         },
                         child: Text("Yes, $title"),
@@ -760,8 +759,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.pop(context);
+                          if (title == "Update Now") {
+                            await AuthServices().sendInstalledAppVersion(
+                              context,
+                              appVersion,
+                            );
+                          }
                         },
                         child: Text("Cancel"),
                       ),

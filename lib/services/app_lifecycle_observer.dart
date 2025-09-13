@@ -36,15 +36,13 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
         startSession();
         break;
 
+      case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
         // App went to background or is disposed
         await endSession();
         break;
 
-      case AppLifecycleState.inactive:
-        // Do nothing (inactive is just temporary, e.g., phone call, lock screen)
-        break;
       case AppLifecycleState.hidden:
         break;
     }

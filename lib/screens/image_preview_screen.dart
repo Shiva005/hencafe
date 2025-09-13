@@ -34,7 +34,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
 
         await Share.shareXFiles([
           XFile(imagePath),
-        ], text: '${AppStrings.shareText}$_packageName}');
+        ], text: '${AppStrings.shareText}$_packageName');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),

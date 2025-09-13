@@ -98,6 +98,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
 
   @override
   void initState() {
+    _initPrefs();
     initializeControllers();
     startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _fetchStates();
@@ -106,6 +107,10 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
     super.initState();
   }
 
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void dispose() {
     disposeControllers();
@@ -453,7 +458,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                             flex: 7,
                             child: AppTextFormField(
                               controller: farmerPriceController,
-                              labelText: "Farmer Price",
+                              labelText: "Price",
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               maxLength: 6,
@@ -921,9 +926,10 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamed(
+                                        NavigationHelper.pop(context);
+                                        /*NavigationHelper.pushReplacementNamed(
                                           AppRoutes.chickenPriceScreen,
-                                        );
+                                        );*/
                                       },
                                       btnOkText: 'Yes',
                                       btnCancelText: 'No',

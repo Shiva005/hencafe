@@ -52,7 +52,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
 
         await Share.shareXFiles([
           XFile(imagePath),
-        ], text: '${AppStrings.shareText}$_packageName}');
+        ], text: '${AppStrings.shareText}$_packageName');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),
@@ -291,7 +291,11 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellChickenScreen,
                       arguments: {'pageType': AppRoutes.chickenPriceScreen},
-                    );
+                    )?.then((value) {
+                      NavigationHelper.pushReplacementNamed(
+                        AppRoutes.chickenPriceScreen,
+                      );
+                    });
                   } else {
                     AwesomeDialog(
                       context: context,
@@ -601,7 +605,7 @@ class ChickenPriceCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
-                              'Rs/Chick',
+                              'Rs/Kg',
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.grey,

@@ -57,7 +57,6 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   var saleType = "N";
   bool _isInitialized = false;
   late final eggPrice.ApiResponse eggPriceModel;
-
   late SharedPreferences prefs;
 
   void initializeControllers() {
@@ -97,6 +96,7 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
 
   @override
   void initState() {
+    _initPrefs();
     initializeControllers();
     startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _fetchStates();
@@ -109,6 +109,10 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
   void dispose() {
     disposeControllers();
     super.dispose();
+  }
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
   }
 
   Future<UserFavouriteStateModel> _fetchStates() async {
@@ -951,9 +955,10 @@ class _EggSellCreateScreenState extends State<EggSellCreateScreen> {
                                         );
                                       },
                                       btnCancelOnPress: () {
-                                        NavigationHelper.pushReplacementNamed(
+                                        NavigationHelper.pop(context);
+                                        /*NavigationHelper.pushReplacementNamed(
                                           AppRoutes.eggPriceScreen,
-                                        );
+                                        );*/
                                       },
                                       btnOkText: 'Yes',
                                       btnCancelText: 'No',

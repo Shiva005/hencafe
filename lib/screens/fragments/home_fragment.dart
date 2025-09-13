@@ -19,19 +19,19 @@ class HomeFragment extends StatelessWidget {
     return PersistentTabView(
       tabs: [
         PersistentTabConfig(
-          screen: Home(),
-          item: ItemConfig(
-            activeForegroundColor: AppColors.primaryColor,
-            icon: Icon(Icons.home),
-            title: "Home",
-          ),
-        ),
-        PersistentTabConfig(
           screen: SaleFragment(),
           item: ItemConfig(
             activeForegroundColor: AppColors.primaryColor,
             icon: Icon(Icons.currency_rupee),
-            title: "Sale",
+            title: "Price",
+          ),
+        ),
+        PersistentTabConfig(
+          screen: Home(),
+          item: ItemConfig(
+            activeForegroundColor: AppColors.primaryColor,
+            icon: Icon(Icons.info_outline),
+            title: "Info",
           ),
         ),
         PersistentTabConfig(
@@ -101,17 +101,17 @@ class _HomeFragmentState extends State<Home>
               labelColor: AppColors.primaryColor,
               indicatorColor: AppColors.primaryColor,
               tabs: [
+                Tab(text: 'Status'),
                 Tab(text: 'Company'),
                 Tab(text: 'Sellers'),
-                Tab(text: 'Status'),
               ],
             ),
             Expanded(
               child: TabBarView(
                 children: [
+                  AppStatusScreen(),
                   CompanyListFragment(pageType: "HomeFragment"),
                   SellerListFragment(pageType: "SellerFragment"),
-                  AppStatusScreen(),
                 ],
               ),
             ),

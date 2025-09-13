@@ -51,7 +51,7 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
 
         await Share.shareXFiles([
           XFile(imagePath),
-        ], text: '${AppStrings.shareText}$_packageName}');
+        ], text: '${AppStrings.shareText}$_packageName');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to capture screenshot')),
@@ -295,7 +295,11 @@ class _EggPriceScreenState extends State<EggPriceScreen> {
                     NavigationHelper.pushNamed(
                       AppRoutes.sellEggScreen,
                       arguments: {'pageType': AppRoutes.eggPriceScreen},
-                    );
+                    )?.then((value) {
+                      NavigationHelper.pushReplacementNamed(
+                        AppRoutes.eggPriceScreen,
+                      );
+                    });
                   } else {
                     AwesomeDialog(
                       context: context,

@@ -14,6 +14,7 @@ import 'package:hencafe/models/error_model.dart';
 import 'package:hencafe/models/faq_model.dart';
 import 'package:hencafe/models/forget_pin_model.dart';
 import 'package:hencafe/models/otp_generate_model.dart';
+import 'package:hencafe/models/playstore_model.dart';
 import 'package:hencafe/models/profile_model.dart';
 import 'package:hencafe/models/referral_model.dart';
 import 'package:hencafe/models/registration_check_model.dart';
@@ -136,7 +137,53 @@ class AuthServices {
       },
       body: jsonEncode(payload),
     );
-    logger.w(prefs.getString(AppStrings.prefAppSessionID));
+    logger.w(prefs.getString(AppStrings.prefMobileNumber));
+    return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+  }
+
+  Future<PlayStoreModel> getPlayStoreAppVersion(BuildContext context) async {
+    var prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(ServiceNames.GET_PLAY_STORE_APP_VERSION),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
+      },
+    );
+    logger.w(response.body);
+    return PlayStoreModel.fromJson(
+      json.decode(utf8.decode(response.bodyBytes)),
+    );
+  }
+
+  Future<SuccessModel> sendInstalledAppVersion(
+    BuildContext context,
+    String appVersion,
+  ) async {
+    var prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> payload = {
+      'app_name': "HENCAFE",
+      'user_mobile': prefs.getString(AppStrings.prefMobileNumber),
+      'user_uuid': prefs.getString(AppStrings.prefUserUUID),
+      'app_version': appVersion,
+    };
+
+    final response = await http.post(
+      Uri.parse(ServiceNames.USER_INSTALLED_VERSION),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'language': prefs.getString(AppStrings.prefLanguage)!,
+        'user-uuid': prefs.getString(AppStrings.prefUserUUID)!,
+        'user-id': prefs.getString(AppStrings.prefUserID)!,
+        'auth-uuid': prefs.getString(AppStrings.prefAuthID)!,
+        'session-id': prefs.getString(AppStrings.prefAppSessionID)!,
+      },
+      body: jsonEncode(payload),
+    );
+    logger.w(response.body);
     return SuccessModel.fromJson(json.decode(utf8.decode(response.bodyBytes)));
   }
 
