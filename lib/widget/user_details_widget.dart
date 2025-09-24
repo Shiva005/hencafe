@@ -220,6 +220,14 @@ class _UserDetailsWidgetState extends State<UserDetailsWidget> {
                           'isSingleFilePick': true,
                         },
                       )?.then((value) {
+                        prefs?.setString(
+                          AppStrings.prefUserImage,
+                          widget
+                              .detailsModel
+                              .apiResponse![0]
+                              .userProfileImg![0]
+                              .attachmentPath!,
+                        );
                         NavigationHelper.pushReplacementNamed(
                           AppRoutes.myProfileScreen,
                           arguments: {

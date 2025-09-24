@@ -466,7 +466,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                               prefixIcon: Icon(Icons.currency_rupee_outlined),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Enter Chick price';
+                                  return 'Enter Chicken price';
                                 }
                                 return null;
                               },
@@ -519,10 +519,11 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                                     return null;
                                   },
                                   onTap: () async {
+                                    DateTime today = DateTime.now();
                                     DateTime? pickedDate = await showDatePicker(
                                       context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
+                                      initialDate: today,
+                                      firstDate: DateTime(today.year, today.month, today.day),
                                       lastDate: DateTime(2040),
                                     );
                                     if (pickedDate != null) {
@@ -616,7 +617,7 @@ class _ChickenSellCreateScreenState extends State<ChickenSellCreateScreen> {
                                     context: context,
                                     initialDate: initialDate,
                                     firstDate: startDate.add(Duration(days: 0)),
-                                    lastDate: startDate.add(Duration(days: 14)),
+                                    lastDate: startDate.add(Duration(days: 30)),
                                   );
 
                                   if (pickedDate != null) {

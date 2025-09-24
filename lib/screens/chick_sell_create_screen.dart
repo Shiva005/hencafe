@@ -115,6 +115,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
     prefs = await SharedPreferences.getInstance();
     setState(() {});
   }
+
   @override
   void dispose() {
     disposeControllers();
@@ -361,6 +362,8 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
       getCityData(chickPriceModel.addressDetails![0].stateId!);
       isSpecialSale = chickPriceModel.isSpecialSale == 'Y';
       saleType = isSpecialSale ? 'Y' : 'N';
+      isVaccinated = chickPriceModel.isVaccinated == 'Y';
+      vaccinatedType = isVaccinated ? 'Y' : 'N';
       _isInitialized = true;
     }
 
@@ -379,12 +382,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
               Form(
                 key: _formKey,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    top: 20,
-                    bottom: 20,
-                  ),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -591,10 +589,11 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     return null;
                                   },
                                   onTap: () async {
+                                    DateTime today = DateTime.now();
                                     DateTime? pickedDate = await showDatePicker(
                                       context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
+                                      initialDate: today,
+                                      firstDate: DateTime(today.year, today.month, today.day),
                                       lastDate: DateTime(2040),
                                     );
                                     if (pickedDate != null) {
@@ -688,7 +687,7 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                                     context: context,
                                     initialDate: initialDate,
                                     firstDate: startDate.add(Duration(days: 0)),
-                                    lastDate: startDate.add(Duration(days: 14)),
+                                    lastDate: startDate.add(Duration(days: 30)),
                                   );
 
                                   if (pickedDate != null) {
@@ -871,39 +870,39 @@ class _ChickSellCreateScreenState extends State<ChickSellCreateScreen> {
                       ),
                       if (prefs.getString(AppStrings.prefMembershipType) ==
                           "Platinum")
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Is Special Sale?",
-                              style: AppTheme.informationString,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Is Special Sale?",
+                                style: AppTheme.informationString,
+                              ),
                             ),
-                          ),
-                          Transform.scale(
-                            alignment: Alignment.centerRight,
-                            scale: 0.7, // Adjust the scale to reduce the size
-                            child: Switch(
-                              value: isSpecialSale,
-                              onChanged: (value) {
-                                setState(() {
-                                  isSpecialSale = value;
-                                  if (value) {
-                                    saleType = "Y";
-                                  } else {
-                                    saleType = "N";
-                                  }
-                                });
-                              },
-                              activeColor: AppColors.primaryColor,
-                              // Color when the switch is "on"
-                              inactiveThumbColor: Colors.black,
-                              // Thumb color when "off"
-                              inactiveTrackColor:
-                                  Colors.white, // Track color when "off"
+                            Transform.scale(
+                              alignment: Alignment.centerRight,
+                              scale: 0.7, // Adjust the scale to reduce the size
+                              child: Switch(
+                                value: isSpecialSale,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isSpecialSale = value;
+                                    if (value) {
+                                      saleType = "Y";
+                                    } else {
+                                      saleType = "N";
+                                    }
+                                  });
+                                },
+                                activeColor: AppColors.primaryColor,
+                                // Color when the switch is "on"
+                                inactiveThumbColor: Colors.black,
+                                // Thumb color when "off"
+                                inactiveTrackColor:
+                                    Colors.white, // Track color when "off"
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

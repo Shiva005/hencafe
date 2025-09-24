@@ -12,6 +12,7 @@ import '../models/playstore_model.dart';
 import '../services/services.dart';
 import '../utils/utils.dart';
 import '../values/app_colors.dart';
+import '../values/app_icons.dart';
 import '../values/app_routes.dart';
 import '../values/app_theme.dart';
 
@@ -56,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Future<PlayStoreModel> getPlayStoreAppVersion() async {
     getPlayStoreVersion = await AuthServices().getPlayStoreAppVersion(context);
-    if (getPlayStoreVersion.apiResponse![0].version != appVersion) {
+    if (!getPlayStoreVersion.apiResponse![0].version.contains(appVersion)) {
       showLogoutDialog(
         context,
         "Update Now",
@@ -276,10 +277,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                             children: [
                               CircleAvatar(
                                 radius: 30,
-                                backgroundImage: NetworkImage(
-                                  prefs.getString(AppStrings.prefUserImage) ??
-                                      '',
-                                ),
+                                backgroundImage:
+                                    prefs.getString(AppStrings.prefUserImage) !=
+                                        null
+                                    ? NetworkImage(
+                                        prefs.getString(
+                                              AppStrings.prefUserImage,
+                                            ) ??
+                                            '',
+                                      )
+                                    : AssetImage(AppIconsData.noImage)
+                                          as ImageProvider,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 15.0),
@@ -589,42 +597,47 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: TextButton(
-                        onPressed: () {
-                          _scaffoldKey.currentState?.closeDrawer();
-                          showLogoutDialog(
-                            context,
-                            "Logout",
-                            "Are you sure you want to logout?",
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(30.0),
-                              bottom: Radius.circular(30.0),
+                    padding: const EdgeInsets.only(bottom: 50.0),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: TextButton(
+                            onPressed: () {
+                              _scaffoldKey.currentState?.closeDrawer();
+                              showLogoutDialog(
+                                context,
+                                "Logout",
+                                "Are you sure you want to logout?",
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(30.0),
+                                  bottom: Radius.circular(30.0),
+                                ),
+                              ),
+                              side: BorderSide(
+                                color: Colors.red, // Black border color
+                                width: 1, // Border width
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.logout, color: Colors.red),
+                                SizedBox(width: 10),
+                                Text(
+                                  AppStrings.logout,
+                                  style: AppTheme.rejectedTitle,
+                                ),
+                              ],
                             ),
                           ),
-                          side: BorderSide(
-                            color: Colors.red, // Black border color
-                            width: 1, // Border width
-                          ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.logout, color: Colors.red),
-                            SizedBox(width: 10),
-                            Text(
-                              AppStrings.logout,
-                              style: AppTheme.rejectedTitle,
-                            ),
-                          ],
-                        ),
-                      ),
+                        Text('App Version: $appVersion'),
+                      ],
                     ),
                   ),
                 ],

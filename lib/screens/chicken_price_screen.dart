@@ -119,7 +119,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
     final filterMap = {
       "Special Sale": ["All", "Yes", "No"],
       "State": favouriteStateList,
-      "Chicks": birdBreedList,
+      "Birds": birdBreedList,
       "My Data Only": ["All", "My Data Only"],
     };
     return filterMap[filter] ?? [];
@@ -136,55 +136,63 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Filter for $filter",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+            final double maxHeight = MediaQuery.of(context).size.height * 0.8;
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: maxHeight, // 👈 auto grow but never exceed 80%
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // auto height
+                  children: [
+                    Text(
+                      "Filter for $filter",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  if (items.isEmpty)
-                    const Text(
-                      "No items available for this filter.",
-                      textAlign: TextAlign.center,
-                    )
-                  else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) => ListTile(
-                        title: Text(items[index]),
-                        trailing: Radio<String>(
-                          value: items[index],
-                          groupValue: selectedFilters[filter],
-                          onChanged: (value) {
-                            setModalState(() {});
-                            setState(() {
-                              selectedFilters[filter] = value!;
-                            });
-                            Navigator.pop(context);
-                          },
+                    const SizedBox(height: 10),
+                    if (items.isEmpty)
+                      const Text(
+                        "No items available for this filter.",
+                        textAlign: TextAlign.center,
+                      )
+                    else
+                      Flexible(
+                        // 👈 allows list to scroll when needed
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: items.length,
+                          itemBuilder: (context, index) => ListTile(
+                            title: Text(items[index]),
+                            trailing: Radio<String>(
+                              value: items[index],
+                              groupValue: selectedFilters[filter],
+                              onChanged: (value) {
+                                setModalState(() {});
+                                setState(() {
+                                  selectedFilters[filter] = value!;
+                                });
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                          separatorBuilder: (context, index) => Divider(
+                            thickness: 1,
+                            height: 2.0,
+                            color: Colors.grey.shade300,
+                          ),
                         ),
                       ),
-                      separatorBuilder: (context, index) => Divider(
-                        thickness: 1,
-                        height: 2.0,
-                        color: Colors.grey.shade300,
-                      ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Close"),
                     ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Close"),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -202,7 +210,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
         "key": "is_special_sale",
         "transform": (String value) => value.toLowerCase() == "yes" ? "y" : "n",
       },
-      "Chicks": {
+      "Birds": {
         "key": "bird_breed_info.0.birdbreed_name_language",
         "transform": (String value) => value.toLowerCase(),
       },
@@ -436,7 +444,7 @@ class _ChickenPriceScreenState extends State<ChickenPriceScreen> {
                           for (final filter in [
                             "Special Sale",
                             "State",
-                            "Chicks",
+                            "Birds",
                             "My Data Only",
                           ])
                             FilterChipWidget(
@@ -576,9 +584,9 @@ class ChickenPriceCard extends StatelessWidget {
             8.0,
           ), // Optional: Adjust border radius
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 4),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 12),
           child: Column(
             children: [
               Row(
@@ -692,25 +700,30 @@ class ChickenPriceCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      Visibility(
-                        visible:
-                            chickenPriceModel
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.077,
+                    child: Column(
+                      children: [
+                        if (chickenPriceModel
                                 .apiResponse![index]
                                 .isSpecialSale ==
-                            "Y",
-                        child: Icon(
-                          Icons.card_giftcard,
+                            "Y")
+                          Icon(
+                            Icons.card_giftcard,
+                            color: AppColors.primaryColor,
+                            size: 20.0,
+                          ),
+                        Spacer(),
+                        Icon(
+                          Icons.arrow_right_alt_outlined,
                           color: AppColors.primaryColor,
-                          size: 20.0,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
+              /*const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -750,7 +763,7 @@ class ChickenPriceCard extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),

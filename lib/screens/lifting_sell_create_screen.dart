@@ -527,10 +527,11 @@ class _LiftingSellCreateScreenState extends State<LiftingSellCreateScreen> {
                                     return null;
                                   },
                                   onTap: () async {
+                                    DateTime today = DateTime.now();
                                     DateTime? pickedDate = await showDatePicker(
                                       context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
+                                      initialDate: today,
+                                      firstDate: DateTime(today.year, today.month, today.day),
                                       lastDate: DateTime(2040),
                                     );
                                     if (pickedDate != null) {
@@ -624,7 +625,7 @@ class _LiftingSellCreateScreenState extends State<LiftingSellCreateScreen> {
                                     context: context,
                                     initialDate: initialDate,
                                     firstDate: startDate.add(Duration(days: 0)),
-                                    lastDate: startDate.add(Duration(days: 14)),
+                                    lastDate: startDate.add(Duration(days: 30)),
                                   );
 
                                   if (pickedDate != null) {

@@ -576,9 +576,9 @@ class ChickPriceCard extends StatelessWidget {
             8.0,
           ), // Optional: Adjust border radius
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 4),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 12),
           child: Column(
             children: [
               Row(
@@ -701,7 +701,11 @@ class ChickPriceCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
-                                    '${chickPriceModel.apiResponse![index].birdAgeInDays!} Days',
+                                    Utils.convertDays(
+                                      chickPriceModel
+                                          .apiResponse![index]
+                                          .birdAgeInDays!,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -716,7 +720,11 @@ class ChickPriceCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
-                                    '${chickPriceModel.apiResponse![index].birdWeightInGrams!} Grams',
+                                    Utils.convertToKgAndGrams(
+                                      chickPriceModel
+                                          .apiResponse![index]
+                                          .birdWeightInGrams!,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -726,23 +734,28 @@ class ChickPriceCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      Visibility(
-                        visible:
-                            chickPriceModel.apiResponse![index].isSpecialSale ==
-                            "Y",
-                        child: Icon(
-                          Icons.card_giftcard,
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    child: Column(
+                      children: [
+                        if (chickPriceModel.apiResponse![index].isSpecialSale ==
+                            "Y")
+                          Icon(
+                            Icons.card_giftcard,
+                            color: AppColors.primaryColor,
+                            size: 20.0,
+                          ),
+                        Spacer(),
+                        Icon(
+                          Icons.arrow_right_alt_outlined,
                           color: AppColors.primaryColor,
-                          size: 20.0,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
+              /*const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -782,7 +795,7 @@ class ChickPriceCard extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),

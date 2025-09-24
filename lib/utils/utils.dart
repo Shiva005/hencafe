@@ -109,4 +109,32 @@ class Utils {
         return "No";
     }
   }
+
+  static String convertDays(int days) {
+    if (days < 7) {
+      return "$days day${days > 1 ? 's' : ''}";
+    } else if (days < 30) {
+      int weeks = (days / 7).floor();
+      return "$weeks week${weeks > 1 ? 's' : ''}";
+    } else if (days < 365) {
+      int months = (days / 30).floor();
+      return "$months month${months > 1 ? 's' : ''}";
+    } else {
+      int years = (days / 365).floor();
+      return "$years year${years > 1 ? 's' : ''}";
+    }
+  }
+
+  static String convertToKgAndGrams(int grams) {
+    int kg = grams ~/ 1000; // integer division
+    int remainingGrams = grams % 1000;
+
+    if (kg > 0 && remainingGrams > 0) {
+      return "$kg kg $remainingGrams grams";
+    } else if (kg > 0) {
+      return "$kg kg";
+    } else {
+      return "$remainingGrams grams";
+    }
+  }
 }

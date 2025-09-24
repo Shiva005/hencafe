@@ -576,9 +576,9 @@ class EggPriceCard extends StatelessWidget {
             8.0,
           ), // Optional: Adjust border radius
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 4),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 12),
           child: Column(
             children: [
               Row(
@@ -696,42 +696,45 @@ class EggPriceCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      Visibility(
-                        visible:
-                            eggPriceModel.apiResponse![index].isHatchingEgg ==
-                            "Y",
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 24.0,
-                              width: 24.0,
-                              child: Image.asset(
-                                AppIconsData.chick,
-                                color: AppColors.primaryColor,
-                                fit: BoxFit.contain,
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.077,
+                    child: Column(
+                      children: [
+                        if (eggPriceModel.apiResponse![index].isHatchingEgg ==
+                            "Y")
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: 18.0,
+                                width: 18.0,
+                                child: Image.asset(
+                                  AppIconsData.chick,
+                                  color: AppColors.primaryColor,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 5),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            eggPriceModel.apiResponse![index].isSpecialSale ==
-                            "Y",
-                        child: Icon(
-                          Icons.card_giftcard,
-                          color: AppColors.primaryColor,
+                              const SizedBox(height: 5),
+                            ],
+                          ),
+                        if (eggPriceModel.apiResponse![index].isSpecialSale ==
+                            "Y")
+                          Icon(
+                            Icons.card_giftcard,
+                            color: AppColors.primaryColor,
+                            size: 18.0,
+                          ),
+                        Spacer(),
+                        Icon(
                           size: 20.0,
+                          Icons.arrow_right_alt_outlined,
+                          color: AppColors.primaryColor,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
+              /*const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -771,7 +774,7 @@ class EggPriceCard extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),

@@ -528,9 +528,9 @@ class LiftingSaleCard extends StatelessWidget {
             8.0,
           ), // Optional: Adjust border radius
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 4),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 12),
           child: Column(
             children: [
               Row(
@@ -678,9 +678,20 @@ class LiftingSaleCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    child: Align(
+                      alignment: AlignmentGeometry.bottomRight,
+                      child: Icon(
+                        Icons.arrow_right_alt_outlined,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 5),
+
+              /*const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -720,7 +731,7 @@ class LiftingSaleCard extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hencafe/models/attachment_model.dart';
 import 'package:hencafe/models/chicken_price_model.dart';
 import 'package:hencafe/models/lifting_price_model.dart';
+import 'package:hencafe/utils/loading_dialog_helper.dart';
 import 'package:hencafe/widget/attachment_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -842,6 +843,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                                                   btnCancelOnPress: () {},
                                                   btnCancelText: 'Cancel',
                                                   btnOkOnPress: () async {
+                                                    LoadingDialogHelper.showLoadingDialog(context);
                                                     if (pageType ==
                                                         AppRoutes
                                                             .eggPriceScreen) {
